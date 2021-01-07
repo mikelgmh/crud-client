@@ -29,14 +29,14 @@ public class Order implements Serializable {
 
     private Set<Product> products;
 
-    private User user;
+    private UserModel user;
 
     //Getters and setters
-    public User getUser() {
+    public UserModel getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserModel user) {
         this.user = user;
     }
 

@@ -5,6 +5,8 @@
  */
 package crudclient.client;
 
+import crudclient.interfaces.User;
+import java.util.Set;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -21,7 +23,7 @@ import javax.ws.rs.client.WebTarget;
  *
  * @author Usuario
  */
-public class UserRESTClient {
+public class UserRESTClient implements User{
 
     private WebTarget webTarget;
     private Client client;
@@ -90,6 +92,26 @@ public class UserRESTClient {
 
     public void close() {
         client.close();
+    }
+
+    @Override
+    public Set<User> getUsers() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public User editUser(User user) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void deleteUser(User user) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void createUser(User user) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
