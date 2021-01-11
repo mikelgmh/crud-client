@@ -33,7 +33,7 @@ public class CRUDClient extends Application {
      */
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("view/userManagement.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("view/UserManagement.fxml"));
         Parent root = (Parent) loader.load();
         UserManagementController controller = ((UserManagementController) loader.getController());
         UserFactory userFactory = new UserFactory();
