@@ -11,9 +11,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Imanol
  */
 /**
- * Class containing all the orders and the products of which it consists. It
- * contains the following fields: order identification, product identification,
- * total price of the order and total quantity of products.
+ * Class containing all the orders and the orderProduct of which it consists. It
+ contains the following fields: order identification, product identification,
+ total price of the order and total quantity of orderProduct.
  */
 @XmlRootElement
 public class Order implements Serializable {
@@ -27,7 +27,7 @@ public class Order implements Serializable {
     //Pregunta Enumtype: ¿Ordinal o String?
     private OrderStatus status;
 
-    private Set<Product> products;
+    private Set<OrderProduct> orderProduct;
 
     private User user;
 
@@ -56,12 +56,12 @@ public class Order implements Serializable {
         this.total_price = total_price;
     }
 
-    public Set<Product> getProducts() {
-        return products;
+    public Set<OrderProduct> getOrderProduct() {
+        return orderProduct;
     }
 
-    public void setProducts(Set<Product> products) {
-        this.products = products;
+    public void setOrderProduct(Set<OrderProduct> orderProduct) {
+        this.orderProduct = orderProduct;
     }
 
     public Timestamp getDate() {
