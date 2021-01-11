@@ -41,4 +41,10 @@ public interface User {
      * @param user
      */
     public void createUser(User user);
+    
+    /**
+     * Gets the public encryption key.
+     * @return The public key.
+     */
+    public String getPublicKey();
 }

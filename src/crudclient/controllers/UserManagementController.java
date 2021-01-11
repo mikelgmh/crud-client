@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Parent;
 import crudclient.interfaces.User;
+import crudclient.util.security.AsymmetricEncryption;
 import crudclient.util.validation.GenericValidations;
 import javafx.fxml.FXML;
 
@@ -78,6 +79,11 @@ public class UserManagementController {
         stage.setResizable(false); // Prevents the user to resize the window.
         //stage.onCloseRequestProperty().set(this::handleCloseRequest);
         stage.show();
+        String prueba = this.userImplementation.getPublicKey();
+        AsymmetricEncryption enc = new AsymmetricEncryption(prueba);
+        String encryptedString = enc.encryptString("EEEE");
+        System.out.println(encryptedString);
+        System.out.println(prueba);
     }
 
     public void setListeners() {

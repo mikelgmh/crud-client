@@ -21,9 +21,9 @@ import javax.ws.rs.client.WebTarget;
  *        client.close();
  * </pre>
  *
- * @author Usuario
+ * @author Mikel
  */
-public class UserRESTClient implements User{
+public class UserRESTClient implements User {
 
     private WebTarget webTarget;
     private Client client;
@@ -32,6 +32,18 @@ public class UserRESTClient implements User{
     public UserRESTClient() {
         client = javax.ws.rs.client.ClientBuilder.newClient();
         webTarget = client.target(BASE_URI).path("user");
+    }
+
+    public <T> T getAllUsers_XML(Class<T> responseType) throws ClientErrorException {
+        WebTarget resource = webTarget;
+        resource = resource.path("user/getAllUsers");
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+    }
+
+    public <T> T getAllUsers_JSON(Class<T> responseType) throws ClientErrorException {
+        WebTarget resource = webTarget;
+        resource = resource.path("user/getAllUsers");
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
     public <T> T findUsersByName_XML(Class<T> responseType, String name) throws ClientErrorException {
@@ -86,6 +98,18 @@ public class UserRESTClient implements User{
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
 
+    public String getPublicKey_XML() throws ClientErrorException {
+        WebTarget resource = webTarget;
+        resource = resource.path("user/getPublicKey");
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(String.class);
+    }
+
+    public String getPublicKey_JSON() throws ClientErrorException {
+        WebTarget resource = webTarget;
+        resource = resource.path("user/getPublicKey");
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(String.class);
+    }
+
     public void remove(String id) throws ClientErrorException {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
     }
@@ -96,7 +120,8 @@ public class UserRESTClient implements User{
 
     @Override
     public Set<User> getUsers() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
+
     }
 
     @Override
@@ -113,5 +138,10 @@ public class UserRESTClient implements User{
     public void createUser(User user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    @Override
+    public String getPublicKey() {
+        return this.getPublicKey_JSON();
+    }
+
 }
