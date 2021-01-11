@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Parent;
 import crudclient.interfaces.User;
+import crudclient.util.validation.GenericValidations;
 import javafx.fxml.FXML;
 
 import javafx.scene.Scene;
@@ -25,6 +26,7 @@ public class UserManagementController {
 
     private Stage stage;
     private static final Logger logger = Logger.getLogger("signupsignin.controllers.SignUpController");
+    private GenericValidations genericValidations = new GenericValidations();
     private User userImplementation;
 
     @FXML
@@ -79,6 +81,14 @@ public class UserManagementController {
     }
 
     public void setListeners() {
+        this.txt_name.textProperty().addListener((obs, oldText, newText) -> {
+            this.genericValidations.minLength(this.txt_name, 3, newText, "minLengthValidator"); // Adds a min lenght validator
+            this.genericValidations.textLimiter(this.txt_name, 20, newText); // Limits the input to 20 characters
+            this.validate(); // Executes the validation.
+        });
+    }
+
+    public void validate() {
 
     }
 
@@ -88,6 +98,10 @@ public class UserManagementController {
 
     public void setUserImplementation(User user) {
         this.userImplementation = user;
+    }
+
+    public User getUserImplementation() {
+        return this.userImplementation;
     }
 
     public void setStage(Stage stage) {
