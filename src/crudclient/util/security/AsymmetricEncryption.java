@@ -5,16 +5,14 @@
  */
 package crudclient.util.security;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.DatatypeConverter;
@@ -59,9 +57,6 @@ public class AsymmetricEncryption {
      */
     private PublicKey getPublicKey() {
         try {
-            String filename = "public-key.key";
-            //byte[] keyBytes = Files.readAllBytes(Paths.get(filename));
-
             byte[] keyBytes = DatatypeConverter.parseHexBinary(this.getPublicKeyAsString());
 
             X509EncodedKeySpec spec
@@ -96,11 +91,37 @@ public class AsymmetricEncryption {
         return DatatypeConverter.parseHexBinary(s);
     }
 
+    /**
+     * Setter of publicKey
+     *
+     * @param publicKey
+     */
     public void setPublicKey(String publicKey) {
         this.publicKey = publicKey;
     }
 
+    /**
+     * Returns the public key as string.
+     *
+     * @return The public key.
+     */
     private String getPublicKeyAsString() {
         return this.publicKey;
     }
+
+    /**
+     * Encodes a string using URLEncoder.
+     *
+     * @param textToEncode The text to encode
+     * @return A string containing the encoded text.
+     */
+    public String encodeString(String textToEncode) {
+        try {
+            return URLEncoder.encode(textToEncode, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(AsymmetricEncryption.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
 }
