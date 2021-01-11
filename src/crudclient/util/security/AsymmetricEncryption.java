@@ -117,7 +117,7 @@ public class AsymmetricEncryption {
      */
     public String encodeString(String textToEncode) {
         try {
-            return URLEncoder.encode(textToEncode, StandardCharsets.UTF_8.toString());
+            return URLEncoder.encode(textToEncode, StandardCharsets.UTF_16.toString());
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(AsymmetricEncryption.class.getName()).log(Level.SEVERE, null, ex);
         }

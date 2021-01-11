@@ -5,17 +5,9 @@
  */
 package crudclient.util.security;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import javax.crypto.Cipher;
-import javax.xml.bind.DatatypeConverter;
 
 /**
  *
@@ -25,13 +17,6 @@ import javax.xml.bind.DatatypeConverter;
 public class KeyGenerator {
 
     private static final String RSA = "RSA";
-
-    /**
-     * Generates RSA keys using RSA algorythm.
-     *
-     * @return a Keypair.
-     * @throws NoSuchAlgorithmException
-     */
 
     /**
      * Executes the encryption using the public key.
