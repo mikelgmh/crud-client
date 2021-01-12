@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  total price of the order and total quantity of orderProduct.
  */
 @XmlRootElement
-public class Order implements Serializable {
+public class OrderModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -24,10 +24,9 @@ public class Order implements Serializable {
     private Timestamp date;
     private Double total_price;
 
-    //Pregunta Enumtype: ¿Ordinal o String?
     private OrderStatus status;
 
-    private Set<OrderProduct> orderProduct;
+    private Set<OrderProductModel> orderProduct;
 
     private User user;
 
@@ -56,11 +55,11 @@ public class Order implements Serializable {
         this.total_price = total_price;
     }
 
-    public Set<OrderProduct> getOrderProduct() {
+    public Set<OrderProductModel> getOrderProduct() {
         return orderProduct;
     }
 
-    public void setOrderProduct(Set<OrderProduct> orderProduct) {
+    public void setOrderProduct(Set<OrderProductModel> orderProduct) {
         this.orderProduct = orderProduct;
     }
 
@@ -98,7 +97,7 @@ public class Order implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Order other = (Order) obj;
+        final OrderModel other = (OrderModel) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }

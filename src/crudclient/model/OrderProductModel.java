@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Imanol
  */
 @XmlRootElement
-public class OrderProduct implements Serializable {
+public class OrderProductModel implements Serializable {
     
     private static final long serialVersionUID = 1L;
 
