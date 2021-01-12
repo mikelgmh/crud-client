@@ -5,10 +5,10 @@
  */
 package crudclient.client;
 
-import crudclient.interfaces.OrderInterface;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import crudclient.interfaces.Order;
 
 /**
  * Jersey REST client generated for REST resource:OrderFacadeREST [order]<br>
@@ -22,7 +22,7 @@ import javax.ws.rs.client.WebTarget;
  *
  * @author Usuario
  */
-public class OrderRESTClient implements OrderInterface {
+public class OrderRESTClient implements Order {
 
     private WebTarget webTarget;
     private Client client;
