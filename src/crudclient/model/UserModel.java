@@ -19,24 +19,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class UserModel implements Serializable {
 
-    public UserModel(Long id, SimpleStringProperty username, SimpleStringProperty email, SimpleStringProperty name, SimpleStringProperty surname, UserStatus status, UserPrivilege privilege, String password, Timestamp lastAccess, Timestamp lastPasswordChange, Company company) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.name = name;
-        this.surname = surname;
-        this.status = status;
-        this.privilege = privilege;
-        this.password = password;
-        this.lastAccess = lastAccess;
-        this.lastPasswordChange = lastPasswordChange;
-        this.company = company;
-    }
-
     public UserModel() {
+        this.email = new SimpleStringProperty();
+        this.name = new SimpleStringProperty();
+        this.surname = new SimpleStringProperty();
+        this.username = new SimpleStringProperty();
+       
     }
-    
-    
 
     private static final long serialVersionUID = 1L;
     /**
@@ -95,36 +84,36 @@ public class UserModel implements Serializable {
         this.company = company;
     }
 
-    public SimpleStringProperty getUsername() {
-        return username;
+    public String getUsername() {
+        return username.get();
     }
 
-    public void setUsername(SimpleStringProperty username) {
-        this.username = username;
+    public void setUsername(String username) {
+        this.username.set(username);
     }
 
-    public SimpleStringProperty getEmail() {
-        return email;
+    public String getEmail() {
+        return email.get();
     }
 
-    public void setEmail(SimpleStringProperty email) {
-        this.email = email;
+    public void setEmail(String email) {
+        this.email.set(email);
     }
 
-    public SimpleStringProperty getName() {
-        return name;
+    public String getName() {
+        return name.get();
     }
 
-    public void setName(SimpleStringProperty name) {
-        this.name = name;
+    public void setName(String name) {
+        this.name.set(name);
     }
 
-    public SimpleStringProperty getSurname() {
-        return surname;
+    public String getSurname() {
+        return surname.get();
     }
 
-    public void setSurname(SimpleStringProperty surname) {
-        this.surname = surname;
+    public void setSurname(String surname) {
+        this.surname.set(surname);
     }
 
     public UserStatus getStatus() {
@@ -205,7 +194,4 @@ public class UserModel implements Serializable {
         return "User{" + "id=" + id + '}';
     }
 
-    
-
 }
-

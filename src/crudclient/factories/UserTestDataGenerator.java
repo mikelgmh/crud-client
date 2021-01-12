@@ -7,6 +7,7 @@ package crudclient.factories;
 
 import crudclient.interfaces.User;
 import crudclient.model.Company;
+import crudclient.model.CompanyType;
 import crudclient.model.UserModel;
 import crudclient.model.UserPrivilege;
 import crudclient.model.UserStatus;
@@ -35,13 +36,13 @@ public class UserTestDataGenerator implements User {
         for (int i = 0; i < numberOfUsers; i++) {
             UserModel userModel = new UserModel();
             userModel.setId(Long.valueOf(i));
-            userModel.setCompany(new Company());
-            userModel.setEmail(new SimpleStringProperty((String) "email" + i));
-            userModel.setName(new SimpleStringProperty((String) "name" + i));
+            userModel.setCompany(new Company(i, "Compañia " + i, CompanyType.ADMIN, "Ciudad " + i));
+            userModel.setEmail("email" + i);
+            userModel.setName("name" + i);
             userModel.setPrivilege(UserPrivilege.PROVIDER);
             userModel.setStatus(UserStatus.ENABLED);
-            userModel.setSurname(new SimpleStringProperty((String) "Surname" + i));
-            userModel.setUsername(new SimpleStringProperty((String) "username" + i));
+            userModel.setSurname("Surname" + i);
+            userModel.setUsername("username" + i);
             userList.add(userModel);
         }
     }

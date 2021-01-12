@@ -5,6 +5,7 @@
  */
 package crudclient.controllers;
 
+import crudclient.factories.UserFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Parent;
@@ -14,7 +15,9 @@ import crudclient.model.UserPrivilege;
 import crudclient.model.UserStatus;
 import crudclient.util.security.AsymmetricEncryption;
 import crudclient.util.validation.GenericValidations;
+import java.util.List;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 
 import javafx.scene.Scene;
@@ -56,7 +59,7 @@ public class UserManagementController {
 
     // Table related stuff
     @FXML
-    private TableView<UserModel> tableview;
+    private TableView<UserModel> table;
     @FXML
     private TableColumn<UserModel, String> tc_name;
     @FXML
@@ -68,9 +71,9 @@ public class UserManagementController {
     @FXML
     private TableColumn<UserModel, String> tc_company;
     @FXML
-    private TableColumn<UserModel, String> tc_status;
+    private TableColumn<UserModel, UserStatus> tc_status;
     @FXML
-    private TableColumn<UserModel, String> tc_privilege;
+    private TableColumn<UserModel, UserPrivilege> tc_privilege;
 
     public void initStage(Parent parent) {
 
@@ -164,6 +167,10 @@ public class UserManagementController {
     public void setDefaultFieldValues() {
         this.chb_privilege.setItems(FXCollections.observableArrayList(UserPrivilege.values()));
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
+
+        User user = new UserFactory().getUserImplementation(UserFactory.ImplementationType.TEST_IMPLEMENTATION);
+        ObservableList i = FXCollections.observableArrayList(user.getUsers());
+        table.setItems(i);
     }
 
     public void validate() {
