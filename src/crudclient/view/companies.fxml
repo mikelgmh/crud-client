@@ -146,10 +146,10 @@
                               </HBox>
                               <TableView fx:id="tableViewCompanies" editable="true" VBox.vgrow="SOMETIMES">
                                 <columns>
-                                  <TableColumn prefWidth="63.0" text="ID" />
-                                  <TableColumn prefWidth="233.0" text="Name" />
-                                    <TableColumn minWidth="0.0" prefWidth="190.0" text="Type" />
-                                    <TableColumn minWidth="0.0" prefWidth="187.0" text="Localization" />
+                                  <TableColumn fx:id="tcIdCompany" prefWidth="63.0" text="ID" />
+                                  <TableColumn fx:id="tcNameCompany" prefWidth="233.0" text="Name" />
+                                    <TableColumn fx:id="tcTypeCompany" minWidth="0.0" prefWidth="190.0" text="Type" />
+                                    <TableColumn fx:id="tcLocalizationCompany" minWidth="0.0" prefWidth="187.0" text="Localization" />
                                 </columns>
                                  <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
