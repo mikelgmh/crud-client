@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 
 /**
- * Entity representating the Companies. It contains the following fields:
+ * Entity representing the Companies. It contains the following fields:
  * company id, company name, company type, company localization and company
  * amount of users.
  *
