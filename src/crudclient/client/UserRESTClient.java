@@ -6,6 +6,7 @@
 package crudclient.client;
 
 import crudclient.interfaces.User;
+import java.util.List;
 import java.util.Set;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
@@ -119,7 +120,7 @@ public class UserRESTClient implements User {
     }
 
     @Override
-    public Set<User> getUsers() {
+    public List getUsers() {
         return null;
 
     }

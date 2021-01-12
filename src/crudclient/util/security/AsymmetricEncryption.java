@@ -115,13 +115,5 @@ public class AsymmetricEncryption {
      * @param textToEncode The text to encode
      * @return A string containing the encoded text.
      */
-//    public String encodeString(String textToEncode) {
-//        try {
-//            return URLEncoder.encode(textToEncode, StandardCharsets.UTF_16.toString());
-//        } catch (UnsupportedEncodingException ex) {
-//            Logger.getLogger(AsymmetricEncryption.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        return null;
-//    }
 
 }

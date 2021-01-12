@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import javafx.collections.ObservableList;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 
 /**
  * Class containing "regex", referenced from controllers to validate data
@@ -13,6 +14,13 @@ import javafx.scene.control.TextField;
  * @author Mikel
  */
 public class GenericValidations {
+    
+    /**
+     * Email regexp.
+     */
+    public static final Color greyColor = Color.web("#686464");
+    public static final Pattern EMAIL_REGEXP = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    public static final String TXT_ENTER_VALID_EMAIL = "Type a valid email.";
 
     public GenericValidations() {
     }

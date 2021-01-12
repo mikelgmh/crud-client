@@ -8,6 +8,7 @@ package crudclient.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
+import javafx.beans.property.SimpleStringProperty;
 import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -17,6 +18,23 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class UserModel implements Serializable {
+
+    public UserModel(Long id, SimpleStringProperty username, SimpleStringProperty email, SimpleStringProperty name, SimpleStringProperty surname, UserStatus status, UserPrivilege privilege, String password, Timestamp lastAccess, Timestamp lastPasswordChange, Company company) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.name = name;
+        this.surname = surname;
+        this.status = status;
+        this.privilege = privilege;
+        this.password = password;
+        this.lastAccess = lastAccess;
+        this.lastPasswordChange = lastPasswordChange;
+        this.company = company;
+    }
+
+    public UserModel() {
+    }
     
     
 
@@ -28,19 +46,19 @@ public class UserModel implements Serializable {
     /**
      * The username of the user.
      */
-    private String username;
+    private SimpleStringProperty username;
     /**
      * The email of the user.
      */
-    private String email;
+    private SimpleStringProperty email;
     /**
      * The name of the user.
      */
-    private String name;
+    private SimpleStringProperty name;
     /**
      * The Surname of the user
      */
-    private String surname;
+    private SimpleStringProperty surname;
 
     /**
      * The status of the user. Enum.
@@ -77,35 +95,35 @@ public class UserModel implements Serializable {
         this.company = company;
     }
 
-    public String getUsername() {
+    public SimpleStringProperty getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(SimpleStringProperty username) {
         this.username = username;
     }
 
-    public String getEmail() {
+    public SimpleStringProperty getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(SimpleStringProperty email) {
         this.email = email;
     }
 
-    public String getName() {
+    public SimpleStringProperty getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(SimpleStringProperty name) {
         this.name = name;
     }
 
-    public String getSurname() {
+    public SimpleStringProperty getSurname() {
         return surname;
     }
 
-    public void setSurname(String surname) {
+    public void setSurname(SimpleStringProperty surname) {
         this.surname = surname;
     }
 

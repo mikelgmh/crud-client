@@ -5,6 +5,7 @@
  */
 package crudclient.interfaces;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -18,7 +19,7 @@ public interface User {
      *
      * @return A collection of users.
      */
-    public Set<User> getUsers();
+    public List getUsers();
 
     /**
      * Edits or updates a user.
