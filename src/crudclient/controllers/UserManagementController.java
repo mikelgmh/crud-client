@@ -16,6 +16,7 @@ import crudclient.model.UserStatus;
 import crudclient.util.security.AsymmetricEncryption;
 import crudclient.util.validation.GenericValidations;
 import java.util.List;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -71,9 +72,9 @@ public class UserManagementController {
     @FXML
     private TableColumn<UserModel, String> tc_company;
     @FXML
-    private TableColumn<UserModel, UserStatus> tc_status;
+    private TableColumn<UserModel, String> tc_status;
     @FXML
-    private TableColumn<UserModel, UserPrivilege> tc_privilege;
+    private TableColumn<UserModel, String> tc_privilege;
 
     public void initStage(Parent parent) {
 
@@ -118,6 +119,8 @@ public class UserManagementController {
         tc_username.setCellValueFactory(new PropertyValueFactory<>("username"));
         tc_company.setCellValueFactory(new PropertyValueFactory<>("username"));
         tc_email.setCellValueFactory(new PropertyValueFactory<>("email"));
+        tc_privilege.setCellValueFactory(new PropertyValueFactory<>("privilege"));
+        tc_status.setCellValueFactory(new PropertyValueFactory<>("status"));
     }
 
     /**
@@ -144,6 +147,8 @@ public class UserManagementController {
             this.genericValidations.textLimiter(this.txt_company, 200, newText); // Limits the input to 200 characters
             this.validate(); // Executes the validation.
         });
+        
+        this.table.getSelectionModel().selectedIndexProperty().addListener(this::handleUsersTableSelectionChanged);
 
         // Validation for the Email field
         this.txt_email.textProperty().addListener((obs, oldText, newText) -> {
@@ -162,6 +167,10 @@ public class UserManagementController {
 
             this.validate();
         });
+    }
+    
+    private void handleUsersTableSelectionChanged(ObservableValue observable, Object oldValue, Object newValue){
+        System.out.println(newValue);
     }
 
     public void setDefaultFieldValues() {
