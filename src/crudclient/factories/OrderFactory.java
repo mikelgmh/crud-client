@@ -6,7 +6,7 @@
 package crudclient.factories;
 
 import crudclient.client.OrderRESTClient;
-import crudclient.interfaces.OrderInterface;
+import crudclient.interfaces.Order;
 
 /**
  *
@@ -14,7 +14,7 @@ import crudclient.interfaces.OrderInterface;
  */
 public class OrderFactory {
     
-    public OrderInterface getImplementation(){
+    public Order getImplementation(){
         return new OrderRESTClient();
     }
             
