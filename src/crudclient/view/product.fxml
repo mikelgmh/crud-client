@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="548.0" prefWidth="757.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="crudclient.controllers.ProductController">
+   <children>
+      <TableView fx:id="tv_Tabla" layoutX="26.0" layoutY="152.0" prefHeight="396.0" prefWidth="687.0">
+        <columns>
+          <TableColumn fx:id="tc_Id" prefWidth="109.0" text="ID" />
+          <TableColumn fx:id="tc_Name" prefWidth="290.0" text="Name" />
+            <TableColumn fx:id="tc_Weight" minWidth="0.0" prefWidth="123.0" text="Weight" />
+            <TableColumn fx:id="tc_Price" prefWidth="164.0" text="Price" />
+        </columns>
+      </TableView>
+      <Button fx:id="btn_Create" layoutX="26.0" layoutY="55.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="123.0" text="Create product" />
+      <Button fx:id="btn_Delete" disable="true" layoutX="290.0" layoutY="55.0" mnemonicParsing="false" text="Delete product" />
+      <Button fx:id="btn_Modify" disable="true" layoutX="160.0" layoutY="55.0" mnemonicParsing="false" text="Modify product" />
+      <Label layoutX="431.0" layoutY="32.0" text="Product ID" />
+      <TextField fx:id="tf_Id" layoutX="431.0" layoutY="53.0" prefHeight="35.0" prefWidth="56.0" promptText="ID" />
+      <Label layoutX="516.0" layoutY="32.0" text="Name" />
+      <TextField fx:id="tf_Name" layoutX="501.0" layoutY="53.0" prefHeight="35.0" prefWidth="56.0" promptText="Name" />
+      <Label layoutX="588.0" layoutY="32.0" text="Weight" />
+      <TextField fx:id="tf_Weight" layoutX="580.0" layoutY="53.0" prefHeight="35.0" prefWidth="56.0" promptText="Weight" />
+      <Label layoutX="664.0" layoutY="32.0" text="Price" />
+      <TextField fx:id="tf_Price" layoutX="652.0" layoutY="53.0" prefHeight="35.0" prefWidth="56.0" promptText="Price" />
+      <Button fx:id="btn_Filter" disable="true" layoutX="656.0" layoutY="103.0" mnemonicParsing="false" text="Filter" />
+   </children>
+</Pane>
