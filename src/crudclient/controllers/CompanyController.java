@@ -1,5 +1,7 @@
 package crudclient.controllers;
 
+import crudclient.client.CompanyRESTClient;
+import crudclient.model.Company;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXML;
@@ -11,6 +13,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import crudclient.model.CompanyType;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 /**
  *
@@ -20,6 +27,7 @@ public class CompanyController {
 
     private static final Logger logger = Logger.getLogger("crudclient.controllers.CompanyController");
     private Stage stage;
+    private ObservableList<Company> companyData;
 
     @FXML
     private Button btnFilter;
@@ -37,6 +45,14 @@ public class CompanyController {
     private TextField tfLocalizationFilter;
     @FXML
     private TableView tableViewCompanies;
+    @FXML
+    private TableColumn tcIdCompany;
+    @FXML
+    private TableColumn tcNameCompany;
+    @FXML
+    private TableColumn tcTypeCompany;
+    @FXML
+    private TableColumn tcLocalizationCompany;
 
     public CompanyController() {
     }
@@ -72,10 +88,25 @@ public class CompanyController {
         btnModifyCompany.setDisable(true);
         btnDeleteCompany.setDisable(true);
         tfNameFilter.clear();
-        // TODO: Load the items from the database.
-        // cbTypeFilter.getItems().addAll();
+        // Get the Company types and set into the choicebox.
+        cbTypeFilter.setItems(FXCollections.observableArrayList(CompanyType.values()));
+        // After load the elements into the choicebox, add an empty item in the 
+        // first position, if the user don't want filter by company type.
+        cbTypeFilter.getItems().add(0, "");
         tfLocalizationFilter.clear();
+        // Set the factories to the column values of the table.
+        tcIdCompany.setCellValueFactory(new PropertyValueFactory("id"));
+        tcNameCompany.setCellValueFactory(new PropertyValueFactory("name"));
+        tcTypeCompany.setCellValueFactory(new PropertyValueFactory("type"));
+        tcLocalizationCompany.setCellValueFactory(new PropertyValueFactory("localization"));
         // TODO: Load the data from the database into the TableView.
+        /*try {
+            CompanyRESTClient rest = new CompanyRESTClient();
+            companyData = FXCollections.observableArrayList();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        tableViewCompanies.setItems(companyData);*/
     }
 
 }
