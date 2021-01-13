@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlRootElement;
 
-
 /**
  * Entity representating the Companies. It contains the following fields:
  * company id, company name, company type, company localization and company
@@ -12,9 +11,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Iker de la Cruz
  */
-
 @XmlRootElement
 public class Company implements Serializable {
+
 
     private static final long serialVersionUID = 1L;
 
@@ -38,6 +37,14 @@ public class Company implements Serializable {
      */
     private String localization;
 
+    
+    public Company(Integer id, String name, CompanyType type, String localization) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.localization = localization;
+    }
+    
     /**
      *
      * @return the id.

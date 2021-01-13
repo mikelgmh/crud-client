@@ -5,12 +5,15 @@
  */
 package crudclient;
 
+import crudclient.controllers.UserManagementController;
+import crudclient.factories.UserFactory;
+import java.util.logging.Logger;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
+import crudclient.interfaces.User;
+import java.util.logging.Level;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.stage.Stage;
 
 /**
@@ -18,34 +21,36 @@ import javafx.stage.Stage;
  * @author 2dam
  */
 public class CRUDClient extends Application {
-    
+
+    private static final Logger logger = Logger.getLogger("signupsignin.SignUpSignInClient");
+
+    /**
+     * The start method in which the JavaFX starts.
+     *
+     * @param stage the first stage of the JavaFX application.
+     * @throws Exception if there ocurred something wrong creating the first
+     * stage.
+     */
     @Override
-    public void start(Stage primaryStage) {
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Hello World!");
-            }
-        });
-        
-        StackPane root = new StackPane();
-        root.getChildren().add(btn);
-        
-        Scene scene = new Scene(root, 300, 250);
-        
-        primaryStage.setTitle("Hello World!");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+    public void start(Stage stage) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("view/UserManagement.fxml"));
+        Parent root = (Parent) loader.load();
+        UserManagementController controller = ((UserManagementController) loader.getController());
+        UserFactory userFactory = new UserFactory();
+        User user = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
+        controller.setUserImplementation(user);
+        controller.setStage(stage);
+        controller.initStage(root);
     }
 
     /**
+     * The main method in which the program starts.
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        logger.log(Level.INFO, "Initializing the program.");
         launch(args);
     }
-    
+
 }
