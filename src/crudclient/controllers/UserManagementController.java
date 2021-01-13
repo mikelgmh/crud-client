@@ -40,6 +40,7 @@ public class UserManagementController {
     private static final Logger logger = Logger.getLogger("signupsignin.controllers.SignUpController");
     private GenericValidations genericValidations = new GenericValidations();
     private UserInterface userImplementation;
+    private ObservableList observableUserList;
 
     @FXML
     private TextField txt_name;
@@ -177,9 +178,13 @@ public class UserManagementController {
         this.chb_privilege.setItems(FXCollections.observableArrayList(UserPrivilege.values()));
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
 
-        UserInterface user = new UserFactory().getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
-        ObservableList observableUserList = FXCollections.observableArrayList(user.getUsers());
-        table.setItems(observableUserList);
+        // Se obtiene la lista de usuarios utilizando la implementación que hay en la propiedad de la clase. Se necesita pasar desde la ventana anterior o desde el método main.
+        this.observableUserList = FXCollections.observableArrayList(getUserImplementation().getUsers());
+        this.table.setItems(observableUserList);
+    }
+
+    public void search() {
+
     }
 
     public void validate() {

@@ -43,7 +43,7 @@ public class UserRESTClient implements UserInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(genericType);
     }
 
-    public <T> T getAllUsers_JSON(Class<T> responseType) throws ClientErrorException {
+    public <T> T getAllUsers_JSON(GenericType<T> responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("user/getAllUsers");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
@@ -123,10 +123,10 @@ public class UserRESTClient implements UserInterface {
 
     @Override
     public List<User> getUsers() {
-        List<User> e = this.getAllUsers_XML(new GenericType<List<User>>(){
-            
+        // Está separado en dos sentencias porque así me aclaro mejor
+        List<User> userList = this.getAllUsers_JSON(new GenericType<List<User>>() {
         });
-        return e;
+        return userList;
     }
 
     @Override
