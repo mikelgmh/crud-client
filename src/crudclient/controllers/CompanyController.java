@@ -8,14 +8,16 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import crudclient.model.CompanyType;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 
@@ -40,7 +42,7 @@ public class CompanyController {
     @FXML
     private TextField tfNameFilter;
     @FXML
-    private ChoiceBox cbTypeFilter;
+    private ComboBox<CompanyType> cbTypeFilter;
     @FXML
     private TextField tfLocalizationFilter;
     @FXML
@@ -73,6 +75,9 @@ public class CompanyController {
         stage.setTitle("Companies");
         stage.setResizable(true);
         stage.setOnShowing(this::handleWindowShowing);
+        // Set handlers
+        tfNameFilter.textProperty().addListener(this::handleFilterButton);
+        tfLocalizationFilter.textProperty().addListener(this::handleFilterButton);
         stage.show();
         logger.log(Level.INFO, "SignIn stage loaded.");
     }
@@ -88,11 +93,10 @@ public class CompanyController {
         btnModifyCompany.setDisable(true);
         btnDeleteCompany.setDisable(true);
         tfNameFilter.clear();
+        // FIXME: Fix the IndexOutOfBoundsException error.
         // Get the Company types and set into the choicebox.
-        cbTypeFilter.setItems(FXCollections.observableArrayList(CompanyType.values()));
-        // After load the elements into the choicebox, add an empty item in the 
-        // first position, if the user don't want filter by company type.
-        cbTypeFilter.getItems().add(0, "");
+        cbTypeFilter.getItems().add(null);
+        cbTypeFilter.getItems().addAll(FXCollections.observableArrayList(CompanyType.values()));
         tfLocalizationFilter.clear();
         // Set the factories to the column values of the table.
         tcIdCompany.setCellValueFactory(new PropertyValueFactory("id"));
@@ -105,8 +109,47 @@ public class CompanyController {
             companyData = FXCollections.observableArrayList();
         } catch (Exception ex) {
             ex.printStackTrace();
+        }*/
+        // Load data into the table view.
+        Company company = new Company(1, "Iker", CompanyType.ADMIN, "Berriz");
+        Company company2 = new Company(2, "Aketza", CompanyType.CLIENT, "Tartanga");
+        companyData = FXCollections.observableArrayList(company, company2);
+        tableViewCompanies.setItems(companyData);
+    }
+
+    /**
+     * Combo box change event handler. It validates the name, type or
+     * localization fields has any content to enable/disable the filter button.
+     *
+     * @param event
+     */
+    @FXML
+    private void handleFilterButtonComboBox(ActionEvent event) {
+        if (!tfNameFilter.getText().trim().isEmpty()
+                || !tfLocalizationFilter.getText().trim().isEmpty()
+                || !(cbTypeFilter.getValue() == null)) {
+            btnFilter.setDisable(false);
+        } else {
+            btnFilter.setDisable(true);
         }
-        tableViewCompanies.setItems(companyData);*/
+    }
+
+    /**
+     * Name and localization text changed event. It validates the name, type or
+     * localization fields has any content to enable/disable the filter button.
+     *
+     * @param observable
+     * @param oldValue
+     * @param newValue
+     */
+    private void handleFilterButton(ObservableValue observable, String oldValue, String newValue) {
+        if (!tfNameFilter.getText().trim().isEmpty()
+                || !tfLocalizationFilter.getText().trim().isEmpty()
+                || !(cbTypeFilter.getValue() == null)) {
+            btnFilter.setDisable(false);
+        } else {
+            btnFilter.setDisable(true);
+        }
     }
 
 }
