@@ -2,6 +2,7 @@ package crudclient.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -16,17 +17,17 @@ import javax.xml.bind.annotation.XmlRootElement;
  total price of the order and total quantity of orderProduct.
  */
 @XmlRootElement
-public class OrderModel implements Serializable {
+public class Order implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private Integer id;
-    private Timestamp date;
+    private Date date;
     private Double total_price;
 
     private OrderStatus status;
 
-    private Set<OrderProductModel> orderProduct;
+    private Set<OrderProduct> orderProduct;
 
     private User user;
 
@@ -55,19 +56,19 @@ public class OrderModel implements Serializable {
         this.total_price = total_price;
     }
 
-    public Set<OrderProductModel> getOrderProduct() {
+    public Set<OrderProduct> getOrderProduct() {
         return orderProduct;
     }
 
-    public void setOrderProduct(Set<OrderProductModel> orderProduct) {
+    public void setOrderProduct(Set<OrderProduct> orderProduct) {
         this.orderProduct = orderProduct;
     }
 
-    public Timestamp getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(Timestamp date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
@@ -97,7 +98,7 @@ public class OrderModel implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final OrderModel other = (OrderModel) obj;
+        final Order other = (Order) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }

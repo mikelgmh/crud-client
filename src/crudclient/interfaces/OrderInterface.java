@@ -6,7 +6,7 @@ import javax.ws.rs.ClientErrorException;
  *
  * @author Imanol
  */
-public interface Order {
+public interface OrderInterface {
     
     public void edit_XML(Object requestEntity) throws ClientErrorException;
 
