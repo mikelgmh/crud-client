@@ -69,7 +69,7 @@ public class UserTestDataGenerator implements UserInterface {
 
     @Override
     public String getPublicKey() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       return "Test Public key";
     }
 
 }

@@ -29,6 +29,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import crudclient.interfaces.UserInterface;
+import crudclient.util.filters.BindedProperty;
+import crudclient.util.filters.FilterSearch;
+import java.util.ArrayList;
+import javafx.scene.control.Button;
+import javafx.scene.control.Control;
 
 /**
  *
@@ -41,6 +46,7 @@ public class UserManagementController {
     private GenericValidations genericValidations = new GenericValidations();
     private UserInterface userImplementation;
     private ObservableList observableUserList;
+    private ArrayList<Control> controlArrayList = new ArrayList<Control>();
 
     @FXML
     private TextField txt_name;
@@ -58,6 +64,10 @@ public class UserManagementController {
     private ChoiceBox chb_privilege;
     @FXML
     private Label hint_email;
+    @FXML
+    private Button btn_search;
+    @FXML
+    private Button btn_delete;
 
     // Table related stuff
     @FXML
@@ -96,6 +106,15 @@ public class UserManagementController {
         // Set stage
         this.setStage(stage);
 
+        // Adds all the controls to an arraylist
+        controlArrayList.add(txt_name);
+        controlArrayList.add(txt_surname);
+        controlArrayList.add(txt_company);
+        controlArrayList.add(txt_email);
+        controlArrayList.add(txt_username);
+        controlArrayList.add(chb_privilege);
+        controlArrayList.add(chb_status);
+
         // Set some properties of the stage
         stage.setScene(scene);
         stage.setTitle("User Management"); // Sets the title of the window
@@ -104,6 +123,7 @@ public class UserManagementController {
 
         // Set the default values for some cells
         this.setDefaultFieldValues();
+        this.btn_delete.setDisable(true);
         stage.show(); // Show the stage
 
         // PRUEBAS DE ENCRIPTAR Y RECIBIR LA CLAVE PÚBLICA DEL SERVIDOR
@@ -149,7 +169,7 @@ public class UserManagementController {
             this.validate(); // Executes the validation.
         });
 
-        this.table.getSelectionModel().selectedIndexProperty().addListener(this::handleUsersTableSelectionChanged);
+        this.table.getSelectionModel().selectedItemProperty().addListener(this::handleUsersTableSelectionChanged);
 
         // Validation for the Email field
         this.txt_email.textProperty().addListener((obs, oldText, newText) -> {
@@ -170,8 +190,16 @@ public class UserManagementController {
         });
     }
 
-    private void handleUsersTableSelectionChanged(ObservableValue observable, Object oldValue, Object newValue) {
-        System.out.println(newValue);
+    /**
+     * Manages the selection of a row in the table.
+     *
+     * @param observable
+     * @param oldValue
+     * @param newValue
+     */
+    private void handleUsersTableSelectionChanged(ObservableValue observable, User oldValue, User newValue) {
+        // System.out.println(newValue.getEmail());
+        this.btn_delete.setDisable(false);
     }
 
     public void setDefaultFieldValues() {
@@ -183,7 +211,28 @@ public class UserManagementController {
         this.table.setItems(observableUserList);
     }
 
-    public void search() {
+    public void searchButtonHandler() {
+//        for (int i = 0; i < controlArrayList.size(); i++) {
+//            System.out.println(controlArrayList.get(i).getClass());
+//            // Si es un choicebox
+//            if (controlArrayList.get(i).getClass() == ChoiceBox.class) {
+//
+//            } else if (controlArrayList.get(i).getClass() == TextField.class) { // Si es un textfield
+//
+//            }
+//        }
+//        txt_name.getText().trim();
+        FilterSearch fs = new FilterSearch();
+        BindedProperty bp = new BindedProperty("name", txt_name);
+        BindedProperty bp2 = new BindedProperty("company","name", txt_company);
+        fs.setObservableUserList(observableUserList);
+        fs.addBindedProperty(bp);
+        fs.addBindedProperty(bp2);
+        fs.filter();
+
+    }
+
+    public void searchByProperty() {
 
     }
 
