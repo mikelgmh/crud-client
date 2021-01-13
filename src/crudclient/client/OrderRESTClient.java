@@ -8,7 +8,7 @@ package crudclient.client;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
-import crudclient.interfaces.Order;
+import crudclient.interfaces.OrderInterface;
 
 /**
  * Jersey REST client generated for REST resource:OrderFacadeREST [order]<br>
@@ -22,7 +22,7 @@ import crudclient.interfaces.Order;
  *
  * @author Usuario
  */
-public class OrderRESTClient implements Order {
+public class OrderRESTClient implements OrderInterface {
 
     private WebTarget webTarget;
     private Client client;
@@ -58,6 +58,7 @@ public class OrderRESTClient implements Order {
     }
 
     @Override
+    
     public <T> T findAllOrders_XML(Class<T> responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("order");

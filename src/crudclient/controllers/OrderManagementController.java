@@ -5,12 +5,13 @@ package crudclient.controllers;
  * @author Imanol
  */
 import crudclient.client.OrderRESTClient;
-import crudclient.interfaces.Order;
-import crudclient.model.OrderModel;
+import crudclient.factories.OrderFactory;
+import crudclient.model.Order;
 import crudclient.model.OrderStatus;
 import crudclient.model.User;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -37,6 +38,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javax.ws.rs.core.GenericType;
+import crudclient.interfaces.OrderInterface;
 
 /**
  * FXML Controller class
@@ -46,9 +48,9 @@ import javax.ws.rs.core.GenericType;
 public class OrderManagementController {
 
     private static final Logger logger = Logger.getLogger("crudclient.controllers.OrderManagementController");
-    private Order orderImplementation;
+    private OrderInterface orderImplementation;
     private Stage stage;
-    private ObservableSet<Order> orderData;
+    private ObservableList<Order> orderData;
 
     @FXML
     private TableView<Order> tableOrder;
@@ -90,7 +92,7 @@ public class OrderManagementController {
         logger.log(Level.INFO, "Loading the OrderManagement stage.");
         Scene scene = new Scene(parent);
         stage = new Stage();
-        this.setListeners();
+        //this.setListeners();
         this.setStage(stage);
         stage.setScene(scene);
         stage.setTitle("Order Management");
@@ -103,19 +105,22 @@ public class OrderManagementController {
         
         date_Order.valueProperty().addListener(this::handleDateChanged);
 
+        combo_statusOrder.setItems( FXCollections.observableArrayList(OrderStatus.values()));
         column_ID.setCellFactory(new PropertyValueFactory("id"));
         column_date.setCellFactory(new PropertyValueFactory("date"));
         column_totalPrice.setCellFactory(new PropertyValueFactory("total_price"));
         column_status.setCellFactory(new PropertyValueFactory("status"));
         column_user.setCellFactory(new PropertyValueFactory("user"));
-        //orderData=FXCollections.observableArrayList();
+        /*ArrayList<OrderModel> orderproof = new ArrayList<>();
+        orderproof.add(orderFactory.getImplementation().findAllOrders_XML(OrderInterface.class));
+        orderData=FXCollections.observableArrayList((Collection) orderproof);*/
 
-        tableOrder.setItems((ObservableList<Order>) orderData);
+        tableOrder.setItems(orderData);
         stage.show();
         logger.log(Level.INFO, "OrderManagement stage loaded.");
     }
 
-    private void setListeners() {
+   /*private void setListeners() {
         this.txt_Firstname.textProperty().addListener((obs, oldText, newText) -> {
             this.validationUtils.minLength(this.txt_Firstname, 3, newText, "minLengthValidator"); // Adds a min lenght validator
             this.validationUtils.textLimiter(this.txt_Firstname, 20, newText); // Limits the input to 20 characters
@@ -123,7 +128,7 @@ public class OrderManagementController {
         });
         
         
-    }
+    }*/
 
     private void handleWindowsShowing(WindowEvent event) {
         txt_IDOrder.requestFocus();
@@ -148,7 +153,7 @@ public class OrderManagementController {
         }
     }
     
-    public void validate() {
+    /*public void validate() {
         if (Boolean.parseBoolean(this.txt_Email.getProperties().get("emailValidator").toString())
                 && Boolean.parseBoolean(this.txt_Firstname.getProperties().get("minLengthValidator").toString())
                 && Boolean.parseBoolean(this.txt_Username.getProperties().get("minLengthValidator").toString())
@@ -160,7 +165,7 @@ public class OrderManagementController {
         } else {
             this.btn_SignUp.setDisable(true);
         }
-    }
+    }*/
     
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -170,7 +175,7 @@ public class OrderManagementController {
         return this.stage;
     }
 
-    public void setOrder(Order order) {
+    public void setOrder(OrderInterface order) {
         this.orderImplementation = order;
     }
     
