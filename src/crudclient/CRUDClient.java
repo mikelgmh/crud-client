@@ -5,9 +5,14 @@
  */
 package crudclient;
 
+import crudclient.controllers.ProductController;
+import java.io.IOException;
+import java.util.logging.Level;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
@@ -21,24 +26,20 @@ public class CRUDClient extends Application {
     
     @Override
     public void start(Stage primaryStage) {
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Hello World!");
-            }
-        });
-        
-        StackPane root = new StackPane();
-        root.getChildren().add(btn);
-        
-        Scene scene = new Scene(root, 300, 250);
-        
-        primaryStage.setTitle("Hello World!");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+          try {
+          //  LOG.log(Level.INFO, "Iniciando la ventana");
+             FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/product.fxml"));
+            //LOG.log(Level.INFO, "Cargando Parent");
+            Parent root = (Parent) loader.load();
+            //LOG.log(Level.INFO, "Cargando controller");
+              ProductController controller = ((ProductController) loader.getController());
+            //LOG.log(Level.INFO, "Iniciando controller");
+            controller.setStage(primaryStage);
+            controller.initStage(root);
+        } catch (IOException ex) {
+            //LOG.log(Level.SEVERE, "Se ha producido un error de E/S");
+
+        }
     }
 
     /**

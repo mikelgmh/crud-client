@@ -15,6 +15,6 @@ import crudclient.interfaces.ProductInterface;
 public class ProductFactory {
     
     public ProductInterface getImplementation(){
-       return new ProductRESTClient();
+       return (ProductInterface) new ProductRESTClient();
     }
 }
