@@ -44,6 +44,11 @@ public class Company implements Serializable {
         this.type = type;
         this.localization = localization;
     }
+
+    public Company() {
+    }
+    
+    
     
     /**
      *

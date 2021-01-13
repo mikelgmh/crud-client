@@ -12,7 +12,7 @@ import java.util.Set;
  *
  * @author Mikel
  */
-public interface User {
+public interface UserInterface {
 
     /**
      * Gets a list of users.
@@ -27,21 +27,21 @@ public interface User {
      * @param user
      * @return the edited user.
      */
-    public User editUser(User user);
+    public UserInterface editUser(UserInterface user);
 
     /**
      * Deletes a user.
      *
      * @param user
      */
-    public void deleteUser(User user);
+    public void deleteUser(UserInterface user);
 
     /**
      * Creates a new user.
      *
      * @param user
      */
-    public void createUser(User user);
+    public void createUser(UserInterface user);
     
     /**
      * Gets the public encryption key.

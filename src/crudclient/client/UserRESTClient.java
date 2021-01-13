@@ -5,12 +5,14 @@
  */
 package crudclient.client;
 
-import crudclient.interfaces.User;
+import crudclient.model.User;
 import java.util.List;
 import java.util.Set;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
+import crudclient.interfaces.UserInterface;
 
 /**
  * Jersey REST client generated for REST resource:UserFacadeREST [user]<br>
@@ -24,7 +26,7 @@ import javax.ws.rs.client.WebTarget;
  *
  * @author Mikel
  */
-public class UserRESTClient implements User {
+public class UserRESTClient implements UserInterface {
 
     private WebTarget webTarget;
     private Client client;
@@ -35,10 +37,10 @@ public class UserRESTClient implements User {
         webTarget = client.target(BASE_URI).path("user");
     }
 
-    public <T> T getAllUsers_XML(Class<T> responseType) throws ClientErrorException {
+    public <T> T getAllUsers_XML(GenericType<T> genericType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("user/getAllUsers");
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(genericType);
     }
 
     public <T> T getAllUsers_JSON(Class<T> responseType) throws ClientErrorException {
@@ -120,23 +122,25 @@ public class UserRESTClient implements User {
     }
 
     @Override
-    public List getUsers() {
-        return null;
-
+    public List<User> getUsers() {
+        List<User> e = this.getAllUsers_XML(new GenericType<List<User>>(){
+            
+        });
+        return e;
     }
 
     @Override
-    public User editUser(User user) {
+    public UserInterface editUser(UserInterface user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void deleteUser(User user) {
+    public void deleteUser(UserInterface user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void createUser(User user) {
+    public void createUser(UserInterface user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

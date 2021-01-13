@@ -9,8 +9,7 @@ import crudclient.factories.UserFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Parent;
-import crudclient.interfaces.User;
-import crudclient.model.UserModel;
+import crudclient.model.User;
 import crudclient.model.UserPrivilege;
 import crudclient.model.UserStatus;
 import crudclient.util.security.AsymmetricEncryption;
@@ -29,6 +28,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import crudclient.interfaces.UserInterface;
 
 /**
  *
@@ -39,7 +39,7 @@ public class UserManagementController {
     private Stage stage;
     private static final Logger logger = Logger.getLogger("signupsignin.controllers.SignUpController");
     private GenericValidations genericValidations = new GenericValidations();
-    private User userImplementation;
+    private UserInterface userImplementation;
 
     @FXML
     private TextField txt_name;
@@ -60,21 +60,21 @@ public class UserManagementController {
 
     // Table related stuff
     @FXML
-    private TableView<UserModel> table;
+    private TableView<User> table;
     @FXML
-    private TableColumn<UserModel, String> tc_name;
+    private TableColumn<User, String> tc_name;
     @FXML
-    private TableColumn<UserModel, String> tc_surname;
+    private TableColumn<User, String> tc_surname;
     @FXML
-    private TableColumn<UserModel, String> tc_username;
+    private TableColumn<User, String> tc_username;
     @FXML
-    private TableColumn<UserModel, String> tc_email;
+    private TableColumn<User, String> tc_email;
     @FXML
-    private TableColumn<UserModel, String> tc_company;
+    private TableColumn<User, String> tc_company;
     @FXML
-    private TableColumn<UserModel, String> tc_status;
+    private TableColumn<User, String> tc_status;
     @FXML
-    private TableColumn<UserModel, String> tc_privilege;
+    private TableColumn<User, String> tc_privilege;
 
     public void initStage(Parent parent) {
 
@@ -90,7 +90,7 @@ public class UserManagementController {
         this.setListeners();
 
         // Set factories
-        this.setFactoriesForColumnCells();
+        this.setCellValueFactories();
 
         // Set stage
         this.setStage(stage);
@@ -113,7 +113,7 @@ public class UserManagementController {
         System.out.println(prueba);
     }
 
-    public void setFactoriesForColumnCells() {
+    public void setCellValueFactories() {
         tc_name.setCellValueFactory(new PropertyValueFactory<>("name"));
         tc_surname.setCellValueFactory(new PropertyValueFactory<>("surname"));
         tc_username.setCellValueFactory(new PropertyValueFactory<>("username"));
@@ -147,7 +147,7 @@ public class UserManagementController {
             this.genericValidations.textLimiter(this.txt_company, 200, newText); // Limits the input to 200 characters
             this.validate(); // Executes the validation.
         });
-        
+
         this.table.getSelectionModel().selectedIndexProperty().addListener(this::handleUsersTableSelectionChanged);
 
         // Validation for the Email field
@@ -168,8 +168,8 @@ public class UserManagementController {
             this.validate();
         });
     }
-    
-    private void handleUsersTableSelectionChanged(ObservableValue observable, Object oldValue, Object newValue){
+
+    private void handleUsersTableSelectionChanged(ObservableValue observable, Object oldValue, Object newValue) {
         System.out.println(newValue);
     }
 
@@ -177,9 +177,9 @@ public class UserManagementController {
         this.chb_privilege.setItems(FXCollections.observableArrayList(UserPrivilege.values()));
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
 
-        User user = new UserFactory().getUserImplementation(UserFactory.ImplementationType.TEST_IMPLEMENTATION);
-        ObservableList i = FXCollections.observableArrayList(user.getUsers());
-        table.setItems(i);
+        UserInterface user = new UserFactory().getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
+        ObservableList observableUserList = FXCollections.observableArrayList(user.getUsers());
+        table.setItems(observableUserList);
     }
 
     public void validate() {
@@ -190,11 +190,11 @@ public class UserManagementController {
         return this.stage;
     }
 
-    public void setUserImplementation(User user) {
+    public void setUserImplementation(UserInterface user) {
         this.userImplementation = user;
     }
 
-    public User getUserImplementation() {
+    public UserInterface getUserImplementation() {
         return this.userImplementation;
     }
 

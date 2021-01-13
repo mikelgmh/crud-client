@@ -6,7 +6,7 @@
 package crudclient.model;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 import javafx.beans.property.SimpleStringProperty;
 import javax.persistence.ManyToOne;
@@ -17,14 +17,14 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Mikel
  */
 @XmlRootElement
-public class UserModel implements Serializable {
+public class User implements Serializable {
 
-    public UserModel() {
+    public User() {
         this.email = new SimpleStringProperty();
         this.name = new SimpleStringProperty();
         this.surname = new SimpleStringProperty();
         this.username = new SimpleStringProperty();
-       
+
     }
 
     private static final long serialVersionUID = 1L;
@@ -64,11 +64,11 @@ public class UserModel implements Serializable {
     /**
      * The last access of the user.
      */
-    private Timestamp lastAccess;
+    private Date lastAccess;
     /**
      * The last passsword change that has been made for this user.
      */
-    private Timestamp lastPasswordChange;
+    private Date lastPasswordChange;
 
     /**
      * The company object where this user belongs.
@@ -140,19 +140,19 @@ public class UserModel implements Serializable {
         this.password = password;
     }
 
-    public Timestamp getLastAccess() {
+    public Date getLastAccess() {
         return lastAccess;
     }
 
-    public void setLastAccess(Timestamp lastAccess) {
+    public void setLastAccess(Date lastAccess) {
         this.lastAccess = lastAccess;
     }
 
-    public Timestamp getLastPasswordChange() {
+    public Date getLastPasswordChange() {
         return lastPasswordChange;
     }
 
-    public void setLastPasswordChange(Timestamp lastPasswordChange) {
+    public void setLastPasswordChange(Date lastPasswordChange) {
         this.lastPasswordChange = lastPasswordChange;
     }
 
@@ -182,7 +182,7 @@ public class UserModel implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final UserModel other = (UserModel) obj;
+        final User other = (User) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }

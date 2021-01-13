@@ -5,10 +5,9 @@
  */
 package crudclient.factories;
 
-import crudclient.interfaces.User;
 import crudclient.model.Company;
 import crudclient.model.CompanyType;
-import crudclient.model.UserModel;
+import crudclient.model.User;
 import crudclient.model.UserPrivilege;
 import crudclient.model.UserStatus;
 import java.util.ArrayList;
@@ -16,15 +15,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
+import crudclient.interfaces.UserInterface;
 
 /**
  *
  * @author Mikel
  */
-public class UserTestDataGenerator implements User {
+public class UserTestDataGenerator implements UserInterface {
 
     private static final Logger logger = Logger.getLogger("crudclient");
-    private ArrayList<UserModel> userList;
+    private ArrayList<User> userList;
 
     /**
      * Generates users to test the client side.
@@ -34,7 +34,7 @@ public class UserTestDataGenerator implements User {
     public UserTestDataGenerator(Integer numberOfUsers) {
         userList = new ArrayList();
         for (int i = 0; i < numberOfUsers; i++) {
-            UserModel userModel = new UserModel();
+            User userModel = new User();
             userModel.setId(Long.valueOf(i));
             userModel.setCompany(new Company(i, "Compañia " + i, CompanyType.ADMIN, "Ciudad " + i));
             userModel.setEmail("email" + i);
@@ -53,17 +53,17 @@ public class UserTestDataGenerator implements User {
     }
 
     @Override
-    public User editUser(User user) {
+    public UserInterface editUser(UserInterface user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void deleteUser(User user) {
+    public void deleteUser(UserInterface user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void createUser(User user) {
+    public void createUser(UserInterface user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

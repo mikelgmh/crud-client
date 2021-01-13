@@ -9,12 +9,12 @@ import crudclient.controllers.UserManagementController;
 import crudclient.factories.UserFactory;
 import java.util.logging.Logger;
 import javafx.application.Application;
-import crudclient.interfaces.User;
 import java.util.logging.Level;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
+import crudclient.interfaces.UserInterface;
 
 /**
  *
@@ -37,7 +37,7 @@ public class CRUDClient extends Application {
         Parent root = (Parent) loader.load();
         UserManagementController controller = ((UserManagementController) loader.getController());
         UserFactory userFactory = new UserFactory();
-        User user = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
+        UserInterface user = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
         controller.setUserImplementation(user);
         controller.setStage(stage);
         controller.initStage(root);

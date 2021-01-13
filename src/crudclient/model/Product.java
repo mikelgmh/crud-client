@@ -98,13 +98,13 @@ public class Product implements Serializable {
      * User for the product.
      */
     @ManyToOne
-    private UserModel user;
+    private User user;
 
-    public UserModel getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(UserModel user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
