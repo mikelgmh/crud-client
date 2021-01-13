@@ -111,9 +111,7 @@ public class OrderManagementController {
         column_totalPrice.setCellFactory(new PropertyValueFactory("total_price"));
         column_status.setCellFactory(new PropertyValueFactory("status"));
         column_user.setCellFactory(new PropertyValueFactory("user"));
-        /*ArrayList<OrderModel> orderproof = new ArrayList<>();
-        orderproof.add(orderFactory.getImplementation().findAllOrders_XML(OrderInterface.class));
-        orderData=FXCollections.observableArrayList((Collection) orderproof);*/
+        orderData=FXCollections.observableArrayList(getOrderImplementation().getOrders());
 
         tableOrder.setItems(orderData);
         stage.show();
@@ -175,10 +173,13 @@ public class OrderManagementController {
         return this.stage;
     }
 
-    public void setOrder(OrderInterface order) {
+    public void setOrderImplementation(OrderInterface order) {
         this.orderImplementation = order;
     }
     
+    public OrderInterface getOrderImplementation() {
+        return this.orderImplementation;
+    }
     
 
 

@@ -32,7 +32,7 @@ public class CRUDClient extends Application {
         OrderManagementController controller = ((OrderManagementController) loader.getController());
         OrderFactory orderFactory = new OrderFactory();
         OrderInterface order = orderFactory.getImplementation();
-        controller.setOrder(order);
+        controller.setOrderImplementation(order);
         controller.initStage(root);
     }
 
