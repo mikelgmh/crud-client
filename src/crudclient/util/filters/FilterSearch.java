@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 
 /**
  *
@@ -86,12 +87,42 @@ public class FilterSearch {
         for (int i = 0; i < observableModelList.size(); i++) {
             Object obj = new Object();
             obj = getParsedObject(observableModelList.get(i), obj);
-
+            ArrayList<Boolean> foundList = new ArrayList<>();
             for (int x = 0; x < bindedProperties.size(); x++) {
-                System.out.println(getGetterValueAsString(x, obj));
-
+                String modelPropertyValue = getGetterValueAsString(x, obj);
+                String controlValue = getControlValue(bindedProperties.get(x).getControl());
+                foundList.add(compareValues(controlValue, modelPropertyValue));
             }
+            boolean found = true;
+            int y = 0;
+            while (found && y < foundList.size()) {
+                if (foundList.get(y) == false) {
+                    found = false;
+                }
+                y++;
+            }
+            
+            System.out.println(found);
         }
+    }
+
+    public String getControlValue(Control control) {
+        // System.out.println(control.getClass().toString());
+        String text = "";
+        switch (control.getClass().toString()) {
+            case "class javafx.scene.control.TextField":
+                TextField tf = new TextField();
+                tf = (TextField) control;
+                text = tf.getText();
+
+                break;
+        }
+        return text;
+
+    }
+
+    public boolean compareValues(String filterFieldValue, String modelValue) {
+        return modelValue.contains(filterFieldValue);
     }
 
     public String getGetterValueAsString(int index, Object object) {
@@ -106,8 +137,7 @@ public class FilterSearch {
 
                 String propertyFirstLetterUppercase2 = bindedProperties.get(index).getSubModelProperty().substring(0, 1).toUpperCase() + bindedProperties.get(index).getSubModelProperty().substring(1);
                 Method method2 = object2.getClass().getMethod("get" + propertyFirstLetterUppercase2, null);
-                String ee = method2.invoke(object2, null).toString();
-                valueToReturn = ee;
+                valueToReturn = method2.invoke(object2, null).toString();
             } else {
                 valueToReturn = method.invoke(object, null).toString();
             }
