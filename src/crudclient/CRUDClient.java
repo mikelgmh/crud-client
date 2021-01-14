@@ -37,7 +37,7 @@ public class CRUDClient extends Application {
         Parent root = (Parent) loader.load();
         UserManagementController controller = ((UserManagementController) loader.getController());
         UserFactory userFactory = new UserFactory();
-        UserInterface user = userFactory.getUserImplementation(UserFactory.ImplementationType.TEST_IMPLEMENTATION);
+        UserInterface user = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
         controller.setUserImplementation(user);
         controller.setStage(stage);
         controller.initStage(root);

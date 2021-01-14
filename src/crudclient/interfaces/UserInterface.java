@@ -7,6 +7,9 @@ package crudclient.interfaces;
 
 import java.util.List;
 import java.util.Set;
+import static javafx.scene.input.KeyCode.T;
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.core.GenericType;
 
 /**
  *
@@ -17,9 +20,10 @@ public interface UserInterface {
     /**
      * Gets a list of users.
      *
+     * @param genericType
      * @return A collection of users.
      */
-    public List getUsers();
+    public List getUsers(GenericType genericType) throws ClientErrorException;
 
     /**
      * Edits or updates a user.

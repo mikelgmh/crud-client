@@ -29,8 +29,17 @@ public class FilterSearch {
     private TableView tableView;
     private ArrayList<BindedProperty> bindedProperties = new ArrayList<>();
     private ObservableList observableModelList;
+    private ObservableList observableModelListCopy;
 
     public FilterSearch() {
+    }
+
+    public ObservableList getObservableModelListCopy() {
+        return observableModelListCopy;
+    }
+
+    public void setObservableModelListCopy(ObservableList observableModelListCopy) {
+        this.observableModelListCopy = observableModelListCopy;
     }
 
     public void addBindedProperty(BindedProperty bp) {
@@ -45,11 +54,11 @@ public class FilterSearch {
         this.bindedProperties = bindedProperties;
     }
 
-    public ObservableList getObservableUserList() {
+    public ObservableList getObservableModelList() {
         return observableModelList;
     }
 
-    public void setObservableUserList(ObservableList observableUserList) {
+    public void observableModelList(ObservableList observableUserList) {
         this.observableModelList = observableUserList;
     }
 
@@ -84,7 +93,10 @@ public class FilterSearch {
     }
 
     public void filter() {
+        ArrayList<Object> deleteList = new ArrayList<>();
         for (int i = 0; i < observableModelList.size(); i++) {
+            System.out.println("Size del array: " + observableModelList.size());
+            System.out.println("Pasando por: " + observableModelList.get(i));
             Object obj = new Object();
             obj = getParsedObject(observableModelList.get(i), obj);
             ArrayList<Boolean> foundList = new ArrayList<>();
@@ -101,9 +113,17 @@ public class FilterSearch {
                 }
                 y++;
             }
-            
-            System.out.println(found);
+            if (!found) {
+                // System.out.println("Eliminado: " + observableModelList.get(i));
+                deleteList.add(observableModelList.get(i));
+
+            }
+            // System.out.println(found);
         }
+        for (int i = 0; i < deleteList.size(); i++) {
+            observableModelList.remove(deleteList.get(i));
+        }
+        
     }
 
     public String getControlValue(Control control) {

@@ -5,6 +5,9 @@
  */
 package crudclient.controllers;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.rits.cloning.Cloner;
+import com.sun.javafx.collections.ObservableListWrapper;
 import crudclient.factories.UserFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +37,7 @@ import crudclient.util.filters.FilterSearch;
 import java.util.ArrayList;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
+import javax.ws.rs.core.GenericType;
 
 /**
  *
@@ -46,7 +50,9 @@ public class UserManagementController {
     private GenericValidations genericValidations = new GenericValidations();
     private UserInterface userImplementation;
     private ObservableList observableUserList;
+    private ObservableList observableUserListCopy;
     private ArrayList<Control> controlArrayList = new ArrayList<Control>();
+    private FilterSearch fs = new FilterSearch();
 
     @FXML
     private TextField txt_name;
@@ -207,7 +213,10 @@ public class UserManagementController {
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
 
         // Se obtiene la lista de usuarios utilizando la implementación que hay en la propiedad de la clase. Se necesita pasar desde la ventana anterior o desde el método main.
-        this.observableUserList = FXCollections.observableArrayList(getUserImplementation().getUsers());
+        this.observableUserList = FXCollections.observableArrayList(getUserImplementation().getUsers(new GenericType<List<User>>() { }));
+        
+        
+        
         this.table.setItems(observableUserList);
     }
 
@@ -222,10 +231,10 @@ public class UserManagementController {
 //            }
 //        }
 //        txt_name.getText().trim();
-        FilterSearch fs = new FilterSearch();
+
         BindedProperty bp = new BindedProperty("name", txt_name);
-        BindedProperty bp2 = new BindedProperty("company","name", txt_company);
-        fs.setObservableUserList(observableUserList);
+        BindedProperty bp2 = new BindedProperty("company", "name", txt_company);
+        fs.observableModelList(observableUserList);
         fs.addBindedProperty(bp);
         fs.addBindedProperty(bp2);
         fs.filter();

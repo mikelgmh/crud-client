@@ -5,6 +5,7 @@
  */
 package crudclient.factories;
 
+import com.esotericsoftware.kryo.util.Generics;
 import crudclient.model.Company;
 import crudclient.model.CompanyType;
 import crudclient.model.User;
@@ -16,6 +17,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
 import crudclient.interfaces.UserInterface;
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.core.GenericType;
 
 /**
  *
@@ -48,7 +51,7 @@ public class UserTestDataGenerator implements UserInterface {
     }
 
     @Override
-    public List getUsers() {
+    public List getUsers(GenericType gt) throws ClientErrorException {
         return userList;
     }
 
@@ -69,7 +72,7 @@ public class UserTestDataGenerator implements UserInterface {
 
     @Override
     public String getPublicKey() {
-       return "Test Public key";
+        return "Test Public key";
     }
 
 }
