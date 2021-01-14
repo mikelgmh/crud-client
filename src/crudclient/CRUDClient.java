@@ -8,6 +8,7 @@ package crudclient;
 import crudclient.controllers.ProductController;
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -23,21 +24,23 @@ import javafx.stage.Stage;
  * @author 2dam
  */
 public class CRUDClient extends Application {
+
+    private static final Logger LOG = Logger.getLogger(CRUDClient.class.getName());
     
     @Override
     public void start(Stage primaryStage) {
           try {
-          //  LOG.log(Level.INFO, "Iniciando la ventana");
+            LOG.log(Level.INFO, "Iniciando la ventana");
              FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/product.fxml"));
-            //LOG.log(Level.INFO, "Cargando Parent");
+            LOG.log(Level.INFO, "Cargando Parent");
             Parent root = (Parent) loader.load();
-            //LOG.log(Level.INFO, "Cargando controller");
+            LOG.log(Level.INFO, "Cargando controller");
               ProductController controller = ((ProductController) loader.getController());
-            //LOG.log(Level.INFO, "Iniciando controller");
+            LOG.log(Level.INFO, "Iniciando controller");
             controller.setStage(primaryStage);
             controller.initStage(root);
         } catch (IOException ex) {
-            //LOG.log(Level.SEVERE, "Se ha producido un error de E/S");
+            LOG.log(Level.SEVERE, "Se ha producido un error de E/S");
 
         }
     }

@@ -14,6 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Product implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     /**
      * Identification field for the product.
      */
@@ -30,6 +31,8 @@ public class Product implements Serializable {
      * The name of the product.
      */
     private String name;
+    
+    private Boolean checkbox;
 
     /**
      *

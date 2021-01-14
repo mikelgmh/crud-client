@@ -5,13 +5,17 @@
  */
 package crudclient.interfaces;
 
+import crudclient.model.Product;
+import java.util.Set;
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.core.GenericType;
 
 /**
  *
  * @author 2dam
  */
 public interface ProductInterface {
+    
 
     public void edit_XML(Object requestEntity) throws ClientErrorException;
 
@@ -27,7 +31,7 @@ public interface ProductInterface {
 
     public void remove(String id) throws ClientErrorException;
 
-    public <T> T findAllProducts_XML(Class<T> responseType) throws ClientErrorException;
+    public Set<Product>  findAllProducts_XML(GenericType responseType) throws ClientErrorException;
 
     public <T> T findAllProducts_JSON(Class<T> responseType) throws ClientErrorException;
     
