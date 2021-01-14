@@ -2,7 +2,6 @@ package crudclient.model;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -97,7 +96,6 @@ public class Product implements Serializable {
     /**
      * User for the product.
      */
-    @ManyToOne
     private User user;
 
     public User getUser() {

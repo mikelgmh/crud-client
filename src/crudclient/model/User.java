@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
-import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -65,7 +64,6 @@ public class User implements Serializable {
     /**
      * The company object where this user belongs.
      */
-    @ManyToOne()
     private Company company;
 
     public Company getCompany() {
