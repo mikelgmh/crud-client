@@ -106,11 +106,11 @@ public class OrderManagementController {
         date_Order.valueProperty().addListener(this::handleDateChanged);
 
         combo_statusOrder.setItems( FXCollections.observableArrayList(OrderStatus.values()));
-        column_ID.setCellFactory(new PropertyValueFactory("id"));
-        column_date.setCellFactory(new PropertyValueFactory("date"));
-        column_totalPrice.setCellFactory(new PropertyValueFactory("total_price"));
-        column_status.setCellFactory(new PropertyValueFactory("status"));
-        column_user.setCellFactory(new PropertyValueFactory("user"));
+        column_ID.setCellValueFactory(new PropertyValueFactory("id"));
+        column_date.setCellValueFactory(new PropertyValueFactory("date"));
+        column_totalPrice.setCellValueFactory(new PropertyValueFactory("total_price"));
+        column_status.setCellValueFactory(new PropertyValueFactory("status"));
+        column_user.setCellValueFactory(new PropertyValueFactory("user"));
         orderData=FXCollections.observableArrayList(getOrderImplementation().getOrders());
 
         tableOrder.setItems(orderData);
