@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.BooleanProperty;
@@ -123,7 +124,7 @@ public class ProductController {
         btn_Modify.setTooltip(new Tooltip("Modify a product"));
         btn_Delete.setTooltip(new Tooltip("Delete a product"));
         btn_OrderCreate.setTooltip(new Tooltip("Create an order"));
-        this.pr = FXCollections.observableSet(getProductImplementation().findAllProducts_XML(new GenericType<List<Product>>() { }));
+        this.pr = FXCollections.observableSet(getProductImplementation().findAllProducts_XML(new GenericType<Set<Product>>() { }));
         LOG.log(Level.INFO, "Tooltip ");
         tabla();
         LOG.log(Level.INFO, "tabla ");
@@ -222,7 +223,8 @@ public class ProductController {
     
     @FXML
     private void handleOnClickDelete(ActionEvent event) throws IOException {
-
+        btn_Delete.setDisable(false);
+        tv_Tabla.getItems().remove(tv_Tabla.getSelectionModel().getSelectedItem());
     }
 
     @FXML
