@@ -7,6 +7,7 @@ package crudclient.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -55,11 +56,11 @@ public class User implements Serializable {
     /**
      * The last access of the user.
      */
-    private Timestamp lastAccess;
+    private Date lastAccess;
     /**
      * The last passsword change that has been made for this user.
      */
-    private Timestamp lastPasswordChange;
+    private Date lastPasswordChange;
 
     /**
      * The company object where this user belongs.
@@ -131,7 +132,7 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public Timestamp getLastAccess() {
+    public Date getLastAccess() {
         return lastAccess;
     }
 
@@ -139,7 +140,7 @@ public class User implements Serializable {
         this.lastAccess = lastAccess;
     }
 
-    public Timestamp getLastPasswordChange() {
+    public Date getLastPasswordChange() {
         return lastPasswordChange;
     }
 
