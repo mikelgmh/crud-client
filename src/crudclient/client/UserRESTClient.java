@@ -7,13 +7,11 @@ package crudclient.client;
 
 import crudclient.model.User;
 import java.util.List;
-import java.util.Set;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import crudclient.interfaces.UserInterface;
-import static javafx.scene.input.KeyCode.T;
 
 /**
  * Jersey REST client generated for REST resource:UserFacadeREST [user]<br>
@@ -98,7 +96,8 @@ public class UserRESTClient implements UserInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public void create_XML(Object requestEntity) throws ClientErrorException {
+    @Override
+    public void createUser(Object requestEntity) throws ClientErrorException {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
@@ -140,11 +139,6 @@ public class UserRESTClient implements UserInterface {
 
     @Override
     public void deleteUser(UserInterface user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void createUser(UserInterface user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

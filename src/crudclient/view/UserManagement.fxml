@@ -16,7 +16,7 @@
         <fx:include source="menubar.fxml" />
         <AnchorPane fx:id="anchorpane" maxHeight="-1.0" maxWidth="-1.0" prefHeight="665.0" prefWidth="1041.0" VBox.vgrow="ALWAYS">
             <children>
-                <TableView fx:id="table" layoutY="328.0" prefHeight="418.0" prefWidth="1004.0">
+                <TableView fx:id="table" layoutY="265.0" prefHeight="418.0" prefWidth="1009.0">
                     <columns>
                         <TableColumn fx:id="tc_name" prefWidth="161.0" text="Name" />
                         <TableColumn fx:id="tc_surname" prefWidth="130.0" text="Surname" />
@@ -24,7 +24,7 @@
                         <TableColumn fx:id="tc_email" prefWidth="170.0" text="Email" />
                         <TableColumn fx:id="tc_company" minWidth="0.0" prefWidth="140.0" text="Company" />
                         <TableColumn fx:id="tc_status" prefWidth="117.0" text="Status" />
-                        <TableColumn fx:id="tc_privilege" prefWidth="143.0" text="Privilege" />
+                        <TableColumn fx:id="tc_privilege" prefWidth="148.0" text="Privilege" />
                     </columns>
                 </TableView>
                 <TextField fx:id="txt_name" layoutX="45.0" layoutY="108.0" prefHeight="25.0" prefWidth="185.0" />
@@ -37,14 +37,13 @@
                 <Label layoutX="462.0" layoutY="91.0" text="Username" />
                 <Label layoutX="653.0" layoutY="83.0" text="Email" />
                 <Label layoutX="45.0" layoutY="170.0" text="Company" />
-                <Button fx:id="btn_search" layoutX="45.0" layoutY="264.0" mnemonicParsing="false" onAction="#searchButtonHandler" prefHeight="30.0" prefWidth="74.0" text="Search" />
                 <Text layoutX="45.0" layoutY="51.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Filters" wrappingWidth="74.27734375">
                     <font>
                         <Font name="Arial" size="27.0" />
                     </font>
                 </Text>
-                <Button fx:id="btn_create" layoutX="29.0" layoutY="764.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="74.0" text="Create" />
-                <Button fx:id="btn_delete" disable="true" layoutX="119.0" layoutY="764.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="74.0" text="Delete" />
+                <Button fx:id="btn_create" layoutX="22.0" layoutY="721.0" mnemonicParsing="false" onAction="#handleOnClickCreateButton" prefHeight="30.0" prefWidth="74.0" text="Create" />
+                <Button fx:id="btn_delete" disable="true" layoutX="111.0" layoutY="721.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="74.0" text="Delete" />
                 <Label layoutX="272.0" layoutY="166.0" text="Status" />
                 <ChoiceBox fx:id="chb_status" layoutX="272.0" layoutY="187.0" prefWidth="150.0" />
                 <Label layoutX="462.0" layoutY="164.0" text="Privilege" />

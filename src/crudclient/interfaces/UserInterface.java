@@ -43,12 +43,13 @@ public interface UserInterface {
     /**
      * Creates a new user.
      *
-     * @param user
+     * @param user The entity to insert. User in this case.
      */
-    public void createUser(UserInterface user);
-    
+    public void createUser(Object user) throws ClientErrorException;
+
     /**
      * Gets the public encryption key.
+     *
      * @return The public key.
      */
     public String getPublicKey();
