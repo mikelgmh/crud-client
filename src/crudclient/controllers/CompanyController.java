@@ -24,6 +24,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javax.ws.rs.core.GenericType;
 
 /**
+ * The controller for the companies view.
  *
  * @author Iker de la Cruz
  */
@@ -32,7 +33,6 @@ public class CompanyController {
     private static final Logger logger = Logger.getLogger("crudclient.controllers.CompanyController");
     private Stage stage;
     private ObservableList<Company> companyData;
-
     @FXML
     private Button btnFilter;
     @FXML
@@ -71,7 +71,7 @@ public class CompanyController {
      * @param root The loaded view.
      */
     public void initStage(Parent root) {
-        logger.log(Level.INFO, "Loading the SignIn stage.");
+        logger.log(Level.INFO, "Loading the Companies stage.");
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setTitle("Companies");
@@ -81,7 +81,7 @@ public class CompanyController {
         tfNameFilter.textProperty().addListener(this::handleFilterButton);
         tfLocalizationFilter.textProperty().addListener(this::handleFilterButton);
         stage.show();
-        logger.log(Level.INFO, "SignIn stage loaded.");
+        logger.log(Level.INFO, "Companies stage loaded.");
     }
 
     /**
