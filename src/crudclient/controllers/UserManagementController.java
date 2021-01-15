@@ -35,6 +35,9 @@ import crudclient.interfaces.UserInterface;
 import crudclient.util.filters.BindedProperty;
 import crudclient.util.filters.FilterSearch;
 import java.util.ArrayList;
+import java.util.Collections;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javax.ws.rs.core.GenericType;
@@ -49,8 +52,7 @@ public class UserManagementController {
     private static final Logger logger = Logger.getLogger("signupsignin.controllers.SignUpController");
     private GenericValidations genericValidations = new GenericValidations();
     private UserInterface userImplementation;
-    private ObservableList observableUserList;
-    private ObservableList observableUserListCopy;
+    private ObservableList<User> masterData = FXCollections.observableArrayList();
     private ArrayList<Control> controlArrayList = new ArrayList<Control>();
     private FilterSearch fs = new FilterSearch();
 
@@ -213,11 +215,39 @@ public class UserManagementController {
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
 
         // Se obtiene la lista de usuarios utilizando la implementación que hay en la propiedad de la clase. Se necesita pasar desde la ventana anterior o desde el método main.
-        this.observableUserList = FXCollections.observableArrayList(getUserImplementation().getUsers(new GenericType<List<User>>() { }));
-        
-        
-        
-        this.table.setItems(observableUserList);
+        getUsers();
+
+        FilteredList<User> filteredData = new FilteredList<>(masterData, p -> true);
+        txt_name.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(user -> {
+                // If filter text is empty, display all persons.
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                // Compare first name and last name of every person with filter text.
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                if (user.getName().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches first name.
+                }
+                return false; // Does not match.
+            });
+        });
+        SortedList<User> sortedData = new SortedList<>(filteredData);
+		
+		// 4. Bind the SortedList comparator to the TableView comparator.
+		sortedData.comparatorProperty().bind(table.comparatorProperty());
+        this.table.setItems(sortedData);
+    }
+
+    public void getUsers() {
+        this.masterData = FXCollections.observableArrayList(getUserImplementation().getUsers(new GenericType<List<User>>() {
+        }));
+        //  ArrayList <User> usersCopy = new ArrayList<User>(observableUserList.size());
+
+        // ObservableList test = FXCollections.observableArrayList(usersCopy);
+        // Collections.copy(test, observableUserList);
     }
 
     public void searchButtonHandler() {
@@ -231,13 +261,14 @@ public class UserManagementController {
 //            }
 //        }
 //        txt_name.getText().trim();
-
-        BindedProperty bp = new BindedProperty("name", txt_name);
-        BindedProperty bp2 = new BindedProperty("company", "name", txt_company);
-        fs.observableModelList(observableUserList);
-        fs.addBindedProperty(bp);
-        fs.addBindedProperty(bp2);
-        fs.filter();
+        //getUsers();
+//        getUsers();
+//        BindedProperty bp = new BindedProperty("name", txt_name);
+//        BindedProperty bp2 = new BindedProperty("company", "name", txt_company);
+//        fs.setObservableModelList(observableUserList);
+//        fs.addBindedProperty(bp);
+//        fs.addBindedProperty(bp2);
+//        fs.filter();
 
     }
 

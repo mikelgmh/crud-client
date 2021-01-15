@@ -15,8 +15,10 @@ import java.util.Observable;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.FXCollections;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
@@ -29,17 +31,24 @@ public class FilterSearch {
     private TableView tableView;
     private ArrayList<BindedProperty> bindedProperties = new ArrayList<>();
     private ObservableList observableModelList;
-    private ObservableList observableModelListCopy;
+    private ObservableList observableListResult;
 
     public FilterSearch() {
+        ArrayList<User> userList = new ArrayList();
+        
+        observableListResult = FXCollections.observableArrayList(userList);
     }
 
-    public ObservableList getObservableModelListCopy() {
-        return observableModelListCopy;
+    public ObservableList getObservableListResult() {
+        return observableListResult;
     }
 
-    public void setObservableModelListCopy(ObservableList observableModelListCopy) {
-        this.observableModelListCopy = observableModelListCopy;
+    public void setObservableListResult(ObservableList observableListResult) {
+        this.observableListResult = observableListResult;
+    }
+
+    public void addToResultObservableList(Object obj) {
+        this.observableListResult.add(obj);
     }
 
     public void addBindedProperty(BindedProperty bp) {
@@ -58,7 +67,7 @@ public class FilterSearch {
         return observableModelList;
     }
 
-    public void observableModelList(ObservableList observableUserList) {
+    public void setObservableModelList(ObservableList observableUserList) {
         this.observableModelList = observableUserList;
     }
 
@@ -93,6 +102,7 @@ public class FilterSearch {
     }
 
     public void filter() {
+        this.observableListResult.clear();
         ArrayList<Object> deleteList = new ArrayList<>();
         for (int i = 0; i < observableModelList.size(); i++) {
             System.out.println("Size del array: " + observableModelList.size());
@@ -115,15 +125,17 @@ public class FilterSearch {
             }
             if (!found) {
                 // System.out.println("Eliminado: " + observableModelList.get(i));
-                deleteList.add(observableModelList.get(i));
-
+                // deleteList.add(observableModelList.get(i));
+            } else {
+                this.addToResultObservableList(observableModelList.get(i));
             }
-            // System.out.println(found);
+            System.out.println(found);
         }
         for (int i = 0; i < deleteList.size(); i++) {
             observableModelList.remove(deleteList.get(i));
         }
-        
+        System.out.println("Total resultados: " + observableListResult.size());
+        this.observableModelList = observableListResult;
     }
 
     public String getControlValue(Control control) {
@@ -138,7 +150,6 @@ public class FilterSearch {
                 break;
         }
         return text;
-
     }
 
     public boolean compareValues(String filterFieldValue, String modelValue) {
