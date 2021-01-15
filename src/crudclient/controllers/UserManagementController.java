@@ -5,18 +5,12 @@
  */
 package crudclient.controllers;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.rits.cloning.Cloner;
-import com.sun.javafx.collections.ObservableListWrapper;
-import com.sun.javafx.scene.control.behavior.TextBinding;
-import crudclient.factories.UserFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Parent;
 import crudclient.model.User;
 import crudclient.model.UserPrivilege;
 import crudclient.model.UserStatus;
-import crudclient.util.security.AsymmetricEncryption;
 import crudclient.util.validation.GenericValidations;
 import java.util.List;
 import javafx.beans.value.ObservableValue;
@@ -35,15 +29,11 @@ import javafx.stage.Stage;
 import crudclient.interfaces.UserInterface;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
-import javafx.scene.control.Control;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -112,6 +102,7 @@ public class UserManagementController {
         // Creates a scena and a stage and opens the window.
         Scene scene = new Scene(parent);
         Stage stage = new Stage();
+
 
         // Set listeners
         this.setListeners();
