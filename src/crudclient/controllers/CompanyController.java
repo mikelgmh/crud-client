@@ -13,6 +13,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import crudclient.model.CompanyType;
+import java.util.List;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,6 +21,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javax.ws.rs.core.GenericType;
 
 /**
  *
@@ -103,17 +105,15 @@ public class CompanyController {
         tcNameCompany.setCellValueFactory(new PropertyValueFactory("name"));
         tcTypeCompany.setCellValueFactory(new PropertyValueFactory("type"));
         tcLocalizationCompany.setCellValueFactory(new PropertyValueFactory("localization"));
-        // TODO: Load the data from the database into the TableView.
-        /*try {
+        // Load the data from the database into the TableView.
+        try {
             CompanyRESTClient rest = new CompanyRESTClient();
-            companyData = FXCollections.observableArrayList();
-        } catch (Exception ex) {
+            companyData = FXCollections.observableArrayList(rest.findAllCompanies_XML(new GenericType<List<Company>>() {
+            }));
+        } // TODO: Show an alert if there are an error with the server or something else
+        catch (Exception ex) {
             ex.printStackTrace();
-        }*/
-        // Load data into the table view.
-        Company company = new Company(1, "Iker", CompanyType.ADMIN, "Berriz");
-        Company company2 = new Company(2, "Aketza", CompanyType.CLIENT, "Tartanga");
-        companyData = FXCollections.observableArrayList(company, company2);
+        }
         tableViewCompanies.setItems(companyData);
     }
 
