@@ -7,6 +7,7 @@ package crudclient.client;
 
 import crudclient.interfaces.ProductInterface;
 import crudclient.model.Product;
+import java.util.List;
 import java.util.Set;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
@@ -89,10 +90,10 @@ public class ProductRESTClient implements ProductInterface{
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
 
-    public Set<Product>  findAllProducts_XML(GenericType responseType) throws ClientErrorException {
+    public <T> T findAllProducts_XML(GenericType<T> responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("findAllProducts");
-        return (Set<Product>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     public <T> T findAllProducts_JSON(Class<T> responseType) throws ClientErrorException {

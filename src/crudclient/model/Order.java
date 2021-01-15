@@ -2,6 +2,7 @@ package crudclient.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -21,7 +22,7 @@ public class Order implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
-    private Timestamp date;
+    private Date date;
     private Double total_price;
 
     //Pregunta Enumtype: ¿Ordinal o String?
@@ -64,11 +65,11 @@ public class Order implements Serializable {
         this.orderProduct = orderProduct;
     }
 
-    public Timestamp getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(Timestamp date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

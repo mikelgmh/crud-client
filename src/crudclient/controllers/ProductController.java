@@ -5,6 +5,7 @@
  */
 package crudclient.controllers;
 
+import crudclient.client.ProductRESTClient;
 import crudclient.interfaces.ProductInterface;
 import crudclient.model.Company;
 import crudclient.model.Product;
@@ -17,6 +18,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.StringProperty;
@@ -34,6 +36,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
@@ -58,10 +61,8 @@ public class ProductController {
     private Stage stage;
     @FXML
     private TableView<Product> tv_Tabla;
-    @FXML
-    private TableColumn<Product, Boolean> tc_Checkbox;
-    @FXML
-    private TableColumn<Product, Integer> tc_Id;
+   // @FXML
+   // private TableColumn<Product, Integer> tc_Id;
     @FXML
     private TableColumn<Product, String> tc_Name;
     @FXML
@@ -73,27 +74,25 @@ public class ProductController {
     @FXML
     private Button btn_Delete;
     @FXML
-    private Button btn_Modify;
-    @FXML
     private Button btn_OrderCreate;
     @FXML
+    private Button btn_Filter;
+   /* @FXML
     private TextField tf_Id;
     @FXML
     private TextField tf_Name;
     @FXML
     private TextField tf_Weight;
     @FXML
-    private TextField tf_Price;
+    private TextField tf_Price;*/
     @FXML
     private Label lbl_Choose;
     @FXML
-    private ComboBox<Company> combo_Company;
-
-    private ProductInterface ProductImplementation;
-    private final List<Product> products = new ArrayList<>();
+    private ComboBox<Company> combo_Company;    
     private static final Logger LOG = Logger.getLogger(ProductController.class.getName());
     private TableView<ObservableList<StringProperty>> table = new TableView<>();
-    private ObservableSet<Product> pr;
+    private ObservableList<Product> pr;
+    private ProductInterface productImplementation;
 
     /**
      * Initializes the controller class.
@@ -116,30 +115,32 @@ public class ProductController {
         LOG.log(Level.INFO, "Stage ");
         /*En los dos labels se muestran datos que hemos recibido desde el lado
         servidor*/
-        tf_Id.setTooltip(new Tooltip("ID of the product"));
+       /* tf_Id.setTooltip(new Tooltip("ID of the product"));
         tf_Name.setTooltip(new Tooltip("Name of the product"));
         tf_Weight.setTooltip(new Tooltip("Weight of the product"));
-        tf_Price.setTooltip(new Tooltip("Price of the product"));
+        tf_Price.setTooltip(new Tooltip("Price of the product"));*/
         btn_Create.setTooltip(new Tooltip("Create a new product"));
-        btn_Modify.setTooltip(new Tooltip("Modify a product"));
         btn_Delete.setTooltip(new Tooltip("Delete a product"));
+        btn_Delete.setOnAction(this::handleOnClickDelete);
         btn_OrderCreate.setTooltip(new Tooltip("Create an order"));
-        this.pr = FXCollections.observableSet(getProductImplementation().findAllProducts_XML(new GenericType<Set<Product>>() { }));
+        btn_Filter.setTooltip(new Tooltip("Create an order"));
+        //this.pr = FXCollections.observableSet(getProductImplementation().findAllProducts_XML(new GenericType<Set<Product>>() { }));
+        tv_Tabla.getSelectionModel().setSelectionMode(
+                SelectionMode.MULTIPLE
+        );
         LOG.log(Level.INFO, "Tooltip ");
         tabla();
         LOG.log(Level.INFO, "tabla ");
-        //tableInfo();
+        tableInfo();
         LOG.log(Level.INFO, "tablainfo ");
         stage.show();
-        
+
     }
 
     private void tabla() {
         tv_Tabla.setEditable(true);
 
-        tc_Checkbox.setCellValueFactory(new PropertyValueFactory<>("id"));
-
-        tc_Id.setCellValueFactory(new PropertyValueFactory<>("id"));
+       // tc_Id.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         tc_Name.setCellValueFactory(new PropertyValueFactory<>("name"));
 
@@ -172,23 +173,21 @@ public class ProductController {
         tc_Price.setOnEditCommit(data -> {
             data.getRowValue().setPrice(data.getNewValue());
         });
-        
-        tc_Checkbox.setCellValueFactory(new PropertyValueFactory<Product, Boolean>("Checkbox"));
-/*
-        tc_Checkbox.setCellValueFactory(cell -> {
-            Product p = cell.getValue();
-            return new ReadOnlyBooleanWrapper(p.getCheckbox());
-        });
-        tc_Checkbox.setCellFactory(CheckBoxTableCell.forTableColumn(tc_Checkbox));
 
-        products.forEach((p) -> {
-            tv_Tabla.getItems().add(p);
-        });
-*/
     }
 
     private void tableInfo() {
-        Product product = new Product();
+
+        LOG.log(Level.INFO, "pr ");
+        ProductRESTClient rest = new ProductRESTClient();
+        pr = FXCollections.observableArrayList(rest.findAllProducts_XML(new GenericType<List<Product>>() {
+        }));
+
+        tv_Tabla.setItems(pr);
+        // this.pr = FXCollections.observableSet(getProductImplementation().findAllProducts_XML(new GenericType<List<Product>>() {
+        //}));
+        //this.table.setItems(pr);
+        /*  Product product = new Product();
         User user = new User();
         product.setId(1);
         product.setName("Aketza");
@@ -196,12 +195,12 @@ public class ProductController {
         product.setPrice(300);
         product.setUser(user);
         ObservableList<Product> info = FXCollections.observableArrayList(product);
-        tv_Tabla.setItems(info);
+        tv_Tabla.setItems(info);*/
 
     }
 
     @FXML
-    private void handleOnClickCreate(ActionEvent event) throws IOException {
+    private void handleOnClickCreate(ActionEvent event) {
         // get current position
         TablePosition pos = table.getFocusModel().getFocusedCell();
 
@@ -220,26 +219,32 @@ public class ProductController {
         tv_Tabla.scrollTo(product);
 
     }
-    
-    @FXML
-    private void handleOnClickDelete(ActionEvent event) throws IOException {
-        btn_Delete.setDisable(false);
-        tv_Tabla.getItems().remove(tv_Tabla.getSelectionModel().getSelectedItem());
-    }
 
     @FXML
-    private void handleOnClickModify(ActionEvent event) {
+    private void handleOnClickDelete(ActionEvent event) {
+        btn_Delete.setDisable(false);
+        //tv_Tabla.getItems().remove(tv_Tabla.getSelectionModel().getSelectedItem());
+        ProductRESTClient rest = new ProductRESTClient();
+        rest.remove(tv_Tabla.getSelectionModel().getSelectedItem().getId().toString());
+        tableInfo();
     }
 
     @FXML
     private void handleOnClickFilter(ActionEvent event) {
     }
-    
-     public void setProductImplementation(ProductInterface product) {
-        this.ProductImplementation = product;
+
+    @FXML
+    private void handleOnClickCreateOrder(ActionEvent event) {
+        List<String> names = tv_Tabla.getSelectionModel().getSelectedItems().stream()
+                .map(Product::getName)
+                .collect(Collectors.toList());
+    }
+
+    public void setProductImplementation(ProductInterface product) {
+        this.productImplementation = product;
     }
 
     public ProductInterface getProductImplementation() {
-        return this.ProductImplementation;
+        return this.productImplementation;
     }
 }
