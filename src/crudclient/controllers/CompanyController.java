@@ -1,6 +1,7 @@
 package crudclient.controllers;
 
 import crudclient.client.CompanyRESTClient;
+import crudclient.interfaces.CompanyInterface;
 import crudclient.model.Company;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +34,7 @@ public class CompanyController {
     private static final Logger logger = Logger.getLogger("crudclient.controllers.CompanyController");
     private Stage stage;
     private ObservableList<Company> companyData;
+    private CompanyInterface companyImplementation;
     @FXML
     private Button btnFilter;
     @FXML
@@ -107,8 +109,7 @@ public class CompanyController {
         tcLocalizationCompany.setCellValueFactory(new PropertyValueFactory("localization"));
         // Load the data from the database into the TableView.
         try {
-            CompanyRESTClient rest = new CompanyRESTClient();
-            companyData = FXCollections.observableArrayList(rest.findAllCompanies_XML(new GenericType<List<Company>>() {
+            companyData = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
             }));
         } // TODO: Show an alert if there are an error with the server or something else
         catch (Exception ex) {
@@ -150,6 +151,18 @@ public class CompanyController {
         } else {
             btnFilter.setDisable(true);
         }
+    }
+
+    public CompanyInterface getCompanyImplementation() {
+        return companyImplementation;
+    }
+
+    public void setCompanyImplementation(CompanyInterface companyImplementation) {
+        this.companyImplementation = companyImplementation;
+    }
+
+    public void setImplementation(CompanyInterface companyInterface) {
+        this.companyImplementation = companyInterface;
     }
 
 }

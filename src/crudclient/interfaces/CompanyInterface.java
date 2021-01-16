@@ -1,0 +1,14 @@
+package crudclient.interfaces;
+
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.core.GenericType;
+
+/**
+ *
+ * @author Iker de la Cruz
+ */
+public interface CompanyInterface {
+
+    public <T> T findAllCompanies_XML(GenericType<T> responseType) throws ClientErrorException;
+
+}
