@@ -20,6 +20,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javax.ws.rs.core.GenericType;
@@ -39,8 +40,6 @@ public class CompanyController {
     private Button btnFilter;
     @FXML
     private Button btnCreateCompany;
-    @FXML
-    private Button btnModifyCompany;
     @FXML
     private Button btnDeleteCompany;
     @FXML
@@ -82,6 +81,8 @@ public class CompanyController {
         // Set handlers
         tfNameFilter.textProperty().addListener(this::handleFilterButton);
         tfLocalizationFilter.textProperty().addListener(this::handleFilterButton);
+        tableViewCompanies.getSelectionModel().selectedItemProperty()
+                .addListener(this::handleCompaniesTableSelectionChanged);
         stage.show();
         logger.log(Level.INFO, "Companies stage loaded.");
     }
@@ -94,7 +95,6 @@ public class CompanyController {
     private void handleWindowShowing(WindowEvent event) {
         btnFilter.setDisable(true);
         btnCreateCompany.setDisable(false);
-        btnModifyCompany.setDisable(true);
         btnDeleteCompany.setDisable(true);
         tfNameFilter.clear();
         // FIXME: Fix the IndexOutOfBoundsException error.
@@ -111,9 +111,9 @@ public class CompanyController {
         try {
             companyData = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
             }));
-        } // TODO: Show an alert if there are an error with the server or something else
-        catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
+            // Change the default message in the tableview with an error.
+            tableViewCompanies.setPlaceholder(new Label(ex.getMessage()));
         }
         tableViewCompanies.setItems(companyData);
     }
@@ -153,14 +153,62 @@ public class CompanyController {
         }
     }
 
+    /**
+     *
+     * @param observable
+     * @param oldValue
+     * @param newValue
+     */
+    private void handleCompaniesTableSelectionChanged(ObservableValue observable,
+            Object oldValue, Object newValue) {
+        if (newValue != null) {
+            btnDeleteCompany.setDisable(false);
+        }
+    }
+
+    /**
+     * Method to create a new row in the TableView.
+     *
+     * @param event
+     */
+    @FXML
+    private void createCompanyAction(ActionEvent event) {
+        // TODO: Autoincrementar el id al añadir nueva fila.
+        tableViewCompanies.getItems().add(new Company());
+    }
+
+    /**
+     * Method to delete the selected Company in the TableView and the database.
+     *
+     * @param event
+     */
+    @FXML
+    private void deleteCompanyAction(ActionEvent event) {
+        tableViewCompanies.getItems().remove(tableViewCompanies.getSelectionModel().getSelectedItem());
+        // TODO: Borrar la compañia borrada en la base de datos.
+        tableViewCompanies.refresh();
+    }
+
+    /**
+     *
+     * @return
+     */
     public CompanyInterface getCompanyImplementation() {
         return companyImplementation;
     }
 
+    /**
+     *
+     * @param companyImplementation
+     */
     public void setCompanyImplementation(CompanyInterface companyImplementation) {
         this.companyImplementation = companyImplementation;
     }
 
+    /**
+     *
+     * @param companyInterface
+     */
     public void setImplementation(CompanyInterface companyInterface) {
         this.companyImplementation = companyInterface;
     }

@@ -122,19 +122,14 @@
                                     </Label>
                                     <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <Button fx:id="btnCreateCompany" mnemonicParsing="false" text="Create Company">
+                                          <Button fx:id="btnCreateCompany" mnemonicParsing="false" onAction="#createCompanyAction" text="Create Company">
                                              <HBox.margin>
                                                 <Insets />
                                              </HBox.margin>
                                           </Button>
-                                          <Button fx:id="btnModifyCompany" mnemonicParsing="false" text="Modify Company">
+                                          <Button fx:id="btnDeleteCompany" mnemonicParsing="false" onAction="#deleteCompanyAction" text="Delete Company">
                                              <HBox.margin>
-                                                <Insets left="10.0" right="10.0" />
-                                             </HBox.margin>
-                                          </Button>
-                                          <Button fx:id="btnDeleteCompany" mnemonicParsing="false" text="Delete Company">
-                                             <HBox.margin>
-                                                <Insets />
+                                                <Insets left="10.0" />
                                              </HBox.margin>
                                           </Button>
                                        </children>
