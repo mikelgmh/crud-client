@@ -62,7 +62,7 @@ public class UserCreationController {
     private ChoiceBox chb_status;
     @FXML
     private ChoiceBox chb_privilege;
-        @FXML
+    @FXML
     private ChoiceBox chb_company;
 
     // Hint labels
@@ -109,6 +109,9 @@ public class UserCreationController {
         txt_lastname.getProperties().put("minLengthValidator", false);
         txt_firstname.getProperties().put("minLengthValidator", false);
         txt_username.getProperties().put("minLengthValidator", false);
+        txt_password.getProperties().put("passwordRequirements", false);
+        txt_repeatPassword.getProperties().put("passwordRequirements", false);
+        txt_repeatPassword.getProperties().put("passwordsMatch", false);
         // Set listeners
         this.setListeners();
 
@@ -126,7 +129,7 @@ public class UserCreationController {
 
         this.companyList = FXCollections.observableArrayList(this.getUserImplementation().getAllCompanies(new GenericType<List<Company>>() {
         }));
-        
+
         this.chb_company.getItems().setAll(companyList);
         // Sets the first values so we don't get an exception when loading the screen.
         this.chb_status.getSelectionModel().selectFirst();
@@ -155,6 +158,9 @@ public class UserCreationController {
 
             setInputError(minlengthValidator, txt_username, hint_username);
             this.validate(); // Executes the validation.
+        });
+        this.chb_company.setOnAction(event -> {
+            this.validate();
         });
 
         // Validation for the Email field
@@ -231,7 +237,33 @@ public class UserCreationController {
     }
 
     public void validate() {
-
+        if (Boolean.parseBoolean(this.txt_email.getProperties().get("emailValidator").toString())
+                && Boolean.parseBoolean(this.txt_firstname.getProperties().get("minLengthValidator").toString())
+                && Boolean.parseBoolean(this.txt_username.getProperties().get("minLengthValidator").toString())
+                && Boolean.parseBoolean(this.txt_lastname.getProperties().get("minLengthValidator").toString())
+                && Boolean.parseBoolean(this.txt_password.getProperties().get("passwordRequirements").toString())
+                && Boolean.parseBoolean(this.txt_repeatPassword.getProperties().get("passwordRequirements").toString())
+                && Boolean.parseBoolean(this.txt_repeatPassword.getProperties().get("passwordsMatch").toString())
+                && this.chb_company.getSelectionModel().getSelectedItem() != null) {
+            this.btn_create.setDisable(false);
+        } else {
+            this.btn_create.setDisable(true);
+        }
+    }
+    
+    public void onCreateButtonClickHandler(){
+        User user = new User();
+        user.setName(txt_firstname.getText());
+        user.setSurname(txt_lastname.getText());
+        user.setEmail(txt_email.getText());
+        user.setCompany((Company) chb_company.getSelectionModel().getSelectedItem());
+        user.setStatus((UserStatus) chb_status.getSelectionModel().getSelectedItem());
+        user.setPrivilege((UserPrivilege) chb_privilege.getSelectionModel().getSelectedItem());
+        AsymmetricEncryption asymmetricEncryption = new AsymmetricEncryption(getUserImplementation().getPublicKey());
+        String encryptedPassword = asymmetricEncryption.encryptString(txt_password.getText());
+        user.setPassword(encryptedPassword);
+        this.userImplementation.createUser(user);
+        System.out.println("Creando usuario");
     }
 
     public Stage getStage() {

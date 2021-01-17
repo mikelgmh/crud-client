@@ -49,7 +49,7 @@ public class UserRESTClient implements UserInterface {
 
     public <T> T getAllUsers_JSON(GenericType<T> responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
-        resource = resource.path("user/getAllUsers");
+        resource = resource.path("getAllUsers");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
@@ -99,7 +99,11 @@ public class UserRESTClient implements UserInterface {
 
     @Override
     public void createUser(Object requestEntity) throws ClientErrorException {
+        webTarget = client.target(BASE_URI).path("user");
+
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        webTarget = client.target(BASE_URI).path("");
+
     }
 
     public void create_JSON(Object requestEntity) throws ClientErrorException {
@@ -150,7 +154,7 @@ public class UserRESTClient implements UserInterface {
 
     @Override
     public List getAllCompanies(GenericType genericType) throws ClientErrorException {
-          WebTarget resource = webTarget;
+        WebTarget resource = webTarget;
         resource = resource.path("company/findAllCompanies");
         return (List<Company>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(genericType);
     }
