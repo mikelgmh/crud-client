@@ -1,6 +1,5 @@
 package crudclient.controllers;
 
-import crudclient.client.CompanyRESTClient;
 import crudclient.interfaces.CompanyInterface;
 import crudclient.model.Company;
 import java.util.logging.Level;
@@ -22,7 +21,9 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -103,10 +104,17 @@ public class CompanyController {
         cbTypeFilter.getItems().addAll(FXCollections.observableArrayList(CompanyType.values()));
         tfLocalizationFilter.clear();
         // Set the factories to the column values of the table.
+        // ID
         tcIdCompany.setCellValueFactory(new PropertyValueFactory("id"));
+        // Name
         tcNameCompany.setCellValueFactory(new PropertyValueFactory("name"));
+        tcNameCompany.setCellFactory(TextFieldTableCell.<Company>forTableColumn());
+        // Type
         tcTypeCompany.setCellValueFactory(new PropertyValueFactory("type"));
+        // TODO: setCellFactory de ComboBox para el tipo de Compañia.
+        // Localization
         tcLocalizationCompany.setCellValueFactory(new PropertyValueFactory("localization"));
+        tcLocalizationCompany.setCellFactory(TextFieldTableCell.<Company>forTableColumn());
         // Load the data from the database into the TableView.
         try {
             companyData = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
@@ -173,8 +181,9 @@ public class CompanyController {
      */
     @FXML
     private void createCompanyAction(ActionEvent event) {
-        // TODO: Autoincrementar el id al añadir nueva fila.
-        tableViewCompanies.getItems().add(new Company());
+        // TODO: Autoincrementar el id desde la base de datos al añadir nueva fila.
+        // TODO: Añadir nueva Company a la base de datos.
+        tableViewCompanies.getItems().add(new Company(tableViewCompanies.getItems().size() + 1, null, CompanyType.CLIENT, null));
     }
 
     /**
@@ -184,8 +193,16 @@ public class CompanyController {
      */
     @FXML
     private void deleteCompanyAction(ActionEvent event) {
+        // Delete selected Company in the database.
+        // Get the selected ID cell
+        TablePosition pos = (TablePosition) tableViewCompanies.getSelectionModel().getSelectedCells().get(0);
+        Integer row = pos.getRow();
+        // Get items of the selected row
+        Company item = (Company) tableViewCompanies.getItems().get(row);
+        TableColumn col = pos.getTableColumn();
+        // Delete the selected Company sending the ID value
+        companyImplementation.remove(col.getCellObservableValue(item).getValue().toString());
         tableViewCompanies.getItems().remove(tableViewCompanies.getSelectionModel().getSelectedItem());
-        // TODO: Borrar la compañia borrada en la base de datos.
         tableViewCompanies.refresh();
     }
 

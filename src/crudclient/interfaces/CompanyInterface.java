@@ -11,4 +11,8 @@ public interface CompanyInterface {
 
     public <T> T findAllCompanies_XML(GenericType<T> responseType) throws ClientErrorException;
 
+    public void remove(String id) throws ClientErrorException;
+
+    public void create_XML(Object requestEntity) throws ClientErrorException;
+
 }
