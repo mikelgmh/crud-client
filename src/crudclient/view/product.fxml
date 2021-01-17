@@ -20,7 +20,7 @@
       <Button fx:id="btn_Delete" layoutX="424.0" layoutY="132.0" mnemonicParsing="false" onAction="#handleOnClickDelete" prefHeight="31.0" prefWidth="123.0" text="Delete product" />
       <Button fx:id="btn_Filter" disable="true" layoutX="317.0" layoutY="46.0" mnemonicParsing="false" onAction="#handleOnClickFilter" text="Search Company" />
       <Label fx:id="lbl_Choose" disable="true" layoutX="38.0" layoutY="47.0" text="Choose company:" />
-      <ComboBox fx:id="combo_Company" disable="true" layoutX="154.0" layoutY="46.0" prefHeight="25.0" prefWidth="140.0" />
+      <ComboBox fx:id="combo_Company" layoutX="154.0" layoutY="46.0" prefHeight="25.0" prefWidth="140.0" />
       <Button fx:id="btn_OrderCreate" layoutX="513.0" layoutY="43.0" mnemonicParsing="false" onAction="#handleOnClickCreateOrder" prefHeight="31.0" prefWidth="207.0" text="Create Order" />
    </children>
 </Pane>
