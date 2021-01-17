@@ -256,6 +256,7 @@ public class UserCreationController {
         user.setName(txt_firstname.getText());
         user.setSurname(txt_lastname.getText());
         user.setEmail(txt_email.getText());
+        user.setUsername(txt_username.getText());
         user.setCompany((Company) chb_company.getSelectionModel().getSelectedItem());
         user.setStatus((UserStatus) chb_status.getSelectionModel().getSelectedItem());
         user.setPrivilege((UserPrivilege) chb_privilege.getSelectionModel().getSelectedItem());
