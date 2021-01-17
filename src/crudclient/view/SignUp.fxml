@@ -55,7 +55,7 @@
             <Font size="11.0" />
          </font>
       </Label>
-      <Label fx:id="hint_repeatPassword" layoutX="392.0" layoutY="681.0" text="Label" textFill="#686464">
+      <Label fx:id="hint_repeatPassword" layoutX="392.0" layoutY="681.0" text="Repeat password" textFill="#686464">
          <font>
             <Font size="11.0" />
          </font>

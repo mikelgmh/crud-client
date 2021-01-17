@@ -5,6 +5,7 @@
  */
 package crudclient.client;
 
+import crudclient.model.Company;
 import crudclient.model.User;
 import java.util.List;
 import javax.ws.rs.ClientErrorException;
@@ -33,7 +34,7 @@ public class UserRESTClient implements UserInterface {
 
     public UserRESTClient() {
         client = javax.ws.rs.client.ClientBuilder.newClient();
-        webTarget = client.target(BASE_URI).path("user");
+        webTarget = client.target(BASE_URI).path("");
     }
 
     @Override
@@ -145,6 +146,13 @@ public class UserRESTClient implements UserInterface {
     @Override
     public String getPublicKey() {
         return this.getPublicKey_JSON();
+    }
+
+    @Override
+    public List getAllCompanies(GenericType genericType) throws ClientErrorException {
+          WebTarget resource = webTarget;
+        resource = resource.path("company/findAllCompanies");
+        return (List<Company>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(genericType);
     }
 
 }

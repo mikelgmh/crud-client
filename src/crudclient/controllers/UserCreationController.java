@@ -6,18 +6,30 @@
 package crudclient.controllers;
 
 import crudclient.interfaces.UserInterface;
+import crudclient.model.Company;
+import crudclient.model.User;
+import crudclient.model.UserPrivilege;
+import crudclient.model.UserStatus;
 import crudclient.util.security.AsymmetricEncryption;
 import crudclient.util.validation.GenericValidations;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableArray;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javax.ws.rs.core.GenericType;
 
 /**
  *
@@ -30,6 +42,7 @@ public class UserCreationController {
     private UserInterface userImplementation;
     private final GenericValidations genericValidations = new GenericValidations();
     private AsymmetricEncryption enc;
+    private ObservableList companyList;
 
     @FXML
     private TextField txt_firstname;
@@ -42,13 +55,15 @@ public class UserCreationController {
     @FXML
     private TextField txt_company;
     @FXML
-    private TextField txt_password;
+    private PasswordField txt_password;
     @FXML
-    private TextField txt_repeatPassword;
+    private PasswordField txt_repeatPassword;
     @FXML
     private ChoiceBox chb_status;
     @FXML
     private ChoiceBox chb_privilege;
+        @FXML
+    private ChoiceBox chb_company;
 
     // Hint labels
     @FXML
@@ -78,6 +93,7 @@ public class UserCreationController {
         // Creates a scena and a stage and opens the window.
         Scene scene = new Scene(parent);
         Stage stage = new Stage();
+        setDefaultFieldValues();
 
         // Set stage
         this.setStage(stage);
@@ -102,6 +118,19 @@ public class UserCreationController {
         String publicKeyAsHex = this.userImplementation.getPublicKey();
         enc = new AsymmetricEncryption(publicKeyAsHex);
 
+    }
+
+    public void setDefaultFieldValues() {
+        this.chb_privilege.setItems(FXCollections.observableArrayList(UserPrivilege.values()));
+        this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
+
+        this.companyList = FXCollections.observableArrayList(this.getUserImplementation().getAllCompanies(new GenericType<List<Company>>() {
+        }));
+        
+        this.chb_company.getItems().setAll(companyList);
+        // Sets the first values so we don't get an exception when loading the screen.
+        this.chb_status.getSelectionModel().selectFirst();
+        this.chb_privilege.getSelectionModel().selectFirst();
     }
 
     public void setListeners() {
@@ -143,11 +172,57 @@ public class UserCreationController {
             }
             this.validate();
         });
+
+        this.txt_password.textProperty().addListener((obs, oldText, newText) -> {
+            Boolean passwordsMatch = this.genericValidations.comparePasswords(this.txt_password, this.txt_repeatPassword, "passwordsMatch");
+            this.genericValidations.textLimiter(this.txt_password, 25, newText);
+            this.genericValidations.regexValidator(this.genericValidations.PASS_REGEXP, this.txt_password, newText, "passwordRequirements");
+            this.setPasswordFieldsError(passwordsMatch);
+            this.validate();
+        });
+        this.txt_repeatPassword.textProperty().addListener((obs, oldText, newText) -> {
+            Boolean passwordsMatch = this.genericValidations.comparePasswords(this.txt_password, this.txt_repeatPassword, "passwordsMatch");
+            this.genericValidations.textLimiter(this.txt_repeatPassword, 25, newText);
+            this.genericValidations.regexValidator(this.genericValidations.PASS_REGEXP, this.txt_repeatPassword, newText, "passwordRequirements");
+            this.setPasswordFieldsError(passwordsMatch);
+            this.validate();
+        });
+    }
+
+    /**
+     * This method sets the password fields in red if they do not match each
+     * other
+     *
+     * @param passwordsMatch boolean indicating if the password is matching or
+     * not
+     */
+    public void setPasswordFieldsError(Boolean passwordsMatch) {
+        if (!passwordsMatch) { // If passwords do noy match sets the input error styles
+            this.hint_password.setTextFill(Color.RED);
+            this.genericValidations.addClass(this.txt_password, "error", Boolean.TRUE);
+            this.hint_password.setText("Passwords don't match");
+            this.hint_repeatPassword.setTextFill(Color.RED);
+            this.genericValidations.addClass(this.txt_repeatPassword, "error", Boolean.TRUE);
+        } else { // Sets the default styles to inputs
+            if (!Boolean.parseBoolean(txt_password.getProperties().get("passwordRequirements").toString())) {
+                this.hint_password.setTextFill(Color.RED);
+                this.genericValidations.addClass(this.txt_password, "error", Boolean.TRUE);
+                this.hint_password.setText("The passwords do not fulfill the requirements:\n" + genericValidations.PASSWORD_CONDITIONS);
+                this.hint_repeatPassword.setTextFill(Color.RED);
+                this.genericValidations.addClass(this.txt_repeatPassword, "error", Boolean.TRUE);
+            } else {
+                this.hint_password.setTextFill(genericValidations.greyColor);
+                this.genericValidations.addClass(this.txt_password, "error", Boolean.FALSE);
+                this.hint_password.setText(genericValidations.PASSWORD_CONDITIONS);
+                this.hint_repeatPassword.setTextFill(genericValidations.greyColor);
+                this.genericValidations.addClass(this.txt_repeatPassword, "error", Boolean.FALSE);
+            }
+
+        }
     }
 
     public void setInputError(boolean validatorStatus, TextField tf, Label hint) {
         if (!validatorStatus) {
-
             this.genericValidations.addClass(tf, "error", Boolean.TRUE);
         } else {
             hint.setTextFill(this.genericValidations.greyColor);

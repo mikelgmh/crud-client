@@ -46,6 +46,8 @@ public interface UserInterface {
      * @param user The entity to insert. User in this case.
      */
     public void createUser(Object user) throws ClientErrorException;
+    
+    public List getAllCompanies (GenericType genericType) throws ClientErrorException;
 
     /**
      * Gets the public encryption key.
