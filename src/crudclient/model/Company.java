@@ -63,20 +63,6 @@ public class Company implements Serializable {
         this.localization = new SimpleStringProperty(localization);
     }
 
-    /**
-     * The constructor with parameters for the Company model.
-     *
-     * @param id The Company id.
-     * @param name The Company name.
-     * @param type The Company type.
-     * @param localization The Company localization.
-     */
-    public Company(Integer id, String name, CompanyType type, String localization) {
-        this.id = new SimpleIntegerProperty(id);
-        this.name = new SimpleStringProperty(name);
-        this.type = new SimpleObjectProperty(type);
-        this.localization = new SimpleStringProperty(localization);
-    }
 
     /**
      *

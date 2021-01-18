@@ -8,6 +8,7 @@ package crudclient.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+import javafx.beans.property.SimpleStringProperty;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**

@@ -49,10 +49,7 @@ public class CompanyRESTClient implements CompanyInterface {
         resource = resource.path("findAllCompanies");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
-    public List<Company> getCompanies() {
-        List<Company> co = this.findAllCompanies_XML(new GenericType<List<Company>>() {});
-        return co;
-    }
+
 
     public <T> T findAllCompanies_JSON(Class<T> responseType) throws ClientErrorException {
         WebTarget resource = webTarget;

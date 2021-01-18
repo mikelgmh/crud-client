@@ -110,7 +110,7 @@ public class ProductController {
                 SelectionMode.MULTIPLE
         );
         
-        combo_Company.setItems(comboCompany());
+        //combo_Company.setItems(comboCompany());
         
         LOG.log(Level.INFO, "Tooltip ");
         
@@ -199,13 +199,7 @@ public class ProductController {
         }));
         tv_Tabla.setItems(pr);
     }
-    private ObservableList<Company> comboCompany(){
-       CompanyRESTClient rest = new CompanyRESTClient();
 
-       ObservableList<Company> types = FXCollections.observableArrayList(rest.getCompanies());
-       
-       return types;
-    }
     
     private void edit() {
 
