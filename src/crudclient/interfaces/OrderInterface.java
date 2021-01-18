@@ -1,7 +1,9 @@
 package crudclient.interfaces;
 
+import crudclient.model.Order;
 import java.util.Set;
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.core.GenericType;
 
 /**
  *
@@ -9,5 +11,7 @@ import javax.ws.rs.ClientErrorException;
  */
 public interface OrderInterface {
     
-    public Set getOrders();
+    public Set<Order> findAllOrders(GenericType responseType) throws ClientErrorException;
+    
+    public void removeOrder(String id) throws ClientErrorException;
 }
