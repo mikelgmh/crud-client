@@ -5,16 +5,19 @@
  */
 package crudclient;
 
-import crudclient.controllers.UserManagementController;
-import crudclient.factories.UserFactory;
-import java.util.logging.Logger;
+import crudclient.controllers.OrderManagementController;
+import crudclient.factories.OrderFactory;
+import java.io.IOException;
 import javafx.application.Application;
-import crudclient.interfaces.User;
-import java.util.logging.Level;
-
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import crudclient.interfaces.OrderInterface;
 
 /**
  *
@@ -32,14 +35,13 @@ public class CRUDClient extends Application {
      * stage.
      */
     @Override
-    public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("view/UserManagement.fxml"));
+    public void start(Stage primaryStage) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/orders.fxml"));
         Parent root = (Parent) loader.load();
-        UserManagementController controller = ((UserManagementController) loader.getController());
-        UserFactory userFactory = new UserFactory();
-        User user = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
-        controller.setUserImplementation(user);
-        controller.setStage(stage);
+        OrderManagementController controller = ((OrderManagementController) loader.getController());
+        OrderFactory orderFactory = new OrderFactory();
+        OrderInterface order = orderFactory.getImplementation();
+        controller.setOrderImplementation(order);
         controller.initStage(root);
     }
 
