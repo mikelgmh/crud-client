@@ -43,7 +43,7 @@
                     </font>
                 </Text>
                 <Button fx:id="btn_create" layoutX="22.0" layoutY="721.0" mnemonicParsing="false" onAction="#handleOnClickCreateButton" prefHeight="30.0" prefWidth="74.0" text="Create" />
-                <Button fx:id="btn_delete" disable="true" layoutX="111.0" layoutY="721.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="74.0" text="Delete" />
+                <Button fx:id="btn_delete" disable="true" layoutX="111.0" layoutY="721.0" mnemonicParsing="false" onAction="#onDeleteButtonClickAction" prefHeight="30.0" prefWidth="74.0" text="Delete" />
                 <Label layoutX="272.0" layoutY="166.0" text="Status" />
                 <ChoiceBox fx:id="chb_status" layoutX="272.0" layoutY="187.0" prefWidth="150.0" />
                 <Label layoutX="462.0" layoutY="164.0" text="Privilege" />

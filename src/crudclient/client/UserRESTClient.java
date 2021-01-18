@@ -42,9 +42,6 @@ public class UserRESTClient implements UserInterface {
         WebTarget resource = webTarget;
         resource = resource.path("user/getAllUsers");
         return (List<User>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(genericType);
-
-//        List<User> userList = this.getAllUsers_JSON(new GenericType<List<User>>() {
-//        });
     }
 
     public <T> T getAllUsers_JSON(GenericType<T> responseType) throws ClientErrorException {
@@ -130,13 +127,6 @@ public class UserRESTClient implements UserInterface {
         client.close();
     }
 
-//    @Override
-//    public List<User> getUsers() {
-//        // Está separado en dos sentencias porque así me aclaro mejor
-//        List<User> userList = this.getAllUsers_JSON(new GenericType<List<User>>() {
-//        });
-//        return userList;
-//    }
     @Override
     public UserInterface editUser(UserInterface user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

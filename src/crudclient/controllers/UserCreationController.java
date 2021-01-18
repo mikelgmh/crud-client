@@ -264,7 +264,6 @@ public class UserCreationController {
         String encryptedPassword = asymmetricEncryption.encryptString(txt_password.getText());
         user.setPassword(encryptedPassword);
         this.userImplementation.createUser(user);
-        System.out.println("Creando usuario");
     }
 
     public Stage getStage() {

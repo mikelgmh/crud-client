@@ -65,9 +65,9 @@ public class UserManagementController {
     @FXML
     private Label hint_email;
 
+    
     @FXML
     private Button btn_delete;
-
     @FXML
     private Button btn_create;
 
@@ -325,6 +325,10 @@ public class UserManagementController {
 
     public void searchByProperty() {
 
+    }
+    
+    public void onDeleteButtonClickAction(){
+        
     }
 
     public void validate() {
