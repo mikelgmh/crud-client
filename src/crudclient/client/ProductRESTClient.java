@@ -5,9 +5,14 @@
  */
 package crudclient.client;
 
+import crudclient.interfaces.ProductInterface;
+import crudclient.model.Product;
+import java.util.List;
+import java.util.Set;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 
 /**
  * Jersey REST client generated for REST resource:ProductFacadeREST
@@ -22,7 +27,7 @@ import javax.ws.rs.client.WebTarget;
  *
  * @author Usuario
  */
-public class ProductRESTClient {
+public class ProductRESTClient implements ProductInterface{
 
     private WebTarget webTarget;
     private Client client;
@@ -85,7 +90,7 @@ public class ProductRESTClient {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
 
-    public <T> T findAllProducts_XML(Class<T> responseType) throws ClientErrorException {
+    public <T> T findAllProducts_XML(GenericType<T> responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("findAllProducts");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
@@ -104,5 +109,7 @@ public class ProductRESTClient {
     public void close() {
         client.close();
     }
+
+    
     
 }

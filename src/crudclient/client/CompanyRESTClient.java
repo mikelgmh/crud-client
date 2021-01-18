@@ -5,9 +5,12 @@
  */
 package crudclient.client;
 
+import crudclient.model.Company;
+import java.util.List;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 
 /**
  * Jersey REST client generated for REST resource:CompanyFacadeREST
@@ -42,10 +45,14 @@ public class CompanyRESTClient {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
 
-    public <T> T findAllCompanies_XML(Class<T> responseType) throws ClientErrorException {
+    public <T> T findAllCompanies_XML(GenericType<T> responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("findAllCompanies");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+    }
+    public List<Company> getCompanies() {
+        List<Company> co = this.findAllCompanies_XML(new GenericType<List<Company>>() {});
+        return co;
     }
 
     public <T> T findAllCompanies_JSON(Class<T> responseType) throws ClientErrorException {
