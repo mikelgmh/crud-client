@@ -4,69 +4,82 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<Pane fx:id="signUpPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="770.0" prefWidth="697.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="signupsignin.controllers.SignUpController">
+<Pane fx:id="signUpPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="852.0" prefWidth="699.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="crudclient.controllers.UserCreationController">
    <children>
-      <ProgressIndicator fx:id="progress_indicator" layoutX="39.0" layoutY="542.0" prefHeight="31.0" prefWidth="37.0" visible="false" />
-      <Label fx:id="lbl_Firstname" layoutX="105.0" layoutY="105.0" text="Firstname" />
-      <Label fx:id="lbl_Lastname" layoutX="390.0" layoutY="105.0" text="Lastname" />
-      <Label fx:id="lbl_Email" layoutX="107.0" layoutY="209.0" text="Email" />
-      <Label fx:id="lbl_Username" layoutX="106.0" layoutY="318.0" text="Username" />
-      <Label fx:id="lbl_Password" layoutX="106.0" layoutY="558.0" text="Password" />
-      <Label fx:id="lbl_RepeatPassword" layoutX="391.0" layoutY="558.0" text="Repeat Password" />
-      <TextField fx:id="txt_Firstname" layoutX="106.0" layoutY="135.0" />
-      <TextField fx:id="txt_Lastname" layoutX="390.0" layoutY="135.0" />
-      <TextField fx:id="txt_Email" layoutX="107.0" layoutY="235.0" prefHeight="31.0" prefWidth="468.0" />
-      <TextField fx:id="txt_Username" layoutX="106.0" layoutY="344.0" prefHeight="31.0" prefWidth="186.0" />
-      <PasswordField fx:id="txt_Password" layoutX="107.0" layoutY="589.0" prefHeight="31.0" prefWidth="186.0" />
-      <PasswordField fx:id="txt_RepeatPassword" layoutX="391.0" layoutY="589.0" prefHeight="31.0" prefWidth="186.0" />
-      <Button fx:id="btn_SignUp" disable="true" layoutX="518.0" layoutY="679.0" mnemonicParsing="false" onAction="#signUpButtonClickHandler" text="Create" />
-      <Button fx:id="btn_Cancel" layoutX="436.0" layoutY="679.0" mnemonicParsing="false" onAction="#backButtonClickHandler" text="Cancel" />
-      <Text layoutX="101.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Create User">
+      <Label fx:id="lbl_firstname" layoutX="106.0" layoutY="161.0" text="Firstname" />
+      <Label fx:id="lbl_lastname" layoutX="391.0" layoutY="161.0" text="Lastname" />
+      <Label fx:id="lbl_email" layoutX="108.0" layoutY="265.0" text="Email" />
+      <Label fx:id="lbl_username" layoutX="107.0" layoutY="374.0" text="Username" />
+      <Label fx:id="lbl_password" layoutX="107.0" layoutY="614.0" text="Password" />
+      <Label fx:id="lbl_repeatPassword" layoutX="392.0" layoutY="614.0" text="Repeat Password" />
+      <TextField fx:id="txt_firstname" layoutX="107.0" layoutY="191.0" />
+      <TextField fx:id="txt_lastname" layoutX="391.0" layoutY="191.0" />
+      <TextField fx:id="txt_email" layoutX="108.0" layoutY="291.0" prefHeight="31.0" prefWidth="468.0" />
+      <TextField fx:id="txt_username" layoutX="107.0" layoutY="400.0" prefHeight="31.0" prefWidth="186.0" />
+      <PasswordField fx:id="txt_password" layoutX="108.0" layoutY="645.0" prefHeight="31.0" prefWidth="186.0" />
+      <PasswordField fx:id="txt_repeatPassword" layoutX="392.0" layoutY="645.0" prefHeight="31.0" prefWidth="186.0" />
+      <Button fx:id="btn_create" disable="true" layoutX="519.0" layoutY="735.0" mnemonicParsing="false" onAction="#onCreateButtonClickHandler" text="Create" />
+      <Button fx:id="btn_cancel" layoutX="437.0" layoutY="735.0" mnemonicParsing="false" text="Cancel" />
+      <Text layoutX="102.0" layoutY="112.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Create User">
          <font>
             <Font size="32.0" />
          </font>
       </Text>
-      <Label fx:id="hint_Firstname" layoutX="108.0" layoutY="162.0" text="Label" textFill="#686464">
+      <Label fx:id="hint_firstname" layoutX="109.0" layoutY="218.0" text="3 characters min" textFill="#686464">
          <font>
             <Font size="11.0" />
          </font>
       </Label>
-      <Label fx:id="hint_Lastname" layoutX="390.0" layoutY="162.0" text="Label" textFill="#686464">
+      <Label fx:id="hint_lastname" layoutX="391.0" layoutY="218.0" text="2 characters min" textFill="#686464">
          <font>
             <Font size="11.0" />
          </font>
       </Label>
-      <Label fx:id="hint_Email" layoutX="108.0" layoutY="270.0" text="Label" textFill="#686464">
+      <Label fx:id="hint_email" layoutX="109.0" layoutY="326.0" text="Enter a valid email" textFill="#686464">
          <font>
             <Font size="11.0" />
          </font>
       </Label>
-      <Label fx:id="hint_Username" layoutX="108.0" layoutY="379.0" text="Label" textFill="#686464">
+      <Label fx:id="hint_username" layoutX="109.0" layoutY="435.0" text="3 characters min" textFill="#686464">
          <font>
             <Font size="11.0" />
          </font>
       </Label>
-      <Label fx:id="hint_Password" layoutX="108.0" layoutY="625.0" text="fferfer" textFill="#686464">
+      <Label fx:id="hint_password" layoutX="109.0" layoutY="681.0" text="fferfer" textFill="#686464">
          <font>
             <Font size="11.0" />
          </font>
       </Label>
-      <Label fx:id="hint_RepeatPassword" layoutX="391.0" layoutY="625.0" text="Label" textFill="#686464">
+      <Label fx:id="hint_repeatPassword" layoutX="392.0" layoutY="681.0" text="Repeat password" textFill="#686464">
          <font>
             <Font size="11.0" />
          </font>
       </Label>
-      <ChoiceBox layoutX="388.0" layoutY="347.0" prefHeight="25.0" prefWidth="186.0" />
-      <Label fx:id="lbl_Username1" layoutX="390.0" layoutY="318.0" text="Company" />
-      <ChoiceBox layoutX="107.0" layoutY="477.0" prefHeight="25.0" prefWidth="186.0" />
-      <Label fx:id="lbl_Username11" layoutX="109.0" layoutY="448.0" text="Satus" />
-      <ChoiceBox layoutX="394.0" layoutY="477.0" prefHeight="25.0" prefWidth="186.0" />
-      <Label fx:id="lbl_Username111" layoutX="391.0" layoutY="448.0" text="Privilege" />
+      <ChoiceBox fx:id="chb_company" layoutX="389.0" layoutY="403.0" prefHeight="25.0" prefWidth="186.0" />
+      <Label fx:id="lbl_company" layoutX="391.0" layoutY="374.0" text="Company" />
+      <ChoiceBox fx:id="chb_status" layoutX="108.0" layoutY="533.0" prefHeight="25.0" prefWidth="186.0" />
+      <Label fx:id="lbl_status" layoutX="110.0" layoutY="504.0" text="Satus" />
+      <ChoiceBox fx:id="chb_privilege" layoutX="395.0" layoutY="533.0" prefHeight="25.0" prefWidth="186.0" />
+      <Label fx:id="lbl_privilege" layoutX="392.0" layoutY="504.0" text="Privilege" />
+      <Label fx:id="hint_company" layoutX="391.0" layoutY="435.0" textFill="#686464">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Label>
+      <Label fx:id="hint_status" layoutX="109.0" layoutY="558.0" textFill="#686464">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Label>
+      <Label fx:id="hint_prvilege" layoutX="394.0" layoutY="558.0" textFill="#686464">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Label>
    </children>
 </Pane>

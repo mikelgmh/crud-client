@@ -20,7 +20,7 @@
                <items>
                   <MenuItem mnemonicParsing="false" text="Companies" />
                   <MenuItem mnemonicParsing="false" text="Users" />
-                  <MenuItem mnemonicParsing="false" text="Products" />
+<!--                  <MenuItem mnemonicsParsing="false" text="Products" />-->
                   <MenuItem mnemonicParsing="false" text="Orders" />
                </items>
             </Menu>

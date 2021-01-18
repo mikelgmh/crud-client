@@ -6,10 +6,9 @@
 package crudclient.model;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 import javafx.beans.property.SimpleStringProperty;
-import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -24,7 +23,7 @@ public class User implements Serializable {
         this.name = new SimpleStringProperty();
         this.surname = new SimpleStringProperty();
         this.username = new SimpleStringProperty();
-       
+
     }
 
     private static final long serialVersionUID = 1L;
@@ -64,16 +63,15 @@ public class User implements Serializable {
     /**
      * The last access of the user.
      */
-    private Timestamp lastAccess;
+    private Date lastAccess;
     /**
      * The last passsword change that has been made for this user.
      */
-    private Timestamp lastPasswordChange;
+    private Date lastPasswordChange;
 
     /**
      * The company object where this user belongs.
      */
-    @ManyToOne()
     private Company company;
 
     public Company getCompany() {
@@ -140,19 +138,19 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public Timestamp getLastAccess() {
+    public Date getLastAccess() {
         return lastAccess;
     }
 
-    public void setLastAccess(Timestamp lastAccess) {
+    public void setLastAccess(Date lastAccess) {
         this.lastAccess = lastAccess;
     }
 
-    public Timestamp getLastPasswordChange() {
+    public Date getLastPasswordChange() {
         return lastPasswordChange;
     }
 
-    public void setLastPasswordChange(Timestamp lastPasswordChange) {
+    public void setLastPasswordChange(Date lastPasswordChange) {
         this.lastPasswordChange = lastPasswordChange;
     }
 

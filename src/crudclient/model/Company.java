@@ -2,55 +2,74 @@ package crudclient.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Entity representating the Companies. It contains the following fields:
- * company id, company name, company type, company localization and company
- * amount of users.
+ * Entity representing the Companies. It contains the following fields: company
+ * id, company name, company type and company localization.
  *
  * @author Iker de la Cruz
  */
 @XmlRootElement
 public class Company implements Serializable {
 
-
     private static final long serialVersionUID = 1L;
 
     /**
      * Identification field of the Company.
      */
-    private Integer id;
+    private final SimpleIntegerProperty id;
 
     /**
      * Name of the Company.
      */
-    private String name;
+    private final SimpleStringProperty name;
 
     /**
      * Type of the Company.
      */
-    private CompanyType type;
+    private final SimpleObjectProperty<CompanyType> type;
 
     /**
      * Localization of the Company.
      */
-    private String localization;
+    private final SimpleStringProperty localization;
 
-    
-    public Company(Integer id, String name, CompanyType type, String localization) {
-        this.id = id;
-        this.name = name;
-        this.type = type;
-        this.localization = localization;
+    /**
+     * The constructor without parameters for the Company model.
+     */
+    public Company() {
+        this.id = new SimpleIntegerProperty();
+        this.name = new SimpleStringProperty();
+        this.type = new SimpleObjectProperty();
+        this.localization = new SimpleStringProperty();
     }
-    
+
+    /**
+     * The constructor with parameters for the Company model.
+     *
+     * @param id The Company id.
+     * @param name The Company name.
+     * @param type The Company type.
+     * @param localization The Company localization.
+     */
+    public Company(Integer id, String name, CompanyType type, String localization) {
+        this.id = new SimpleIntegerProperty(id);
+        this.name = new SimpleStringProperty(name);
+        this.type = new SimpleObjectProperty(type);
+        this.localization = new SimpleStringProperty(localization);
+    }
+
+
     /**
      *
      * @return the id.
      */
     public Integer getId() {
-        return id;
+        return this.id.get();
     }
 
     /**
@@ -58,7 +77,7 @@ public class Company implements Serializable {
      * @param id the id to be set.
      */
     public void setId(Integer id) {
-        this.id = id;
+        this.id.set(id);
     }
 
     /**
@@ -66,7 +85,7 @@ public class Company implements Serializable {
      * @return the name.
      */
     public String getName() {
-        return name;
+        return this.name.get();
     }
 
     /**
@@ -74,7 +93,7 @@ public class Company implements Serializable {
      * @param name the name to set.
      */
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
     }
 
     /**
@@ -82,7 +101,7 @@ public class Company implements Serializable {
      * @return the type.
      */
     public CompanyType getType() {
-        return type;
+        return this.type.get();
     }
 
     /**
@@ -90,7 +109,7 @@ public class Company implements Serializable {
      * @param type the type to set.
      */
     public void setType(CompanyType type) {
-        this.type = type;
+        this.type.set(type);
     }
 
     /**
@@ -98,7 +117,7 @@ public class Company implements Serializable {
      * @return the localization.
      */
     public String getLocalization() {
-        return localization;
+        return this.localization.get();
     }
 
     /**
@@ -106,7 +125,7 @@ public class Company implements Serializable {
      * @param localization the localization to set.
      */
     public void setLocalization(String localization) {
-        this.localization = localization;
+        this.localization.set(localization);
     }
 
     /**
@@ -153,7 +172,8 @@ public class Company implements Serializable {
      */
     @Override
     public String toString() {
-        return "Company{" + "id=" + id + '}';
+        return name.get();
     }
+  
 
 }

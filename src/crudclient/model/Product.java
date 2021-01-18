@@ -2,6 +2,11 @@ package crudclient.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleFloatProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -12,31 +17,53 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class Product implements Serializable {
-
+    
+    
+     
     private static final long serialVersionUID = 1L;
+    
     /**
      * Identification field for the product.
      */
-    private Integer id;
+    private final SimpleIntegerProperty id;
     /**
      * The weight of the product.
      */
-    private float weight;
+    private SimpleFloatProperty weight;
     /**
      * The price of the product.
      */
-    private double price;
+    private SimpleDoubleProperty price;
     /**
      * The name of the product.
      */
-    private String name;
+    private SimpleStringProperty name;
+    
+    @ManyToOne
+    private User user;
+    
+    
+     public Product() {
+        this.id = new SimpleIntegerProperty();
+        this.name = new SimpleStringProperty();
+        this.weight = new SimpleFloatProperty();
+        this.price = new SimpleDoubleProperty();
+    }
+
+    public Product(Integer id, Float weight, Double price, String name) {
+        this.id = new SimpleIntegerProperty(id);
+        this.name = new SimpleStringProperty(name);
+        this.weight = new SimpleFloatProperty(weight);
+        this.price = new SimpleDoubleProperty(price);
+
+    }
 
     /**
      *
      * @return the id
      */
     public Integer getId() {
-        return id;
+        return this.id.get();
     }
 
     /**
@@ -44,7 +71,7 @@ public class Product implements Serializable {
      * @param id the id to be set
      */
     public void setId(Integer id) {
-        this.id = id;
+        this.id.set(id);
     }
 
     /**
@@ -52,7 +79,7 @@ public class Product implements Serializable {
      * @return the weight
      */
     public float getWeight() {
-        return weight;
+        return this.weight.get();
     }
 
     /**
@@ -60,7 +87,7 @@ public class Product implements Serializable {
      * @param weight the weight to be set
      */
     public void setWeight(float weight) {
-        this.weight = weight;
+        this.weight.set(weight);
     }
 
     /**
@@ -68,7 +95,7 @@ public class Product implements Serializable {
      * @return the price
      */
     public double getPrice() {
-        return price;
+        return this.price.get();
     }
 
     /**
@@ -76,7 +103,7 @@ public class Product implements Serializable {
      * @param price the price to be set
      */
     public void setPrice(double price) {
-        this.price = price;
+        this.price.set(price);
     }
 
     /**
@@ -84,7 +111,7 @@ public class Product implements Serializable {
      * @return the name
      */
     public String getName() {
-        return name;
+        return this.name.get();
     }
 
     /**
@@ -92,13 +119,12 @@ public class Product implements Serializable {
      * @param name the name to be set
      */
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
     }
     /**
      * User for the product.
      */
-    @ManyToOne
-    private User user;
+    
 
     public User getUser() {
         return user;

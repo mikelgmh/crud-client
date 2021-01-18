@@ -5,7 +5,6 @@
  */
 package crudclient.factories;
 
-import crudclient.interfaces.User;
 import crudclient.model.Company;
 import crudclient.model.CompanyType;
 import crudclient.model.User;
@@ -13,15 +12,16 @@ import crudclient.model.UserPrivilege;
 import crudclient.model.UserStatus;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
-import javafx.beans.property.SimpleStringProperty;
+import crudclient.interfaces.UserInterface;
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.core.GenericType;
 
 /**
  *
  * @author Mikel
  */
-public class UserTestDataGenerator implements User {
+public class UserTestDataGenerator implements UserInterface {
 
     private static final Logger logger = Logger.getLogger("crudclient");
     private ArrayList<User> userList;
@@ -37,38 +37,43 @@ public class UserTestDataGenerator implements User {
             User userModel = new User();
             userModel.setId(Long.valueOf(i));
             userModel.setCompany(new Company(i, "Compañia " + i, CompanyType.ADMIN, "Ciudad " + i));
-            userModel.setEmail("email" + i);
-            userModel.setName("name" + i);
+            userModel.setEmail("email " + i);
+            userModel.setName("name " + i);
             userModel.setPrivilege(UserPrivilege.PROVIDER);
             userModel.setStatus(UserStatus.ENABLED);
-            userModel.setSurname("Surname" + i);
-            userModel.setUsername("username" + i);
+            userModel.setSurname("Surname " + i);
+            userModel.setUsername("username " + i);
             userList.add(userModel);
         }
     }
 
     @Override
-    public List getUsers() {
+    public List getUsers(GenericType gt) throws ClientErrorException {
         return userList;
     }
 
     @Override
-    public User editUser(User user) {
+    public UserInterface editUser(UserInterface user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void deleteUser(User user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void createUser(User user) {
+    public void deleteUser(UserInterface user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public String getPublicKey() {
+        return "Test Public key";
+    }
+
+    @Override
+    public void createUser(Object user) throws ClientErrorException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List getAllCompanies(GenericType genericType) throws ClientErrorException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
