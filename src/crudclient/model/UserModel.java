@@ -7,8 +7,9 @@ package crudclient.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.Objects;
+import javafx.beans.property.SimpleStringProperty;
+import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -16,7 +17,15 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Mikel
  */
 @XmlRootElement
-public class User implements Serializable {
+public class UserModel implements Serializable {
+
+    public UserModel() {
+        this.email = new SimpleStringProperty();
+        this.name = new SimpleStringProperty();
+        this.surname = new SimpleStringProperty();
+        this.username = new SimpleStringProperty();
+       
+    }
 
     private static final long serialVersionUID = 1L;
     /**
@@ -26,19 +35,19 @@ public class User implements Serializable {
     /**
      * The username of the user.
      */
-    private String username;
+    private SimpleStringProperty username;
     /**
      * The email of the user.
      */
-    private String email;
+    private SimpleStringProperty email;
     /**
      * The name of the user.
      */
-    private String name;
+    private SimpleStringProperty name;
     /**
      * The Surname of the user
      */
-    private String surname;
+    private SimpleStringProperty surname;
 
     /**
      * The status of the user. Enum.
@@ -55,15 +64,16 @@ public class User implements Serializable {
     /**
      * The last access of the user.
      */
-    private Date lastAccess;
+    private Timestamp lastAccess;
     /**
      * The last passsword change that has been made for this user.
      */
-    private Date lastPasswordChange;
+    private Timestamp lastPasswordChange;
 
     /**
      * The company object where this user belongs.
      */
+    @ManyToOne()
     private Company company;
 
     public Company getCompany() {
@@ -75,35 +85,35 @@ public class User implements Serializable {
     }
 
     public String getUsername() {
-        return username;
+        return username.get();
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.username.set(username);
     }
 
     public String getEmail() {
-        return email;
+        return email.get();
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email.set(email);
     }
 
     public String getName() {
-        return name;
+        return name.get();
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
     }
 
     public String getSurname() {
-        return surname;
+        return surname.get();
     }
 
     public void setSurname(String surname) {
-        this.surname = surname;
+        this.surname.set(surname);
     }
 
     public UserStatus getStatus() {
@@ -130,7 +140,7 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public Date getLastAccess() {
+    public Timestamp getLastAccess() {
         return lastAccess;
     }
 
@@ -138,7 +148,7 @@ public class User implements Serializable {
         this.lastAccess = lastAccess;
     }
 
-    public Date getLastPasswordChange() {
+    public Timestamp getLastPasswordChange() {
         return lastPasswordChange;
     }
 
@@ -172,7 +182,7 @@ public class User implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final User other = (User) obj;
+        final UserModel other = (UserModel) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }
@@ -184,7 +194,4 @@ public class User implements Serializable {
         return "User{" + "id=" + id + '}';
     }
 
-    
-
 }
-
