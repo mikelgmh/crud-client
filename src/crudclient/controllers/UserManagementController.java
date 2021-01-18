@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Parent;
 import crudclient.interfaces.User;
-import crudclient.model.UserModel;
+import crudclient.model.User;
 import crudclient.model.UserPrivilege;
 import crudclient.model.UserStatus;
 import crudclient.util.security.AsymmetricEncryption;
@@ -60,21 +60,21 @@ public class UserManagementController {
 
     // Table related stuff
     @FXML
-    private TableView<UserModel> table;
+    private TableView<User> table;
     @FXML
-    private TableColumn<UserModel, String> tc_name;
+    private TableColumn<User, String> tc_name;
     @FXML
-    private TableColumn<UserModel, String> tc_surname;
+    private TableColumn<User, String> tc_surname;
     @FXML
-    private TableColumn<UserModel, String> tc_username;
+    private TableColumn<User, String> tc_username;
     @FXML
-    private TableColumn<UserModel, String> tc_email;
+    private TableColumn<User, String> tc_email;
     @FXML
-    private TableColumn<UserModel, String> tc_company;
+    private TableColumn<User, String> tc_company;
     @FXML
-    private TableColumn<UserModel, String> tc_status;
+    private TableColumn<User, String> tc_status;
     @FXML
-    private TableColumn<UserModel, String> tc_privilege;
+    private TableColumn<User, String> tc_privilege;
 
     public void initStage(Parent parent) {
 

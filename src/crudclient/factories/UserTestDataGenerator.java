@@ -8,7 +8,7 @@ package crudclient.factories;
 import crudclient.interfaces.User;
 import crudclient.model.Company;
 import crudclient.model.CompanyType;
-import crudclient.model.UserModel;
+import crudclient.model.User;
 import crudclient.model.UserPrivilege;
 import crudclient.model.UserStatus;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import javafx.beans.property.SimpleStringProperty;
 public class UserTestDataGenerator implements User {
 
     private static final Logger logger = Logger.getLogger("crudclient");
-    private ArrayList<UserModel> userList;
+    private ArrayList<User> userList;
 
     /**
      * Generates users to test the client side.
@@ -34,7 +34,7 @@ public class UserTestDataGenerator implements User {
     public UserTestDataGenerator(Integer numberOfUsers) {
         userList = new ArrayList();
         for (int i = 0; i < numberOfUsers; i++) {
-            UserModel userModel = new UserModel();
+            User userModel = new User();
             userModel.setId(Long.valueOf(i));
             userModel.setCompany(new Company(i, "Compañia " + i, CompanyType.ADMIN, "Ciudad " + i));
             userModel.setEmail("email" + i);

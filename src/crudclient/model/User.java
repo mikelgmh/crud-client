@@ -17,9 +17,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Mikel
  */
 @XmlRootElement
-public class UserModel implements Serializable {
+public class User implements Serializable {
 
-    public UserModel() {
+    public User() {
         this.email = new SimpleStringProperty();
         this.name = new SimpleStringProperty();
         this.surname = new SimpleStringProperty();
@@ -182,7 +182,7 @@ public class UserModel implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final UserModel other = (UserModel) obj;
+        final User other = (User) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }
