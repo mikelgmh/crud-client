@@ -38,7 +38,7 @@ public interface UserInterface {
      *
      * @param user
      */
-    public void deleteUser(UserInterface user);
+    public void deleteUser(String userId);
 
     /**
      * Creates a new user.

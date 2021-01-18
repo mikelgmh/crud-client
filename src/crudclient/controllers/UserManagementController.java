@@ -41,13 +41,13 @@ import javax.ws.rs.core.GenericType;
  * @author Mikel
  */
 public class UserManagementController {
-
+    
     private Stage stage;
     private static final Logger logger = Logger.getLogger("signupsignin.controllers.SignUpController");
     private final GenericValidations genericValidations;
     private UserInterface userImplementation;
     private ObservableList<User> masterData = FXCollections.observableArrayList();
-
+    
     @FXML
     private TextField txt_name;
     @FXML
@@ -64,7 +64,6 @@ public class UserManagementController {
     private ChoiceBox chb_privilege;
     @FXML
     private Label hint_email;
-
     
     @FXML
     private Button btn_delete;
@@ -88,21 +87,20 @@ public class UserManagementController {
     private TableColumn<User, String> tc_status;
     @FXML
     private TableColumn<User, String> tc_privilege;
-
+    
     public UserManagementController() {
         this.genericValidations = new GenericValidations();
     }
-
+    
     public void initStage(Parent parent) {
 
         // Sets the default hint behavior
         this.hint_email.setVisible(false);
-
+        
         logger.log(Level.INFO, "Loading window...");
         // Creates a scena and a stage and opens the window.
         Scene scene = new Scene(parent);
         Stage stage = new Stage();
-
 
         // Set listeners
         this.setListeners();
@@ -131,7 +129,7 @@ public class UserManagementController {
 //        System.out.println(encryptedString);
 //        System.out.println(prueba);
     }
-
+    
     public void setCellValueFactories() {
         tc_name.setCellValueFactory(new PropertyValueFactory<>("name"));
         tc_surname.setCellValueFactory(new PropertyValueFactory<>("surname"));
@@ -152,12 +150,12 @@ public class UserManagementController {
             this.genericValidations.textLimiter(this.txt_name, 200, newText); // Limits the input to 200 characters
             this.validate(); // Executes the validation.
         });
-
+        
         this.txt_surname.textProperty().addListener((obs, oldText, newText) -> {
             this.genericValidations.textLimiter(this.txt_surname, 200, newText); // Limits the input to 200 characters
             this.validate(); // Executes the validation.
         });
-
+        
         this.txt_username.textProperty().addListener((obs, oldText, newText) -> {
             this.genericValidations.textLimiter(this.txt_username, 200, newText); // Limits the input to 200 characters
             this.validate(); // Executes the validation.
@@ -166,24 +164,12 @@ public class UserManagementController {
             this.genericValidations.textLimiter(this.txt_company, 200, newText); // Limits the input to 200 characters
             this.validate(); // Executes the validation.
         });
-
+        
         this.table.getSelectionModel().selectedItemProperty().addListener(this::handleUsersTableSelectionChanged);
 
         // Validation for the Email field
         this.txt_email.textProperty().addListener((obs, oldText, newText) -> {
-            //this.genericValidations.minLength(this.txt_email, 3, newText, "minLengthValidator");
             this.genericValidations.textLimiter(this.txt_email, 254, newText);
-//            boolean emailValidator = this.genericValidations.regexValidator(this.genericValidations.EMAIL_REGEXP, this.txt_email, newText.toLowerCase(), "emailValidator"); // Adds a regex validation to check if the email is correct
-//            this.hint_email.setText(this.genericValidations.TXT_ENTER_VALID_EMAIL);
-//            if (!emailValidator) {
-//
-//                this.genericValidations.addClass(this.txt_email, "error", Boolean.TRUE);
-//            } else {
-//                this.hint_email.setTextFill(this.genericValidations.greyColor);
-//                this.genericValidations.addClass(this.txt_email, "error", Boolean.FALSE);
-//            }
-            // Changes the color of the inputs when the user types.
-
             this.validate();
         });
     }
@@ -199,7 +185,7 @@ public class UserManagementController {
         // System.out.println(newValue.getEmail());
         this.btn_delete.setDisable(false);
     }
-
+    
     public void setDefaultFieldValues() {
         this.chb_privilege.setItems(FXCollections.observableArrayList(UserPrivilege.values()));
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
@@ -219,12 +205,12 @@ public class UserManagementController {
         sortedData.comparatorProperty().bind(table.comparatorProperty());
         this.table.setItems(sortedData);
     }
-
+    
     public void getUsers() {
         this.masterData = FXCollections.observableArrayList(getUserImplementation().getUsers(new GenericType<List<User>>() {
         }));
     }
-
+    
     public void handleOnClickCreateButton() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/SignUp.fxml"));
         Parent root = (Parent) loader.load();
@@ -233,7 +219,7 @@ public class UserManagementController {
         controller.setStage(getStage());
         controller.initStage(root);
     }
-
+    
     public void setSearchFilterListeners(FilteredList<User> filteredData) {
         if (chb_status.getSelectionModel() == null) {
             System.out.println("El modelo del checkboz es null");
@@ -322,33 +308,30 @@ public class UserManagementController {
 //            });
 //        });
     }
-
-    public void searchByProperty() {
-
+    
+    public void onDeleteButtonClickAction() {
+        User u = table.getSelectionModel().getSelectedItem();
+        this.getUserImplementation().deleteUser(u.getId().toString());
     }
     
-    public void onDeleteButtonClickAction(){
+    public void validate() {
         
     }
-
-    public void validate() {
-
-    }
-
+    
     public Stage getStage() {
         return this.stage;
     }
-
+    
     public void setUserImplementation(UserInterface user) {
         this.userImplementation = user;
     }
-
+    
     public UserInterface getUserImplementation() {
         return this.userImplementation;
     }
-
+    
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-
+    
 }

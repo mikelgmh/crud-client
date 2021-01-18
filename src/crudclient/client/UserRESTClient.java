@@ -119,8 +119,12 @@ public class UserRESTClient implements UserInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(String.class);
     }
 
-    public void remove(String id) throws ClientErrorException {
+    @Override
+    public void deleteUser(String id) throws ClientErrorException {
+        webTarget = client.target(BASE_URI).path("user");
+        System.out.println("Deleted user" + id);
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
+          webTarget = client.target(BASE_URI).path("");
     }
 
     public void close() {
@@ -132,10 +136,7 @@ public class UserRESTClient implements UserInterface {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    public void deleteUser(UserInterface user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+
 
     @Override
     public String getPublicKey() {
