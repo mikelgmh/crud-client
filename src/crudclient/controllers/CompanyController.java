@@ -22,6 +22,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javax.ws.rs.core.GenericType;
@@ -32,7 +33,7 @@ import javax.ws.rs.core.GenericType;
  * @author Iker de la Cruz
  */
 public class CompanyController {
-
+    
     private static final Logger logger = Logger.getLogger("crudclient.controllers.CompanyController");
     private Stage stage;
     private ObservableList<Company> companyData;
@@ -59,10 +60,10 @@ public class CompanyController {
     private TableColumn tcTypeCompany;
     @FXML
     private TableColumn tcLocalizationCompany;
-
+    
     public CompanyController() {
     }
-
+    
     public void setStage(Stage stage) {
         this.stage = stage;
     }
@@ -111,7 +112,7 @@ public class CompanyController {
         tcNameCompany.setCellFactory(TextFieldTableCell.<Company>forTableColumn());
         // Type
         tcTypeCompany.setCellValueFactory(new PropertyValueFactory("type"));
-        // TODO: setCellFactory de ComboBox para el tipo de Compañia.
+        tcTypeCompany.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(CompanyType.values())));
         // Localization
         tcLocalizationCompany.setCellValueFactory(new PropertyValueFactory("localization"));
         tcLocalizationCompany.setCellFactory(TextFieldTableCell.<Company>forTableColumn());
@@ -181,9 +182,13 @@ public class CompanyController {
      */
     @FXML
     private void createCompanyAction(ActionEvent event) {
-        // TODO: Autoincrementar el id desde la base de datos al añadir nueva fila.
+        // Count the Companies from the database and input the amount + 1 in the new row ID column
+        Integer amountCompanies = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
+        })).size();
+        Company newCompany = new Company(amountCompanies + 1, null, CompanyType.ADMIN, null);
+        tableViewCompanies.getItems().add(newCompany);
         // TODO: Añadir nueva Company a la base de datos.
-        tableViewCompanies.getItems().add(new Company(tableViewCompanies.getItems().size() + 1, null, CompanyType.CLIENT, null));
+        //companyImplementation.create_XML(newCompany);
     }
 
     /**
@@ -229,5 +234,5 @@ public class CompanyController {
     public void setImplementation(CompanyInterface companyInterface) {
         this.companyImplementation = companyInterface;
     }
-
+    
 }
