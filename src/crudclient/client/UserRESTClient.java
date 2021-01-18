@@ -5,12 +5,14 @@
  */
 package crudclient.client;
 
-import crudclient.interfaces.User;
+import crudclient.model.Company;
+import crudclient.model.User;
 import java.util.List;
-import java.util.Set;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
+import crudclient.interfaces.UserInterface;
 
 /**
  * Jersey REST client generated for REST resource:UserFacadeREST [user]<br>
@@ -24,7 +26,7 @@ import javax.ws.rs.client.WebTarget;
  *
  * @author Mikel
  */
-public class UserRESTClient implements User {
+public class UserRESTClient implements UserInterface {
 
     private WebTarget webTarget;
     private Client client;
@@ -32,18 +34,19 @@ public class UserRESTClient implements User {
 
     public UserRESTClient() {
         client = javax.ws.rs.client.ClientBuilder.newClient();
-        webTarget = client.target(BASE_URI).path("user");
+        webTarget = client.target(BASE_URI).path("");
     }
 
-    public <T> T getAllUsers_XML(Class<T> responseType) throws ClientErrorException {
+    @Override
+    public List<User> getUsers(GenericType genericType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("user/getAllUsers");
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        return (List<User>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(genericType);
     }
 
-    public <T> T getAllUsers_JSON(Class<T> responseType) throws ClientErrorException {
+    public <T> T getAllUsers_JSON(GenericType<T> responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
-        resource = resource.path("user/getAllUsers");
+        resource = resource.path("getAllUsers");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
@@ -91,8 +94,13 @@ public class UserRESTClient implements User {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public void create_XML(Object requestEntity) throws ClientErrorException {
+    @Override
+    public void createUser(Object requestEntity) throws ClientErrorException {
+        webTarget = client.target(BASE_URI).path("user");
+
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        webTarget = client.target(BASE_URI).path("");
+
     }
 
     public void create_JSON(Object requestEntity) throws ClientErrorException {
@@ -120,29 +128,25 @@ public class UserRESTClient implements User {
     }
 
     @Override
-    public List getUsers() {
-        return null;
-
-    }
-
-    @Override
-    public User editUser(User user) {
+    public UserInterface editUser(UserInterface user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void deleteUser(User user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void createUser(User user) {
+    public void deleteUser(UserInterface user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public String getPublicKey() {
         return this.getPublicKey_JSON();
+    }
+
+    @Override
+    public List getAllCompanies(GenericType genericType) throws ClientErrorException {
+        WebTarget resource = webTarget;
+        resource = resource.path("company/findAllCompanies");
+        return (List<Company>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(genericType);
     }
 
 }

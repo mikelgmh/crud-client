@@ -16,7 +16,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Company implements Serializable {
 
-
     private static final long serialVersionUID = 1L;
 
     /**
@@ -64,14 +63,21 @@ public class Company implements Serializable {
         this.localization = new SimpleStringProperty(localization);
     }
 
-    
+    /**
+     * The constructor with parameters for the Company model.
+     *
+     * @param id The Company id.
+     * @param name The Company name.
+     * @param type The Company type.
+     * @param localization The Company localization.
+     */
     public Company(Integer id, String name, CompanyType type, String localization) {
-        this.id = id;
-        this.name = name;
-        this.type = type;
-        this.localization = localization;
+        this.id = new SimpleIntegerProperty(id);
+        this.name = new SimpleStringProperty(name);
+        this.type = new SimpleObjectProperty(type);
+        this.localization = new SimpleStringProperty(localization);
     }
-    
+
     /**
      *
      * @return the id.
@@ -180,7 +186,8 @@ public class Company implements Serializable {
      */
     @Override
     public String toString() {
-        return "Company{" + "id=" + id + '}';
+        return name.get();
     }
+  
 
 }

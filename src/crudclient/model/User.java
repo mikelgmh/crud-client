@@ -6,7 +6,6 @@
 package crudclient.model;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -16,14 +15,14 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Mikel
  */
 @XmlRootElement
-public class UserModel implements Serializable {
+public class User implements Serializable {
 
-    public UserModel() {
+    public User() {
         this.email = new SimpleStringProperty();
         this.name = new SimpleStringProperty();
         this.surname = new SimpleStringProperty();
         this.username = new SimpleStringProperty();
-       
+
     }
 
     private static final long serialVersionUID = 1L;
@@ -180,7 +179,7 @@ public class UserModel implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final UserModel other = (UserModel) obj;
+        final User other = (User) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }

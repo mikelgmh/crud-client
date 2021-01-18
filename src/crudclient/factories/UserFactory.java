@@ -6,7 +6,7 @@
 package crudclient.factories;
 
 import crudclient.client.UserRESTClient;
-import crudclient.interfaces.User;
+import crudclient.interfaces.UserInterface;
 
 /**
  *
@@ -28,9 +28,9 @@ public class UserFactory {
      * @param implementation The type of implementation to return.
      * @return An implementation of type Signable.
      */
-    public User getUserImplementation(ImplementationType implementation) {
+    public UserInterface getUserImplementation(ImplementationType implementation) {
 
-        User selectedImplementation = null;
+        UserInterface selectedImplementation = null;
         switch (implementation) {
             case TEST_IMPLEMENTATION:
                 selectedImplementation = new UserTestDataGenerator(Integer.parseInt(USERS_TO_GENERATE));
