@@ -5,8 +5,7 @@
  */
 package crudclient.client;
 
-import crudclient.model.Company;
-import java.util.List;
+import crudclient.interfaces.CompanyInterface;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -23,9 +22,9 @@ import javax.ws.rs.core.GenericType;
  *        client.close();
  * </pre>
  *
- * @author 2dam
+ * @author Iker de la Cruz
  */
-public class CompanyRESTClient {
+public class CompanyRESTClient implements CompanyInterface {
 
     private WebTarget webTarget;
     private Client client;
@@ -101,5 +100,5 @@ public class CompanyRESTClient {
     public void close() {
         client.close();
     }
-    
+
 }

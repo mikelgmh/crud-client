@@ -1,7 +1,5 @@
 package crudclient.interfaces;
 
-import crudclient.model.Company;
-import java.util.List;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
 
@@ -12,7 +10,9 @@ import javax.ws.rs.core.GenericType;
 public interface CompanyInterface {
 
     public <T> T findAllCompanies_XML(GenericType<T> responseType) throws ClientErrorException;
-    
-    public List<Company> getCompanies();
+
+    public void remove(String id) throws ClientErrorException;
+
+    public void create_XML(Object requestEntity) throws ClientErrorException;
 
 }
