@@ -39,6 +39,10 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javax.ws.rs.core.GenericType;
 import crudclient.interfaces.OrderInterface;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.transformation.FilteredList;
+import javafx.event.ActionEvent;
 
 /**
  * FXML Controller class
@@ -63,7 +67,7 @@ public class OrderManagementController {
     @FXML
     private TableColumn<Order, String> column_status;
     @FXML
-    private TableColumn<Order, Long> column_user;
+    private TableColumn<Order, String> column_user;
     @FXML
     private DatePicker date_Order;
     @FXML
@@ -99,71 +103,28 @@ public class OrderManagementController {
         stage.setResizable(false);
         stage.setOnShowing(this::handleWindowsShowing);
         
-        txt_totalPriceOrder.textProperty().addListener(this::handleTextChanged);
-        txt_IDOrder.textProperty().addListener(this::handleTextChanged);
-        txt_userOrder.textProperty().addListener(this::handleTextChanged);
-        
-        date_Order.valueProperty().addListener(this::handleDateChanged);
-
-        combo_statusOrder.setItems( FXCollections.observableArrayList(OrderStatus.values()));
+       
+        column_date.setSortType(TableColumn.SortType.DESCENDING);
+        combo_statusOrder.setItems(FXCollections.observableArrayList(OrderStatus.values()));
         column_ID.setCellValueFactory(new PropertyValueFactory("id"));
         column_date.setCellValueFactory(new PropertyValueFactory("date"));
         column_totalPrice.setCellValueFactory(new PropertyValueFactory("total_price"));
         column_status.setCellValueFactory(new PropertyValueFactory("status"));
-        column_user.setCellValueFactory(new PropertyValueFactory("user"));
-        orderData=FXCollections.observableArrayList(getOrderImplementation().getOrders());
-
+        column_user.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUser().getName().concat(" " + cellData.getValue().getUser().getSurname())));
+        orderData=FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<Set<Order>>() {}));
+        FilteredList<Order> filteredData = new FilteredList<>(orderData, p -> true);
+        
         tableOrder.setItems(orderData);
         stage.show();
         logger.log(Level.INFO, "OrderManagement stage loaded.");
     }
 
-   /*private void setListeners() {
-        this.txt_Firstname.textProperty().addListener((obs, oldText, newText) -> {
-            this.validationUtils.minLength(this.txt_Firstname, 3, newText, "minLengthValidator"); // Adds a min lenght validator
-            this.validationUtils.textLimiter(this.txt_Firstname, 20, newText); // Limits the input to 20 characters
-            this.validate(); // Executes the validation.
-        });
-        
-        
-    }*/
 
     private void handleWindowsShowing(WindowEvent event) {
         txt_IDOrder.requestFocus();
+        btn_deleteOrder.setOnAction(this::handlerDeleteOrder);
+        btn_deleteOrder.disableProperty().bind(Bindings.isEmpty(tableOrder.getSelectionModel().getSelectedItems()));
     }
-    
-    private void handleTextChanged(ObservableValue observable,
-             Object oldValue,
-             Object newValue){
-        
-    }
-    
-    private void handleDateChanged(ObservableValue observable,
-             Object oldValue,
-             Object newValue) {
-        //If there is a row selected, move row data to corresponding fields in the
-        //window and enable create, modify and delete buttons
-        LocalDate today = LocalDate.now();
-        if(date_Order.getValue()==null || date_Order.getValue().isAfter(today)){
-            btn_filterOrder.setDisable(true);
-        }else{
-            btn_filterOrder.setDisable(false);
-        }
-    }
-    
-    /*public void validate() {
-        if (Boolean.parseBoolean(this.txt_Email.getProperties().get("emailValidator").toString())
-                && Boolean.parseBoolean(this.txt_Firstname.getProperties().get("minLengthValidator").toString())
-                && Boolean.parseBoolean(this.txt_Username.getProperties().get("minLengthValidator").toString())
-                && Boolean.parseBoolean(this.txt_Lastname.getProperties().get("minLengthValidator").toString())
-                && Boolean.parseBoolean(this.txt_Password.getProperties().get("passwordRequirements").toString())
-                && Boolean.parseBoolean(this.txt_RepeatPassword.getProperties().get("passwordRequirements").toString())
-                && Boolean.parseBoolean(this.txt_RepeatPassword.getProperties().get("passwordsMatch").toString())) {
-            this.btn_SignUp.setDisable(false);
-        } else {
-            this.btn_SignUp.setDisable(true);
-        }
-    }*/
     
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -179,6 +140,12 @@ public class OrderManagementController {
     
     public OrderInterface getOrderImplementation() {
         return this.orderImplementation;
+    }
+
+    private void handlerDeleteOrder(ActionEvent event) {
+        Order order = tableOrder.getSelectionModel().getSelectedItem();
+        this.getOrderImplementation().removeOrder(order.getId().toString());
+        tableOrder.getItems().remove(order);
     }
     
 
