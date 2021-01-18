@@ -57,10 +57,10 @@ public class OrderRESTClient implements OrderInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public <T> T findAllOrders_XML(GenericType<T> responseType) throws ClientErrorException {
+    public Set<Order> findAllOrders(GenericType responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("order");
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        return (Set<Order>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     public <T> T findAllOrders_JSON(Class<T> responseType) throws ClientErrorException {
@@ -89,7 +89,7 @@ public class OrderRESTClient implements OrderInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public void remove(String id) throws ClientErrorException {
+    public void removeOrder(String id) throws ClientErrorException {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
     }
 
@@ -97,11 +97,5 @@ public class OrderRESTClient implements OrderInterface {
         client.close();
     }
 
-    @Override
-    public Set getOrders() {
-        Set<Order> orderList = this.findAllOrders_XML(new GenericType<Set<Order>>() {
-        });
-        return orderList;
-    }
     
 }
