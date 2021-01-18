@@ -5,6 +5,8 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -21,14 +23,19 @@ public class Order implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public Order(){
+        this.status = new SimpleObjectProperty<OrderStatus>();
+    }
+            
+    public Order(OrderStatus status){
+        this.status= new SimpleObjectProperty(status);
+    }
+            
     private Integer id;
     private Date date;
     private Double total_price;
-
-    private OrderStatus status;
-
+    private SimpleObjectProperty<OrderStatus> status;
     private Set<OrderProduct> orderProduct;
-
     private User user;
 
     //Getters and setters
@@ -73,11 +80,11 @@ public class Order implements Serializable {
     }
 
     public OrderStatus getStatus() {
-        return status;
+        return this.status.get();
     }
 
     public void setStatus(OrderStatus status) {
-        this.status = status;
+        this.status.set(status);
     }
 
     @Override
