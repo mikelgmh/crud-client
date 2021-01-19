@@ -4,6 +4,7 @@ import crudclient.controllers.OrderManagementController;
 import crudclient.controllers.ProductController;
 import crudclient.controllers.UserManagementController;
 import crudclient.factories.OrderFactory;
+import crudclient.factories.ProductFactory;
 import crudclient.factories.UserFactory;
 import java.io.IOException;
 import javafx.application.Application;
@@ -18,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import crudclient.interfaces.OrderInterface;
+import crudclient.interfaces.ProductInterface;
 import crudclient.interfaces.UserInterface;
 import java.util.logging.Logger;
 
@@ -41,9 +43,9 @@ public class CRUDClient extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/product.fxml"));
         Parent root = (Parent) loader.load();
         ProductController controller = ((ProductController) loader.getController());
-       // UserFactory userFactory = new UserFactory();
-       // UserInterface user = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
-       // controller.setProductImplementation(product);
+        ProductFactory productFactory = new ProductFactory();
+        ProductInterface productInterface = productFactory.getImplementation();
+        controller.setProductImplementation(productInterface);
         controller.initStage(root);
     }
 

@@ -7,6 +7,7 @@ package crudclient.controllers;
 
 import crudclient.client.CompanyRESTClient;
 import crudclient.client.ProductRESTClient;
+import crudclient.factories.ProductFactory;
 import crudclient.interfaces.CompanyInterface;
 import crudclient.interfaces.ProductInterface;
 import crudclient.model.Company;
@@ -68,16 +69,13 @@ public class ProductController {
     private Button btn_OrderCreate;
     @FXML
     private Label lbl_Choose;
-     @FXML
+    @FXML
     private TextField tf_company;
     private static final Logger LOG = Logger.getLogger(ProductController.class.getName());
     private TableView<ObservableList<StringProperty>> table = new TableView<>();
     private ObservableList<Product> pr;
     private ObservableList<Company> co;
     private ProductInterface productImplementation;
-    
-   
-    
 
     /**
      * Initializes the controller class.
@@ -98,32 +96,31 @@ public class ProductController {
         stage.setTitle("Product Managment");
         stage.setResizable(false);
         LOG.log(Level.INFO, "Stage ");
-        
+
         btn_Create.setTooltip(new Tooltip("Create a new product"));
-        
+
         btn_Delete.setTooltip(new Tooltip("Delete a product"));
-        
+
         btn_Delete.setOnAction(this::handleOnClickDelete);
-        
+
         btn_OrderCreate.setTooltip(new Tooltip("Create an order"));
-        
+
         tf_company.textProperty().addListener(this::handleTextChange);
-        
+
         tv_Tabla.getSelectionModel().setSelectionMode(
                 SelectionMode.MULTIPLE
         );
-        
-        
+
         LOG.log(Level.INFO, "Tooltip ");
-        
+
         tabla();
-        
+
         LOG.log(Level.INFO, "tabla ");
-        
+
         tableInfo();
-        
+
         LOG.log(Level.INFO, "tablainfo ");
-        
+
         stage.show();
     }
 
@@ -150,11 +147,19 @@ public class ProductController {
                 tv_Tabla.refresh();
 
             } else {
-            Product p = data.getRowValue();
-            ProductRESTClient rest = new ProductRESTClient();
-            p.setName(data.getNewValue());
-            rest.edit_XML(p);
-            tableInfo();
+                //productImplementation = (ProductInterface) new ProductFactory().getImplementation();
+                //productImplementation = (ProductRESTClient) new ProductFactory().getImplementation();
+                tv_Tabla.getSelectionModel().getSelectedItem().setName(data.getNewValue());
+                //   System.out.println(table.getSelectionModel().getSelectedItem().getName());
+                productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
+                
+                //Devuelve el dato de la fila
+                //Product p = data.getRowValue();
+                //Añadimos el nuevo valor a la fila
+                //p.setName(data.getNewValue());
+                //getProductImplementation().edit_XML(p);
+                //tableInfo();
+
             }
         });
 
@@ -162,7 +167,7 @@ public class ProductController {
         FloatStringConverter converterFloat = new FloatStringConverter();
         tc_Weight.setCellFactory(TextFieldTableCell.<Product, Float>forTableColumn(converterFloat));
         tc_Weight.setOnEditCommit(data -> {
-       /*     if (!Pattern.matches("[a-zA-Z0-9]+", data.getNewValue().toString())) {
+            /*     if (!Pattern.matches("[a-zA-Z0-9]+", data.getNewValue().toString())) {
                 Alert alert = new Alert(AlertType.WARNING);
                 alert.setTitle("Warning Dialog");
                 alert.setHeaderText("Look, a Warning Dialog");
@@ -172,15 +177,15 @@ public class ProductController {
 
             } else {*/
             data.getRowValue().setWeight(data.getNewValue());
-          //  }
+            //  }
         });
 
         tc_Price.setCellValueFactory(new PropertyValueFactory<Product, Double>("price"));
         DoubleStringConverter converterDouble = new DoubleStringConverter();
         tc_Price.setCellFactory(TextFieldTableCell.<Product, Double>forTableColumn(converterDouble));
         tc_Price.setOnEditCommit(data -> {
-            
-           /*   if (!Pattern.matches("[a-zA-Z0-9]+", data.getNewValue().toString())) {
+
+            /*   if (!Pattern.matches("[a-zA-Z0-9]+", data.getNewValue().toString())) {
                 Alert alert = new Alert(AlertType.WARNING);
                 alert.setTitle("Warning Dialog");
                 alert.setHeaderText("Look, a Warning Dialog");
@@ -193,9 +198,6 @@ public class ProductController {
             //  }
         });
     }
-    
-
-    
 
     private void tableInfo() {
         LOG.log(Level.INFO, "pr ");
@@ -206,7 +208,6 @@ public class ProductController {
         tv_Tabla.setItems(pr);
     }
 
-    
     private void edit() {
 
     }
@@ -242,8 +243,7 @@ public class ProductController {
         tableInfo();
     }
 
-    
-      private void handleTextChange(ObservableValue observable, String oldValue, String newValue) {
+    private void handleTextChange(ObservableValue observable, String oldValue, String newValue) {
         FilteredList<Product> filteredData = new FilteredList<>(pr, u -> true);
 
         filteredData.setPredicate(product -> {
@@ -270,7 +270,6 @@ public class ProductController {
         tv_Tabla.setItems(sortedData);
     }
 
-    
     @FXML
     private void handleOnClickCreateOrder(ActionEvent event) {
         List<String> names = tv_Tabla.getSelectionModel().getSelectedItems().stream()
@@ -278,15 +277,12 @@ public class ProductController {
                 .collect(Collectors.toList());
     }
 
-    
     public void setProductImplementation(ProductInterface product) {
         this.productImplementation = product;
     }
 
-    
     public ProductInterface getProductImplementation() {
         return this.productImplementation;
     }
-    
-  
+
 }
