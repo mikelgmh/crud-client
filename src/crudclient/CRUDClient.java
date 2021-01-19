@@ -18,7 +18,9 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import crudclient.interfaces.OrderInterface;
 import crudclient.interfaces.UserInterface;
+import crudclient.model.User;
 import java.util.logging.Logger;
+import javax.ws.rs.core.GenericType;
 
 /**
  *
@@ -29,12 +31,15 @@ public class CRUDClient extends Application {
     
     @Override
     public void start(Stage primaryStage) throws IOException {
+        User user= new User();
+        user.setId((long)9);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/orders.fxml"));
         Parent root = (Parent) loader.load();
         OrderManagementController controller = ((OrderManagementController) loader.getController());
         OrderFactory orderFactory = new OrderFactory();
         OrderInterface order = orderFactory.getImplementation();
         controller.setOrderImplementation(order);
+        controller.setUser(user);
         controller.initStage(root);
     }
 
