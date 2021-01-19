@@ -33,7 +33,7 @@ public class Order implements Serializable {
             
     private Integer id;
     private Date date;
-    private Double total_price;
+    private Float total_price;
     private SimpleObjectProperty<OrderStatus> status;
     private Set<OrderProduct> orderProduct;
     private User user;
@@ -55,11 +55,11 @@ public class Order implements Serializable {
         this.id = id;
     }
 
-    public Double getTotal_price() {
+    public Float getTotal_price() {
         return total_price;
     }
 
-    public void setTotal_price(Double total_price) {
+    public void setTotal_price(Float total_price) {
         this.total_price = total_price;
     }
 
