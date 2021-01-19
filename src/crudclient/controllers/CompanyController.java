@@ -21,7 +21,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -33,13 +33,11 @@ import javax.ws.rs.core.GenericType;
  * @author Iker de la Cruz
  */
 public class CompanyController {
-    
+
     private static final Logger logger = Logger.getLogger("crudclient.controllers.CompanyController");
     private Stage stage;
     private ObservableList<Company> companyData;
     private CompanyInterface companyImplementation;
-    @FXML
-    private Button btnFilter;
     @FXML
     private Button btnCreateCompany;
     @FXML
@@ -51,19 +49,17 @@ public class CompanyController {
     @FXML
     private TextField tfLocalizationFilter;
     @FXML
-    private TableView tableViewCompanies;
-    @FXML
-    private TableColumn tcIdCompany;
+    private TableView<Company> tableViewCompanies;
     @FXML
     private TableColumn tcNameCompany;
     @FXML
     private TableColumn tcTypeCompany;
     @FXML
     private TableColumn tcLocalizationCompany;
-    
+
     public CompanyController() {
     }
-    
+
     public void setStage(Stage stage) {
         this.stage = stage;
     }
@@ -80,9 +76,6 @@ public class CompanyController {
         stage.setTitle("Companies");
         stage.setResizable(true);
         stage.setOnShowing(this::handleWindowShowing);
-        // Set handlers
-        tfNameFilter.textProperty().addListener(this::handleFilterButton);
-        tfLocalizationFilter.textProperty().addListener(this::handleFilterButton);
         tableViewCompanies.getSelectionModel().selectedItemProperty()
                 .addListener(this::handleCompaniesTableSelectionChanged);
         stage.show();
@@ -95,7 +88,6 @@ public class CompanyController {
      * @param event
      */
     private void handleWindowShowing(WindowEvent event) {
-        btnFilter.setDisable(true);
         btnCreateCompany.setDisable(false);
         btnDeleteCompany.setDisable(true);
         tfNameFilter.clear();
@@ -105,11 +97,14 @@ public class CompanyController {
         cbTypeFilter.getItems().addAll(FXCollections.observableArrayList(CompanyType.values()));
         tfLocalizationFilter.clear();
         // Set the factories to the column values of the table.
-        // ID
-        tcIdCompany.setCellValueFactory(new PropertyValueFactory("id"));
         // Name
         tcNameCompany.setCellValueFactory(new PropertyValueFactory("name"));
         tcNameCompany.setCellFactory(TextFieldTableCell.<Company>forTableColumn());
+        /*tcNameCompany.setOnEditCommit(
+                (CellEditEvent<Company, String> t) -> {
+                    ((Company) t.getTableView().getItems().get(
+                            t.getTablePosition().getRow())).setName(t.getNewValue());
+                });*/
         // Type
         tcTypeCompany.setCellValueFactory(new PropertyValueFactory("type"));
         tcTypeCompany.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(CompanyType.values())));
@@ -125,41 +120,6 @@ public class CompanyController {
             tableViewCompanies.setPlaceholder(new Label(ex.getMessage()));
         }
         tableViewCompanies.setItems(companyData);
-    }
-
-    /**
-     * Combo box change event handler. It validates the name, type or
-     * localization fields has any content to enable/disable the filter button.
-     *
-     * @param event
-     */
-    @FXML
-    private void handleFilterButtonComboBox(ActionEvent event) {
-        if (!tfNameFilter.getText().trim().isEmpty()
-                || !tfLocalizationFilter.getText().trim().isEmpty()
-                || !(cbTypeFilter.getValue() == null)) {
-            btnFilter.setDisable(false);
-        } else {
-            btnFilter.setDisable(true);
-        }
-    }
-
-    /**
-     * Name and localization text changed event. It validates the name, type or
-     * localization fields has any content to enable/disable the filter button.
-     *
-     * @param observable
-     * @param oldValue
-     * @param newValue
-     */
-    private void handleFilterButton(ObservableValue observable, String oldValue, String newValue) {
-        if (!tfNameFilter.getText().trim().isEmpty()
-                || !tfLocalizationFilter.getText().trim().isEmpty()
-                || !(cbTypeFilter.getValue() == null)) {
-            btnFilter.setDisable(false);
-        } else {
-            btnFilter.setDisable(true);
-        }
     }
 
     /**
@@ -182,13 +142,14 @@ public class CompanyController {
      */
     @FXML
     private void createCompanyAction(ActionEvent event) {
-        // Count the Companies from the database and input the amount + 1 in the new row ID column
-        Integer amountCompanies = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
-        })).size();
-        Company newCompany = new Company(amountCompanies + 1, null, CompanyType.ADMIN, null);
+        // TODO: Comprobar que no haya ninguna fila sin rellenar todos los datos para crear nueva Compañia
+        Company newCompany = new Company();
         tableViewCompanies.getItems().add(newCompany);
-        // TODO: Añadir nueva Company a la base de datos.
-        //companyImplementation.create_XML(newCompany);
+        // TODO: Cambiar esta comprobacion en el metodo adecuado
+        // If there are all the Company data filled create the Company in the database
+        if (newCompany.getName() != null && newCompany.getType() != null && newCompany.getLocalization() != null) {
+            companyImplementation.create_XML(newCompany);
+        }
     }
 
     /**
@@ -199,15 +160,11 @@ public class CompanyController {
     @FXML
     private void deleteCompanyAction(ActionEvent event) {
         // Delete selected Company in the database.
-        // Get the selected ID cell
-        TablePosition pos = (TablePosition) tableViewCompanies.getSelectionModel().getSelectedCells().get(0);
-        Integer row = pos.getRow();
-        // Get items of the selected row
-        Company item = (Company) tableViewCompanies.getItems().get(row);
-        TableColumn col = pos.getTableColumn();
-        // Delete the selected Company sending the ID value
-        companyImplementation.remove(col.getCellObservableValue(item).getValue().toString());
+        Company delCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
+        companyImplementation.remove(delCompany.getId().toString());
+        // Delete selected Company in the TableView
         tableViewCompanies.getItems().remove(tableViewCompanies.getSelectionModel().getSelectedItem());
+        // Refresh the table
         tableViewCompanies.refresh();
     }
 
@@ -234,5 +191,5 @@ public class CompanyController {
     public void setImplementation(CompanyInterface companyInterface) {
         this.companyImplementation = companyInterface;
     }
-    
+
 }

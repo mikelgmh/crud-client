@@ -21,7 +21,7 @@ public class Company implements Serializable {
     /**
      * Identification field of the Company.
      */
-    private final SimpleIntegerProperty id;
+    private Integer id;
 
     /**
      * Name of the Company.
@@ -42,7 +42,6 @@ public class Company implements Serializable {
      * The constructor without parameters for the Company model.
      */
     public Company() {
-        this.id = new SimpleIntegerProperty();
         this.name = new SimpleStringProperty();
         this.type = new SimpleObjectProperty();
         this.localization = new SimpleStringProperty();
@@ -51,25 +50,22 @@ public class Company implements Serializable {
     /**
      * The constructor with parameters for the Company model.
      *
-     * @param id The Company id.
      * @param name The Company name.
      * @param type The Company type.
      * @param localization The Company localization.
      */
-    public Company(Integer id, String name, CompanyType type, String localization) {
-        this.id = new SimpleIntegerProperty(id);
+    public Company(String name, CompanyType type, String localization) {
         this.name = new SimpleStringProperty(name);
         this.type = new SimpleObjectProperty(type);
         this.localization = new SimpleStringProperty(localization);
     }
-
 
     /**
      *
      * @return the id.
      */
     public Integer getId() {
-        return this.id.get();
+        return id;
     }
 
     /**
@@ -77,7 +73,7 @@ public class Company implements Serializable {
      * @param id the id to be set.
      */
     public void setId(Integer id) {
-        this.id.set(id);
+        this.id = id;
     }
 
     /**
@@ -174,6 +170,5 @@ public class Company implements Serializable {
     public String toString() {
         return name.get();
     }
-  
 
 }
