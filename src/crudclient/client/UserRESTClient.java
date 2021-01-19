@@ -5,6 +5,7 @@
  */
 package crudclient.client;
 
+import crudclient.interfaces.EmailServiceInterface;
 import crudclient.model.Company;
 import crudclient.model.User;
 import java.util.List;
@@ -26,7 +27,7 @@ import crudclient.interfaces.UserInterface;
  *
  * @author Mikel
  */
-public class UserRESTClient implements UserInterface {
+public class UserRESTClient implements UserInterface, EmailServiceInterface {
 
     private WebTarget webTarget;
     private Client client;
@@ -34,7 +35,7 @@ public class UserRESTClient implements UserInterface {
 
     public UserRESTClient() {
         client = javax.ws.rs.client.ClientBuilder.newClient();
-        webTarget = client.target(BASE_URI).path("");
+        webTarget = client.target(BASE_URI).path("user");
     }
 
     @Override
@@ -102,7 +103,23 @@ public class UserRESTClient implements UserInterface {
         webTarget = client.target(BASE_URI).path("");
 
     }
+    
+    public void sendNewPassword_XML(Object requestEntity, String email) throws ClientErrorException {
+        webTarget.path(java.text.MessageFormat.format("user/sendNewPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+    }
 
+    public void sendNewPassword_JSON(Object requestEntity, String email) throws ClientErrorException {
+        webTarget.path(java.text.MessageFormat.format("user/sendNewPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+    }
+    
+    public void recoverUserPassword_XML(Object requestEntity, String email) throws ClientErrorException {
+        webTarget.path(java.text.MessageFormat.format("user/recoverUserPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+    }
+
+    public void recoverUserPassword_JSON(Object requestEntity, String email) throws ClientErrorException {
+        webTarget.path(java.text.MessageFormat.format("user/recoverUserPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+    }
+    
     public void create_JSON(Object requestEntity) throws ClientErrorException {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
