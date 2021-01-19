@@ -51,11 +51,11 @@ public class CompanyController {
     @FXML
     private TableView<Company> tableViewCompanies;
     @FXML
-    private TableColumn tcNameCompany;
+    private TableColumn<Company, String> tcNameCompany;
     @FXML
-    private TableColumn tcTypeCompany;
+    private TableColumn<Company, CompanyType> tcTypeCompany;
     @FXML
-    private TableColumn tcLocalizationCompany;
+    private TableColumn<Company, String> tcLocalizationCompany;
 
     public CompanyController() {
     }
@@ -100,11 +100,11 @@ public class CompanyController {
         // Name
         tcNameCompany.setCellValueFactory(new PropertyValueFactory("name"));
         tcNameCompany.setCellFactory(TextFieldTableCell.<Company>forTableColumn());
-        /*tcNameCompany.setOnEditCommit(
-                (TableColumn.CellEditEvent<Company, String> t) -> {
+        tcNameCompany.setOnEditCommit(
+                (CellEditEvent<Company, String> t) -> {
                     ((Company) t.getTableView().getItems().get(
                             t.getTablePosition().getRow())).setName(t.getNewValue());
-                });*/
+                });
         // Type
         tcTypeCompany.setCellValueFactory(new PropertyValueFactory("type"));
         tcTypeCompany.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(CompanyType.values())));
