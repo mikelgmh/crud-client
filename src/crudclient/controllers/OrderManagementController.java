@@ -41,6 +41,7 @@ import javafx.stage.WindowEvent;
 import javax.ws.rs.core.GenericType;
 import crudclient.interfaces.OrderInterface;
 import crudclient.interfaces.ProductInterface;
+import crudclient.model.Product;
 import java.io.IOException;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
@@ -127,6 +128,8 @@ public class OrderManagementController {
         txt_IDOrder.requestFocus();
         btn_newOrder.setOnAction(this::handlerCreateOrder);
         btn_newOrder.disableProperty().bind(Bindings.isEmpty(tableOrder.getSelectionModel().getSelectedItems()));
+        btn_modifyOrder.setOnAction(this::handlerModifyOrder);
+        btn_modifyOrder.disableProperty().bind(Bindings.isEmpty(tableOrder.getSelectionModel().getSelectedItems()));
         btn_deleteOrder.setOnAction(this::handlerDeleteOrder);
         btn_deleteOrder.disableProperty().bind(Bindings.isEmpty(tableOrder.getSelectionModel().getSelectedItems()));
     }
@@ -162,7 +165,24 @@ public class OrderManagementController {
             ProductFactory productFactory = new ProductFactory();
             ProductInterface product = productFactory.getImplementation();
             pController.setProductImplementation(product);
-            pController.initStage(root);
+            pController.initStageCreateOrder(root);
+            this.stage.close();
+        } catch (IOException ex) {
+            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void handlerModifyOrder(ActionEvent event) {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/product.fxml"));
+        Product productA= new Product();
+        Parent root;
+        try {
+            root = (Parent) loader.load();
+            ProductController pController = ((ProductController) loader.getController());
+            ProductFactory productFactory = new ProductFactory();
+            ProductInterface product = productFactory.getImplementation();
+            pController.setProductImplementation(product);
+            pController.initStageModifyOrder(root);
             this.stage.close();
         } catch (IOException ex) {
             Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
