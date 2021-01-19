@@ -60,6 +60,15 @@ public class OrderManagementController {
     private OrderInterface orderImplementation;
     private Stage stage;
     private ObservableList<Order> orderData;
+    private List<Product> products;
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
 
     @FXML
     private TableView<Order> tableOrder;
@@ -121,13 +130,12 @@ public class OrderManagementController {
 
         tableOrder.setItems(orderData);
         stage.show();
-        logger.log(Level.INFO, "OrderManagement stage loaded.");
+    logger.log(Level.INFO, "OrderManagement stage loaded.");
     }
 
     private void handleWindowsShowing(WindowEvent event) {
         txt_IDOrder.requestFocus();
         btn_newOrder.setOnAction(this::handlerCreateOrder);
-        btn_newOrder.disableProperty().bind(Bindings.isEmpty(tableOrder.getSelectionModel().getSelectedItems()));
         btn_modifyOrder.setOnAction(this::handlerModifyOrder);
         btn_modifyOrder.disableProperty().bind(Bindings.isEmpty(tableOrder.getSelectionModel().getSelectedItems()));
         btn_deleteOrder.setOnAction(this::handlerDeleteOrder);
@@ -166,7 +174,8 @@ public class OrderManagementController {
             ProductInterface product = productFactory.getImplementation();
             pController.setProductImplementation(product);
             pController.initStageCreateOrder(root);
-            this.stage.close();
+            pController.setOrdermanagementController(this);
+            
         } catch (IOException ex) {
             Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
         }
