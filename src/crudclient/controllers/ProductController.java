@@ -113,18 +113,18 @@ public class ProductController {
 
         LOG.log(Level.INFO, "Tooltip ");
 
-        tabla();
+        editableProductTable();
 
         LOG.log(Level.INFO, "tabla ");
 
-        tableInfo();
+        productTableInfo();
 
         LOG.log(Level.INFO, "tablainfo ");
 
         stage.show();
     }
 
-    private void tabla() {
+    private void editableProductTable() {
         tv_Tabla.setEditable(true);
 
         tc_Name.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -149,9 +149,17 @@ public class ProductController {
             } else {
                 //productImplementation = (ProductInterface) new ProductFactory().getImplementation();
                 //productImplementation = (ProductRESTClient) new ProductFactory().getImplementation();
+                //Product product = (Product) tc_Name.getTableView().getItems().get(data.getTablePosition().getRow());
+                //product.setName(data.getNewValue());
+                //productImplementation.edit_XML(product.getName());
+                Product product = data.getRowValue();
+               // product.setName(data.getNewValue());
+                product.setName(data.getNewValue()); 
                 tv_Tabla.getSelectionModel().getSelectedItem().setName(data.getNewValue());
-                //   System.out.println(table.getSelectionModel().getSelectedItem().getName());
-                productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
+                LOG.log(Level.INFO, "lore ");
+                
+                productImplementation.edit_XML(product);
+                //productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
                 
                 //Devuelve el dato de la fila
                 //Product p = data.getRowValue();
@@ -199,10 +207,8 @@ public class ProductController {
         });
     }
 
-    private void tableInfo() {
+    private void productTableInfo() {
         LOG.log(Level.INFO, "pr ");
-        //ProductRESTClient rest = new ProductRESTClient();
-        //pr =FXCollections.observableArrayList(getProductImplementation().findAllProducts_XML(new GenericType<List<Product>>));
         pr = FXCollections.observableArrayList(getProductImplementation().findAllProducts_XML(new GenericType<List<Product>>() {
         }));
         tv_Tabla.setItems(pr);
@@ -216,14 +222,11 @@ public class ProductController {
     private void handleOnClickCreate(ActionEvent event) {
         // get current position
         TablePosition pos = table.getFocusModel().getFocusedCell();
-
         // clear current selection
         table.getSelectionModel().clearSelection();
-
         // create new record and add it to the model
         Product product = new Product();
         tv_Tabla.getItems().add(product);
-
         // get last row
         int row = table.getItems().size() - 1;
         tv_Tabla.getFocusModel().focus(pos);
@@ -240,7 +243,7 @@ public class ProductController {
         btn_Delete.setDisable(false);
         ProductRESTClient rest = new ProductRESTClient();
         rest.remove(tv_Tabla.getSelectionModel().getSelectedItem().getId().toString());
-        tableInfo();
+        productTableInfo();
     }
 
     private void handleTextChange(ObservableValue observable, String oldValue, String newValue) {
