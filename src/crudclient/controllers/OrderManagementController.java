@@ -41,9 +41,12 @@ import javafx.stage.WindowEvent;
 import javax.ws.rs.core.GenericType;
 import crudclient.interfaces.OrderInterface;
 import crudclient.interfaces.ProductInterface;
+import crudclient.model.OrderProduct;
 import crudclient.model.Product;
 import java.io.IOException;
+import java.util.HashSet;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
@@ -60,15 +63,10 @@ public class OrderManagementController {
     private OrderInterface orderImplementation;
     private Stage stage;
     private ObservableList<Order> orderData;
+    private ObservableSet<OrderProduct> productsData;
     private List<Product> products;
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
+    private Order order;
+    private User user;
 
     @FXML
     private TableView<Order> tableOrder;
@@ -77,13 +75,11 @@ public class OrderManagementController {
     @FXML
     private TableColumn<Order, Date> column_date;
     @FXML
-    private TableColumn<Order, Double> column_totalPrice;
+    private TableColumn<Order, Float> column_totalPrice;
     @FXML
     private TableColumn<Order, String> column_status;
     @FXML
     private TableColumn<Order, String> column_user;
-    @FXML
-    private DatePicker date_Order;
     @FXML
     private ComboBox<OrderStatus> combo_statusOrder;
     @FXML
@@ -101,7 +97,17 @@ public class OrderManagementController {
     @FXML
     private Button btn_deleteOrder;
     @FXML
-    private Button btn_filterOrder;
+    private Button btn_confirmOrder;
+    @FXML
+    private TableView<OrderProduct> tableProducts;
+    @FXML
+    private TableColumn<OrderProduct, String> column_NameProduct;
+    @FXML
+    private TableColumn<OrderProduct, Integer> column_QuantityProduct;
+    @FXML
+    private TableColumn<OrderProduct, Float> column_totalPriceProduct;
+    @FXML
+    private Button btn_ModifyProduct;
 
     public OrderManagementController() {
     }
@@ -130,7 +136,7 @@ public class OrderManagementController {
 
         tableOrder.setItems(orderData);
         stage.show();
-    logger.log(Level.INFO, "OrderManagement stage loaded.");
+        logger.log(Level.INFO, "OrderManagement stage loaded.");
     }
 
     private void handleWindowsShowing(WindowEvent event) {
@@ -142,6 +148,89 @@ public class OrderManagementController {
         btn_deleteOrder.disableProperty().bind(Bindings.isEmpty(tableOrder.getSelectionModel().getSelectedItems()));
     }
 
+  
+
+    private void handlerDeleteOrder(ActionEvent event) {
+        order = tableOrder.getSelectionModel().getSelectedItem();
+        this.getOrderImplementation().removeOrder(order.getId().toString());
+        tableOrder.getItems().remove(order);
+    }
+
+    private void handlerCreateOrder(ActionEvent event) {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/product.fxml"));
+        Parent root;
+        try {
+            root = (Parent) loader.load();
+            ProductController pController = ((ProductController) loader.getController());
+            ProductFactory productFactory = new ProductFactory();
+            ProductInterface product = productFactory.getImplementation();
+            pController.setProductImplementation(product);
+            pController.setOrdermanagementController(this);
+            pController.initStageCreateOrder(root);
+
+            createOrder(products, user);
+
+        } catch (IOException ex) {
+            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void handlerModifyOrder(ActionEvent event) {
+        column_NameProduct.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));
+        column_QuantityProduct.setCellValueFactory(new PropertyValueFactory("total_quantity"));
+        column_totalPriceProduct.setCellValueFactory(new PropertyValueFactory("total_price"));
+        order = tableOrder.getSelectionModel().getSelectedItem();
+        System.out.println(order.getId().toString());
+        Set<OrderProduct> a = order.getOrderProduct();
+        for (OrderProduct prueba : a){
+            System.out.println(prueba.getTotal_quantity());
+        }
+        productsData = FXCollections.observableSet(order.getOrderProduct());
+        tableProducts.setItems((ObservableList<OrderProduct>) productsData);
+        
+    }
+
+    private void createOrder(List<Product> products, User user) {
+        order = new Order();
+        OrderProduct orderProductAuxiliar = new OrderProduct();
+        Date date = java.util.Calendar.getInstance().getTime();
+        
+        order.setDate(date);
+        order.setUser(user);
+        order.setStatus(OrderStatus.REQUESTED);
+        Float total_price= 0.0f;
+        Set<OrderProduct> orderProduct = new HashSet<OrderProduct>();;
+
+        for (Product p : products) {
+            orderProductAuxiliar.setProduct(p);
+            orderProductAuxiliar.setTotal_price(p.getPrice());
+            total_price=p.getPrice()+total_price;
+            orderProduct.add(orderProductAuxiliar);
+        }
+        
+        order.setOrderProduct(orderProduct);
+        order.setTotal_price(total_price);
+        
+        this.getOrderImplementation().createOrder(order);
+        
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
+    
     public void setStage(Stage stage) {
         this.stage = stage;
     }
@@ -157,45 +246,4 @@ public class OrderManagementController {
     public OrderInterface getOrderImplementation() {
         return this.orderImplementation;
     }
-
-    private void handlerDeleteOrder(ActionEvent event) {
-        Order order = tableOrder.getSelectionModel().getSelectedItem();
-        this.getOrderImplementation().removeOrder(order.getId().toString());
-        tableOrder.getItems().remove(order);
-    }
-
-    private void handlerCreateOrder(ActionEvent event) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/product.fxml"));
-        Parent root;
-        try {
-            root = (Parent) loader.load();
-            ProductController pController = ((ProductController) loader.getController());
-            ProductFactory productFactory = new ProductFactory();
-            ProductInterface product = productFactory.getImplementation();
-            pController.setProductImplementation(product);
-            pController.initStageCreateOrder(root);
-            pController.setOrdermanagementController(this);
-            
-        } catch (IOException ex) {
-            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    private void handlerModifyOrder(ActionEvent event) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/product.fxml"));
-        Product productA= new Product();
-        Parent root;
-        try {
-            root = (Parent) loader.load();
-            ProductController pController = ((ProductController) loader.getController());
-            ProductFactory productFactory = new ProductFactory();
-            ProductInterface product = productFactory.getImplementation();
-            pController.setProductImplementation(product);
-            pController.initStageModifyOrder(root);
-            this.stage.close();
-        } catch (IOException ex) {
-            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
 }
