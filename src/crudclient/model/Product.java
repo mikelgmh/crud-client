@@ -33,7 +33,7 @@ public class Product implements Serializable {
     /**
      * The price of the product.
      */
-    private SimpleDoubleProperty price;
+    private SimpleFloatProperty price;
     /**
      * The name of the product.
      */
@@ -47,14 +47,14 @@ public class Product implements Serializable {
         this.id = new SimpleIntegerProperty();
         this.name = new SimpleStringProperty();
         this.weight = new SimpleFloatProperty();
-        this.price = new SimpleDoubleProperty();
+        this.price = new SimpleFloatProperty();
     }
 
-    public Product(Integer id, Float weight, Double price, String name) {
+    public Product(Integer id, Float weight, Float price, String name) {
         this.id = new SimpleIntegerProperty(id);
         this.name = new SimpleStringProperty(name);
         this.weight = new SimpleFloatProperty(weight);
-        this.price = new SimpleDoubleProperty(price);
+        this.price = new SimpleFloatProperty(price);
 
     }
 
@@ -94,7 +94,7 @@ public class Product implements Serializable {
      *
      * @return the price
      */
-    public double getPrice() {
+    public float getPrice() {
         return this.price.get();
     }
 
@@ -102,7 +102,7 @@ public class Product implements Serializable {
      *
      * @param price the price to be set
      */
-    public void setPrice(double price) {
+    public void setPrice(float price) {
         this.price.set(price);
     }
 
