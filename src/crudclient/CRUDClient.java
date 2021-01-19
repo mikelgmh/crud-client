@@ -1,6 +1,7 @@
 package crudclient;
 
 import crudclient.controllers.OrderManagementController;
+import crudclient.controllers.ProductController;
 import crudclient.controllers.UserManagementController;
 import crudclient.factories.OrderFactory;
 import crudclient.factories.UserFactory;
@@ -37,12 +38,12 @@ public class CRUDClient extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/UserManagement.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/product.fxml"));
         Parent root = (Parent) loader.load();
-        UserManagementController controller = ((UserManagementController) loader.getController());
-        UserFactory userFactory = new UserFactory();
-        UserInterface user = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
-        controller.setUserImplementation(user);
+        ProductController controller = ((ProductController) loader.getController());
+       // UserFactory userFactory = new UserFactory();
+       // UserInterface user = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
+       // controller.setProductImplementation(product);
         controller.initStage(root);
     }
 
