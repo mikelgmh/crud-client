@@ -31,7 +31,7 @@ public interface UserInterface {
      * @param user
      * @return the edited user.
      */
-    public UserInterface editUser(UserInterface user);
+    public void editUser(Object user) throws ClientErrorException;
 
     /**
      * Deletes a user.

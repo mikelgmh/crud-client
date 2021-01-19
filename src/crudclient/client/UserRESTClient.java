@@ -62,8 +62,11 @@ public class UserRESTClient implements UserInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public void edit_XML(Object requestEntity) throws ClientErrorException {
+    @Override
+    public void editUser(Object requestEntity) throws ClientErrorException {
+        webTarget = client.target(BASE_URI).path("user");
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        webTarget = client.target(BASE_URI).path("");
     }
 
     public void edit_JSON(Object requestEntity) throws ClientErrorException {
@@ -122,21 +125,13 @@ public class UserRESTClient implements UserInterface {
     @Override
     public void deleteUser(String id) throws ClientErrorException {
         webTarget = client.target(BASE_URI).path("user");
-        System.out.println("Deleted user" + id);
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
-          webTarget = client.target(BASE_URI).path("");
+        webTarget = client.target(BASE_URI).path("");
     }
 
     public void close() {
         client.close();
     }
-
-    @Override
-    public UserInterface editUser(UserInterface user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-
 
     @Override
     public String getPublicKey() {
