@@ -1,6 +1,8 @@
 package crudclient.controllers;
 
 import crudclient.client.UserRESTClient;
+import crudclient.interfaces.EmailServiceInterface;
+import crudclient.model.User;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
@@ -17,16 +19,17 @@ import javafx.stage.WindowEvent;
  *
  * @author Iker de la Cruz
  */
-public class RecoverPasswordController {
+public class EmailServiceController {
 
     private static final Logger logger = Logger.getLogger("crudclient.controllers.RecoverPasswordController");
     private Stage stage;
+    private EmailServiceInterface emailServiceImplementation;
     @FXML
     private TextField tfRecoverPassword;
     @FXML
     private Button btnRecoverPassword;
 
-    public RecoverPasswordController() {
+    public EmailServiceController() {
     }
 
     public void setStage(Stage stage) {
@@ -66,8 +69,28 @@ public class RecoverPasswordController {
      */
     @FXML
     private void sendRecoverPasswordMail(ActionEvent event) {
-        // TODO: Recover the user password by email
+        // Create an User to send via XML the email to the server
+        User user = new User();
+        user.setEmail(tfRecoverPassword.getText());
+        getEmailServiceImplementation().sendNewPassword_XML(user, user.getEmail());
+        getEmailServiceImplementation().recoverUserPassword_XML(user, user.getEmail());
         stage.close();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public EmailServiceInterface getEmailServiceImplementation() {
+        return emailServiceImplementation;
+    }
+
+    /**
+     *
+     * @param emailServiceInterface
+     */
+    public void setImplementation(EmailServiceInterface emailServiceInterface) {
+        this.emailServiceImplementation = emailServiceInterface;
     }
 
 }

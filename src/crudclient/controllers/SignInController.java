@@ -10,6 +10,8 @@ import exceptions.UserNotFoundException;
 import interfaces.Signable;
 import user.User;*/
 // Java
+import crudclient.factories.EmailServiceFactory;
+import crudclient.interfaces.EmailServiceInterface;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -239,11 +241,14 @@ public class SignInController {
         // Create the stage for RecoverPassword.
         Stage stageRecoverPassword = new Stage();
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/RecoverPassword.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/EmailService.fxml"));
         Parent root = (Parent) loader.load();
-        RecoverPasswordController controller = ((RecoverPasswordController) loader.getController());
+        EmailServiceController controller = ((EmailServiceController) loader.getController());
         // Load the stage in Modal mode.
+        EmailServiceFactory emailServiceFactory = new EmailServiceFactory();
+        EmailServiceInterface emailServiceImplementation = emailServiceFactory.getImplementation();
         stageRecoverPassword.initModality(Modality.APPLICATION_MODAL);
+        controller.setImplementation(emailServiceImplementation);
         controller.setStage(stageRecoverPassword);
         controller.initStage(root);
         stageRecoverPassword.showAndWait();
