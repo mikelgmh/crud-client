@@ -101,7 +101,7 @@ public class CompanyController {
         tcNameCompany.setCellValueFactory(new PropertyValueFactory("name"));
         tcNameCompany.setCellFactory(TextFieldTableCell.<Company>forTableColumn());
         /*tcNameCompany.setOnEditCommit(
-                (CellEditEvent<Company, String> t) -> {
+                (TableColumn.CellEditEvent<Company, String> t) -> {
                     ((Company) t.getTableView().getItems().get(
                             t.getTablePosition().getRow())).setName(t.getNewValue());
                 });*/
@@ -113,7 +113,7 @@ public class CompanyController {
         tcLocalizationCompany.setCellFactory(TextFieldTableCell.<Company>forTableColumn());
         // Load the data from the database into the TableView.
         try {
-            companyData = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
+            companyData = FXCollections.observableArrayList(getCompanyImplementation().findAllCompanies_XML(new GenericType<List<Company>>() {
             }));
         } catch (Exception ex) {
             // Change the default message in the tableview with an error.
@@ -123,6 +123,7 @@ public class CompanyController {
     }
 
     /**
+     * Method to handle the delete button, to enable/disable the button.
      *
      * @param observable
      * @param oldValue
@@ -145,10 +146,11 @@ public class CompanyController {
         // TODO: Comprobar que no haya ninguna fila sin rellenar todos los datos para crear nueva Compañia
         Company newCompany = new Company();
         tableViewCompanies.getItems().add(newCompany);
+        getCompanyImplementation().create_XML(newCompany);
         // TODO: Cambiar esta comprobacion en el metodo adecuado
         // If there are all the Company data filled create the Company in the database
         if (newCompany.getName() != null && newCompany.getType() != null && newCompany.getLocalization() != null) {
-            companyImplementation.create_XML(newCompany);
+            getCompanyImplementation().create_XML(newCompany);
         }
     }
 
@@ -161,7 +163,7 @@ public class CompanyController {
     private void deleteCompanyAction(ActionEvent event) {
         // Delete selected Company in the database.
         Company delCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
-        companyImplementation.remove(delCompany.getId().toString());
+        getCompanyImplementation().remove(delCompany.getId().toString());
         // Delete selected Company in the TableView
         tableViewCompanies.getItems().remove(tableViewCompanies.getSelectionModel().getSelectedItem());
         // Refresh the table
@@ -169,22 +171,16 @@ public class CompanyController {
     }
 
     /**
+     * Method to return the Company implementation.
      *
-     * @return
+     * @return The Company implementation.
      */
     public CompanyInterface getCompanyImplementation() {
         return companyImplementation;
     }
 
     /**
-     *
-     * @param companyImplementation
-     */
-    public void setCompanyImplementation(CompanyInterface companyImplementation) {
-        this.companyImplementation = companyImplementation;
-    }
-
-    /**
+     * Method to set the Company implementation getting the Company interface.
      *
      * @param companyInterface
      */
