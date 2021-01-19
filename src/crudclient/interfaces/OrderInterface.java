@@ -13,5 +13,7 @@ public interface OrderInterface {
     
     public Set<Order> findAllOrders(GenericType responseType) throws ClientErrorException;
     
+    public void createOrder(Object requestEntity) throws ClientErrorException;
+    
     public void removeOrder(String id) throws ClientErrorException;
 }
