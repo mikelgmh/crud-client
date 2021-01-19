@@ -11,6 +11,7 @@ import crudclient.interfaces.CompanyInterface;
 import crudclient.interfaces.ProductInterface;
 import crudclient.model.Company;
 import crudclient.model.Product;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -25,6 +26,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -60,7 +62,7 @@ public class ProductController {
     @FXML
     private TableColumn<Product, Float> tc_Weight;
     @FXML
-    private TableColumn<Product, Double> tc_Price;
+    private TableColumn<Product, Float> tc_Price;
     @FXML
     private Button btn_Create;
     @FXML
@@ -76,19 +78,17 @@ public class ProductController {
     private ObservableList<Product> pr;
     private ObservableList<Company> co;
     private ProductInterface productImplementation;
-    private OrderManagementController ordermanagementController ;
+    private OrderManagementController orderManagementController ;
+
 
     public OrderManagementController getOrdermanagementController() {
-        return ordermanagementController;
+        return orderManagementController;
     }
 
     public void setOrdermanagementController(OrderManagementController ordermanagementController) {
-        this.ordermanagementController = ordermanagementController;
+        this.orderManagementController = ordermanagementController;
     }
-    
    
-    
-
     /**
      * Initializes the controller class.
      */
@@ -148,7 +148,7 @@ public class ProductController {
         
         btn_Delete.setVisible(false);
         btn_Create.setVisible(false);
-        
+        btn_OrderCreate.setOnAction(this::handleOnClickCreateOrder);
         btn_OrderCreate.setTooltip(new Tooltip("Create an order"));
         
         tf_company.textProperty().addListener(this::handleTextChange);
@@ -164,44 +164,8 @@ public class ProductController {
         
         LOG.log(Level.INFO, "tablainfo ");
         //Inicializar la variable en ordermanagement?
-        ordermanagementController.setProducts(tv_Tabla.getSelectionModel().getSelectedItems());
-        stage.show();
-    }
-    
-    public void initStageModifyOrder(Parent root) {
-        LOG.log(Level.INFO, "Inicio ");
-        Scene scene = new Scene(root);
-        stage = new Stage();
-        stage.setScene(scene);
-        stage.setTitle("Product Managment");
-        stage.setResizable(false);
-        LOG.log(Level.INFO, "Stage ");
-        
-        btn_Create.setTooltip(new Tooltip("Create a new product"));
-        
-        btn_Delete.setTooltip(new Tooltip("Delete a product"));
-        
-        btn_Delete.setOnAction(this::handleOnClickDelete);
-        
-        btn_OrderCreate.setTooltip(new Tooltip("Create an order"));
-        
-        tf_company.textProperty().addListener(this::handleTextChange);
        
-        tv_Tabla.getSelectionModel().setSelectionMode(
-                SelectionMode.MULTIPLE
-        );
-        
-        
-        LOG.log(Level.INFO, "Tooltip ");
-        
-        
-        LOG.log(Level.INFO, "Table Create Order with products ");
-        
-        //showCompanyProducts();
-        
-        LOG.log(Level.INFO, "tablainfo ");
-        
-        stage.show();
+        stage.showAndWait();
     }
 
     private void tabla() {
@@ -251,9 +215,8 @@ public class ProductController {
           //  }
         });
 
-        tc_Price.setCellValueFactory(new PropertyValueFactory<Product, Double>("price"));
-        DoubleStringConverter converterDouble = new DoubleStringConverter();
-        tc_Price.setCellFactory(TextFieldTableCell.<Product, Double>forTableColumn(converterDouble));
+        tc_Price.setCellValueFactory(new PropertyValueFactory<Product, Float>("price"));
+        tc_Price.setCellFactory(TextFieldTableCell.<Product, Float>forTableColumn(converterFloat));
         tc_Price.setOnEditCommit(data -> {
             
            /*   if (!Pattern.matches("[a-zA-Z0-9]+", data.getNewValue().toString())) {
@@ -350,9 +313,10 @@ public class ProductController {
     
     @FXML
     private void handleOnClickCreateOrder(ActionEvent event) {
-        List<String> names = tv_Tabla.getSelectionModel().getSelectedItems().stream()
-                .map(Product::getName)
-                .collect(Collectors.toList());
+        List<Product> products = tv_Tabla.getSelectionModel().getSelectedItems();
+        orderManagementController.setProducts(products);
+        
+        stage.close();
     }
 
     
