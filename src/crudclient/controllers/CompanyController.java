@@ -78,6 +78,38 @@ public class CompanyController {
         stage.setOnShowing(this::handleWindowShowing);
         tableViewCompanies.getSelectionModel().selectedItemProperty()
                 .addListener(this::handleCompaniesTableSelectionChanged);
+        // setOnEditCommit handlers for the columns
+        // TODO: Crear css para el cambio de colores en la tabla
+        tcNameCompany.setOnEditCommit(
+                (CellEditEvent<Company, String> t) -> {
+                    ((Company) t.getTableView().getItems().get(
+                            t.getTablePosition().getRow())).setName(t.getNewValue().trim());
+                    // If all the field are filled, create the Company in the database
+                    Company newCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
+                    if (isCompanyDataFilled(newCompany)) {
+                        getCompanyImplementation().edit_XML(newCompany);
+                    }
+                });
+        tcTypeCompany.setOnEditCommit(
+                (CellEditEvent<Company, CompanyType> t) -> {
+                    ((Company) t.getTableView().getItems().get(
+                            t.getTablePosition().getRow())).setType(t.getNewValue());
+                    // If all the field are filled, create the Company in the database
+                    Company newCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
+                    if (isCompanyDataFilled(newCompany)) {
+                        getCompanyImplementation().edit_XML(newCompany);
+                    }
+                });
+        tcLocalizationCompany.setOnEditCommit(
+                (CellEditEvent<Company, String> t) -> {
+                    ((Company) t.getTableView().getItems().get(
+                            t.getTablePosition().getRow())).setLocalization(t.getNewValue().trim());
+                    // If all the field are filled, create the Company in the database
+                    Company newCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
+                    if (isCompanyDataFilled(newCompany)) {
+                        getCompanyImplementation().edit_XML(newCompany);
+                    }
+                });
         stage.show();
         logger.log(Level.INFO, "Companies stage loaded.");
     }
@@ -100,11 +132,6 @@ public class CompanyController {
         // Name
         tcNameCompany.setCellValueFactory(new PropertyValueFactory("name"));
         tcNameCompany.setCellFactory(TextFieldTableCell.<Company>forTableColumn());
-        tcNameCompany.setOnEditCommit(
-                (CellEditEvent<Company, String> t) -> {
-                    ((Company) t.getTableView().getItems().get(
-                            t.getTablePosition().getRow())).setName(t.getNewValue());
-                });
         // Type
         tcTypeCompany.setCellValueFactory(new PropertyValueFactory("type"));
         tcTypeCompany.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(CompanyType.values())));
@@ -112,14 +139,7 @@ public class CompanyController {
         tcLocalizationCompany.setCellValueFactory(new PropertyValueFactory("localization"));
         tcLocalizationCompany.setCellFactory(TextFieldTableCell.<Company>forTableColumn());
         // Load the data from the database into the TableView.
-        try {
-            companyData = FXCollections.observableArrayList(getCompanyImplementation().findAllCompanies_XML(new GenericType<List<Company>>() {
-            }));
-        } catch (Exception ex) {
-            // Change the default message in the tableview with an error.
-            tableViewCompanies.setPlaceholder(new Label(ex.getMessage()));
-        }
-        tableViewCompanies.setItems(companyData);
+        loadTableView();
     }
 
     /**
@@ -143,15 +163,13 @@ public class CompanyController {
      */
     @FXML
     private void createCompanyAction(ActionEvent event) {
-        // TODO: Comprobar que no haya ninguna fila sin rellenar todos los datos para crear nueva Compañia
-        Company newCompany = new Company();
+        // Create the Company in the table and in the database with data
+        // filled, to comprobate the CRUD is working fine.
+        Company newCompany = new Company("Test", CompanyType.CLIENT, "Test");
         tableViewCompanies.getItems().add(newCompany);
         getCompanyImplementation().create_XML(newCompany);
-        // TODO: Cambiar esta comprobacion en el metodo adecuado
-        // If there are all the Company data filled create the Company in the database
-        if (newCompany.getName() != null && newCompany.getType() != null && newCompany.getLocalization() != null) {
-            getCompanyImplementation().create_XML(newCompany);
-        }
+        // Load again the table to load the Company's ids correctly
+        loadTableView();
     }
 
     /**
@@ -166,8 +184,37 @@ public class CompanyController {
         getCompanyImplementation().remove(delCompany.getId().toString());
         // Delete selected Company in the TableView
         tableViewCompanies.getItems().remove(tableViewCompanies.getSelectionModel().getSelectedItem());
-        // Refresh the table
-        tableViewCompanies.refresh();
+        // Load again the table to load the Company's ids correctly
+        loadTableView();
+    }
+
+    /**
+     * Method to verify if are the field in Company are not empty or null.
+     *
+     * @param newCompany The selected Company in the TableView.
+     * @return
+     */
+    public boolean isCompanyDataFilled(Company newCompany) {
+        // If there are all the Company data filled create the Company in the database
+        return newCompany.getName() != null && newCompany.getType()
+                != null && newCompany.getLocalization() != null
+                && !newCompany.getName().trim().equals("")
+                && !newCompany.getType().equals("")
+                && !newCompany.getLocalization().trim().equals("");
+    }
+
+    /**
+     * Method to load the TableView from the database.
+     */
+    public void loadTableView() {
+        try {
+            companyData = FXCollections.observableArrayList(getCompanyImplementation().findAllCompanies_XML(new GenericType<List<Company>>() {
+            }));
+        } catch (Exception ex) {
+            // Change the default message in the tableview with an error.
+            tableViewCompanies.setPlaceholder(new Label(ex.getMessage()));
+        }
+        tableViewCompanies.setItems(companyData);
     }
 
     /**
