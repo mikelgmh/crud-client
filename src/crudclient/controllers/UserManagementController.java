@@ -27,19 +27,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import crudclient.interfaces.UserInterface;
-import crudclient.model.Product;
-import javafx.scene.control.cell.ChoiceBoxListCell;
+import crudclient.model.Company;
 import java.io.IOException;
-import java.util.Arrays;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import javafx.beans.binding.Bindings;
-import javafx.collections.ObservableArray;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
-import javafx.scene.control.cell.ComboBoxListCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javax.ws.rs.core.GenericType;
 
@@ -54,6 +50,7 @@ public class UserManagementController {
     private final GenericValidations genericValidations;
     private UserInterface userImplementation;
     private ObservableList<User> masterData = FXCollections.observableArrayList();
+    private User currentUser;
 
     @FXML
     private TextField txt_name;
@@ -89,9 +86,9 @@ public class UserManagementController {
     @FXML
     private TableColumn<User, String> tc_email;
     @FXML
-    private TableColumn<User, String> tc_company;
+    private TableColumn<User, Company> tc_company;
     @FXML
-    private TableColumn<User, String> tc_status;
+    private TableColumn<User, UserStatus> tc_status;
     @FXML
     private TableColumn<User, UserPrivilege> tc_privilege;
 
@@ -145,25 +142,60 @@ public class UserManagementController {
     public void configTableView() {
         table.setEditable(true);
 
+        // Name column
         tc_name.setCellFactory(TextFieldTableCell.forTableColumn());
         tc_name.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
-            // System.out.println(table.getSelectionModel().getSelectedItem().getName());
             table.getSelectionModel().getSelectedItem().setName(data.getNewValue());
-            //   System.out.println(table.getSelectionModel().getSelectedItem().getName());
             userImplementation.editUser(table.getSelectionModel().getSelectedItem());
         });
 
+        // Surname column
+        tc_surname.setCellFactory(TextFieldTableCell.forTableColumn());
+        tc_surname.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
+            table.getSelectionModel().getSelectedItem().setSurname(data.getNewValue());
+            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+        });
+
+        // Username column
+        tc_username.setCellFactory(TextFieldTableCell.forTableColumn());
+        tc_username.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
+            table.getSelectionModel().getSelectedItem().setUsername(data.getNewValue());
+            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+        });
+
+        // Email column
+        tc_email.setCellFactory(TextFieldTableCell.forTableColumn());
+        tc_email.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
+            table.getSelectionModel().getSelectedItem().setEmail(data.getNewValue());
+            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+        });
+
+        // User Status column
         ObservableList userStatuses = FXCollections.observableArrayList(UserStatus.values());
         tc_status.setCellFactory(ComboBoxTableCell.forTableColumn(userStatuses));
+        tc_status.setOnEditCommit((TableColumn.CellEditEvent<User, UserStatus> data) -> {
+            table.getSelectionModel().getSelectedItem().setStatus(data.getNewValue());
+            table.refresh();
+            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+        });
 
+        // User Privilege column
         ObservableList userPrivileges = FXCollections.observableArrayList(UserPrivilege.values());
         tc_privilege.setCellFactory(ComboBoxTableCell.forTableColumn(userPrivileges));
-
         tc_privilege.setOnEditCommit((TableColumn.CellEditEvent<User, UserPrivilege> data) -> {
             table.getSelectionModel().getSelectedItem().setPrivilege(data.getNewValue());
             table.refresh();
-            User i = table.getSelectionModel().getSelectedItem();
-            userImplementation.editUser(i);
+            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+        });
+
+        // Company column
+        ObservableList companies = FXCollections.observableArrayList(userImplementation.getAllCompanies(new GenericType<List<Company>>() {
+        }));
+        tc_company.setCellFactory(ComboBoxTableCell.forTableColumn(companies));
+        tc_company.setOnEditCommit((TableColumn.CellEditEvent<User, Company> data) -> {
+            table.getSelectionModel().getSelectedItem().setCompany(data.getNewValue());
+            table.refresh();
+            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
         });
     }
 
@@ -209,6 +241,7 @@ public class UserManagementController {
      */
     private void handleUsersTableSelectionChanged(ObservableValue observable, User oldValue, User newValue) {
         // System.out.println(newValue.getEmail());
+
         this.btn_delete.setDisable(false);
     }
 
@@ -268,6 +301,7 @@ public class UserManagementController {
     public void onDeleteButtonClickAction() {
         User u = table.getSelectionModel().getSelectedItem();
         this.getUserImplementation().deleteUser(u.getId().toString());
+        masterData.remove(u);
     }
 
     public void validate() {
@@ -288,6 +322,14 @@ public class UserManagementController {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
     }
 
 }
