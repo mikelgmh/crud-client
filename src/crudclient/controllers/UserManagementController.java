@@ -5,6 +5,7 @@
  */
 package crudclient.controllers;
 
+import crudclient.exceptions.CellMaxLengthException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Parent;
@@ -35,6 +36,7 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javax.ws.rs.core.GenericType;
@@ -145,29 +147,53 @@ public class UserManagementController {
         // Name column
         tc_name.setCellFactory(TextFieldTableCell.forTableColumn());
         tc_name.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
-            table.getSelectionModel().getSelectedItem().setName(data.getNewValue());
-            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            try {
+                checkCellMaxLength(254, data.getNewValue().length());
+                table.getSelectionModel().getSelectedItem().setName(data.getNewValue());
+                userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            } catch (CellMaxLengthException ex) {
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
         });
 
         // Surname column
         tc_surname.setCellFactory(TextFieldTableCell.forTableColumn());
         tc_surname.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
-            table.getSelectionModel().getSelectedItem().setSurname(data.getNewValue());
-            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            try {
+                checkCellMaxLength(254, data.getNewValue().length());
+                table.getSelectionModel().getSelectedItem().setSurname(data.getNewValue());
+                userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            } catch (CellMaxLengthException ex) {
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
         });
 
         // Username column
         tc_username.setCellFactory(TextFieldTableCell.forTableColumn());
         tc_username.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
-            table.getSelectionModel().getSelectedItem().setUsername(data.getNewValue());
-            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            try {
+                checkCellMaxLength(254, data.getNewValue().length());
+                table.getSelectionModel().getSelectedItem().setUsername(data.getNewValue());
+                userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            } catch (CellMaxLengthException ex) {
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
         });
 
         // Email column
         tc_email.setCellFactory(TextFieldTableCell.forTableColumn());
         tc_email.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
-            table.getSelectionModel().getSelectedItem().setEmail(data.getNewValue());
-            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            try {
+                checkCellMaxLength(254, data.getNewValue().length());
+                table.getSelectionModel().getSelectedItem().setEmail(data.getNewValue());
+                userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            } catch (CellMaxLengthException ex) {
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
         });
 
         // User Status column
@@ -197,6 +223,13 @@ public class UserManagementController {
             table.refresh();
             userImplementation.editUser(table.getSelectionModel().getSelectedItem());
         });
+    }
+
+    public void checkCellMaxLength(int maxLength, int currentLength) throws CellMaxLengthException {
+        if (currentLength > maxLength) {
+            showAlert(Alert.AlertType.WARNING, "Character limit reached", "", "The max length allowed for this field is " + maxLength);
+            throw new CellMaxLengthException();
+        }
     }
 
     /**
@@ -302,6 +335,15 @@ public class UserManagementController {
         User u = table.getSelectionModel().getSelectedItem();
         this.getUserImplementation().deleteUser(u.getId().toString());
         masterData.remove(u);
+    }
+
+    public void showAlert(Alert.AlertType type, String title, String header, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+
+        alert.showAndWait();
     }
 
     public void validate() {

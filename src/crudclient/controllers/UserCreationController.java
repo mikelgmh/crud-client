@@ -14,15 +14,19 @@ import crudclient.util.security.AsymmetricEncryption;
 import crudclient.util.validation.GenericValidations;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -82,6 +86,9 @@ public class UserCreationController {
     // Buttons
     @FXML
     private Button btn_create;
+
+    @FXML
+    private Button btn_cancel;
 
     public UserCreationController() {
     }
@@ -250,8 +257,8 @@ public class UserCreationController {
             this.btn_create.setDisable(true);
         }
     }
-    
-    public void onCreateButtonClickHandler(){
+
+    public void onCreateButtonClickHandler() {
         User user = new User();
         user.setName(txt_firstname.getText());
         user.setSurname(txt_lastname.getText());
@@ -264,6 +271,31 @@ public class UserCreationController {
         String encryptedPassword = asymmetricEncryption.encryptString(txt_password.getText());
         user.setPassword(encryptedPassword);
         this.userImplementation.createUser(user);
+    }
+
+    public void closeWindow() {
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Close confirmation");
+        alert.setHeaderText("Application will be closed");
+        alert.setContentText("You will close the application");
+        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get().equals(ButtonType.OK)) {
+            stage.close();
+
+        } else {
+            alert.close();
+        }
+    }
+
+    public void showAlert(Alert.AlertType type, String title, String header, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+
+        alert.showAndWait();
     }
 
     public Stage getStage() {
