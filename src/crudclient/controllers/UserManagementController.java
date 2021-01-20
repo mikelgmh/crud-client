@@ -133,7 +133,7 @@ public class UserManagementController {
         tc_name.setCellValueFactory(new PropertyValueFactory<>("name"));
         tc_surname.setCellValueFactory(new PropertyValueFactory<>("surname"));
         tc_username.setCellValueFactory(new PropertyValueFactory<>("username"));
-        tc_company.setCellValueFactory(new PropertyValueFactory<>("username"));
+        tc_company.setCellValueFactory(new PropertyValueFactory<>("company"));
         tc_email.setCellValueFactory(new PropertyValueFactory<>("email"));
         tc_privilege.setCellValueFactory(new PropertyValueFactory<>("privilege"));
         tc_status.setCellValueFactory(new PropertyValueFactory<>("status"));
@@ -281,11 +281,11 @@ public class UserManagementController {
 
     public void setSearchFilterListeners(FilteredList<User> filteredData) {
         filteredData.predicateProperty().bind(Bindings.createObjectBinding(()
-                -> user -> user.getName().contains(txt_name.getText().toLowerCase().trim())
-                && user.getSurname().contains(txt_surname.getText().toLowerCase().trim())
-                && user.getEmail().contains(txt_email.getText().toLowerCase().trim())
-                && user.getUsername().contains(txt_username.getText())
-                && user.getCompany().getName().contains(txt_company.getText().toLowerCase().trim())
+                -> user -> user.getName().toLowerCase().contains(txt_name.getText().toLowerCase().trim())
+                && user.getSurname().toLowerCase().contains(txt_surname.getText().toLowerCase().trim())
+                && user.getEmail().toLowerCase().contains(txt_email.getText().toLowerCase().trim())
+                && user.getUsername().toLowerCase().contains(txt_username.getText())
+                && user.getCompany().getName().toLowerCase().contains(txt_company.getText().toLowerCase().trim())
                 && user.getStatus().toString().equalsIgnoreCase(chb_status.getSelectionModel().getSelectedItem().toString())
                 && user.getPrivilege().toString().equalsIgnoreCase(chb_privilege.getSelectionModel().getSelectedItem().toString()),
                 txt_name.textProperty(),
