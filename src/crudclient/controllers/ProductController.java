@@ -102,7 +102,7 @@ public class ProductController {
         btn_Delete.setTooltip(new Tooltip("Delete a product"));
 
         btn_Delete.setOnAction(this::handleOnClickDelete);
-        
+
         btn_Create.setOnAction(this::handleOnClickCreate);
 
         btn_OrderCreate.setTooltip(new Tooltip("Create an order"));
@@ -155,12 +155,17 @@ public class ProductController {
                 //product.setName(data.getNewValue());
                 //productImplementation.edit_XML(product.getName());
                 //Product product = data.getRowValue();
-               // product.setName(data.getNewValue());
+                // product.setName(data.getNewValue());
                 //product.setName(data.getNewValue());  
                 LOG.log(Level.INFO, "lore ");
                 //productImplementation.edit_XML(product);
-                tv_Tabla.getSelectionModel().getSelectedItem().setName(data.getNewValue());
-                productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
+                productImplementation = (ProductInterface) new ProductFactory().getImplementation();
+                Product p = data.getRowValue();
+                p.setName(data.getNewValue());
+                productImplementation.edit_XML(p);
+                productTableInfo();
+                //tv_Tabla.getSelectionModel().getSelectedItem().setName(data.getNewValue());
+                //productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
                 //Devuelve el dato de la fila
                 //Product p = data.getRowValue();
                 //Añadimos el nuevo valor a la fila
@@ -186,7 +191,7 @@ public class ProductController {
             } else {*/
             //data.getRowValue().setWeight(data.getNewValue());
             tv_Tabla.getSelectionModel().getSelectedItem().setWeight(data.getNewValue());
-             productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
+            productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
             //  }
         });
 
@@ -206,7 +211,7 @@ public class ProductController {
             } else {*/
             //data.getRowValue().setPrice(data.getNewValue());
             tv_Tabla.getSelectionModel().getSelectedItem().setPrice(data.getNewValue());
-             productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
+            productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
             //  }
         });
     }
@@ -220,24 +225,33 @@ public class ProductController {
 
     @FXML
     private void handleOnClickCreate(ActionEvent event) {
-        
+
+        Product newProduct = new Product();
+        newProduct.setName("");
+        newProduct.setPrice(0);
+        newProduct.setWeight(0);
+        productImplementation = (ProductInterface) new ProductFactory().getImplementation();
+        pr.add(newProduct);
         // get current position
-        TablePosition pos = table.getFocusModel().getFocusedCell();
+        //TablePosition pos = table.getFocusModel().getFocusedCell();
         // clear current selection
-        table.getSelectionModel().clearSelection();
+        // table.getSelectionModel().clearSelection();
         // create new record and add it to the model
-        Product product = new Product();
-        tv_Tabla.getItems().add(product);
+        // Product product = new Product();
+        //  tv_Tabla.getItems().add(product);
         // get last row
         int row = table.getItems().size() - 1;
-        tv_Tabla.getFocusModel().focus(pos);
         tv_Tabla.requestFocus();
+        tv_Tabla.getSelectionModel().select(row);
+        tv_Tabla.getFocusModel().focus(row);
+        //tv_Tabla.requestFocus();
         //table.getSelectionModel().select(row, pos.getTableColumn());
         // tv_Tabla.getFocusModel().focus(row, tableColumn);
         // tv_Tabla.requestFocus();
         // scroll to new row
-        productImplementation.create_XML(tv_Tabla.getSelectionModel().getSelectedItem());
-        tv_Tabla.scrollTo(product);
+        productImplementation.create_XML(newProduct);
+
+        //tv_Tabla.scrollTo(product);
     }
 
     @FXML
