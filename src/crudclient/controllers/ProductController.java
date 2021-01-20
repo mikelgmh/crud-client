@@ -102,6 +102,8 @@ public class ProductController {
         btn_Delete.setTooltip(new Tooltip("Delete a product"));
 
         btn_Delete.setOnAction(this::handleOnClickDelete);
+        
+        btn_Create.setOnAction(this::handleOnClickCreate);
 
         btn_OrderCreate.setTooltip(new Tooltip("Create an order"));
 
@@ -152,15 +154,13 @@ public class ProductController {
                 //Product product = (Product) tc_Name.getTableView().getItems().get(data.getTablePosition().getRow());
                 //product.setName(data.getNewValue());
                 //productImplementation.edit_XML(product.getName());
-                Product product = data.getRowValue();
+                //Product product = data.getRowValue();
                // product.setName(data.getNewValue());
-                product.setName(data.getNewValue()); 
-                tv_Tabla.getSelectionModel().getSelectedItem().setName(data.getNewValue());
+                //product.setName(data.getNewValue());  
                 LOG.log(Level.INFO, "lore ");
-                
-                productImplementation.edit_XML(product);
-                //productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
-                
+                //productImplementation.edit_XML(product);
+                tv_Tabla.getSelectionModel().getSelectedItem().setName(data.getNewValue());
+                productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
                 //Devuelve el dato de la fila
                 //Product p = data.getRowValue();
                 //Añadimos el nuevo valor a la fila
@@ -172,8 +172,8 @@ public class ProductController {
         });
 
         tc_Weight.setCellValueFactory(new PropertyValueFactory<Product, Float>("weight"));
-        FloatStringConverter converterFloat = new FloatStringConverter();
-        tc_Weight.setCellFactory(TextFieldTableCell.<Product, Float>forTableColumn(converterFloat));
+        FloatStringConverter converterFloatWeight = new FloatStringConverter();
+        tc_Weight.setCellFactory(TextFieldTableCell.<Product, Float>forTableColumn(converterFloatWeight));
         tc_Weight.setOnEditCommit(data -> {
             /*     if (!Pattern.matches("[a-zA-Z0-9]+", data.getNewValue().toString())) {
                 Alert alert = new Alert(AlertType.WARNING);
@@ -184,13 +184,15 @@ public class ProductController {
                 tv_Tabla.refresh();
 
             } else {*/
-            data.getRowValue().setWeight(data.getNewValue());
+            //data.getRowValue().setWeight(data.getNewValue());
+            tv_Tabla.getSelectionModel().getSelectedItem().setWeight(data.getNewValue());
+             productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
             //  }
         });
 
         tc_Price.setCellValueFactory(new PropertyValueFactory<Product, Double>("price"));
-        DoubleStringConverter converterDouble = new DoubleStringConverter();
-        tc_Price.setCellFactory(TextFieldTableCell.<Product, Double>forTableColumn(converterDouble));
+        DoubleStringConverter converterFloatPrice = new DoubleStringConverter();
+        tc_Price.setCellFactory(TextFieldTableCell.<Product, Double>forTableColumn(converterFloatPrice));
         tc_Price.setOnEditCommit(data -> {
 
             /*   if (!Pattern.matches("[a-zA-Z0-9]+", data.getNewValue().toString())) {
@@ -202,7 +204,9 @@ public class ProductController {
                 tv_Tabla.refresh();
 
             } else {*/
-            data.getRowValue().setPrice(data.getNewValue());
+            //data.getRowValue().setPrice(data.getNewValue());
+            tv_Tabla.getSelectionModel().getSelectedItem().setPrice(data.getNewValue());
+             productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
             //  }
         });
     }
@@ -214,12 +218,9 @@ public class ProductController {
         tv_Tabla.setItems(pr);
     }
 
-    private void edit() {
-
-    }
-
     @FXML
     private void handleOnClickCreate(ActionEvent event) {
+        
         // get current position
         TablePosition pos = table.getFocusModel().getFocusedCell();
         // clear current selection
@@ -235,6 +236,7 @@ public class ProductController {
         // tv_Tabla.getFocusModel().focus(row, tableColumn);
         // tv_Tabla.requestFocus();
         // scroll to new row
+        productImplementation.create_XML(tv_Tabla.getSelectionModel().getSelectedItem());
         tv_Tabla.scrollTo(product);
     }
 
