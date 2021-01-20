@@ -3,10 +3,12 @@ package crudclient.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -35,7 +37,7 @@ public class Order implements Serializable {
     private Date date;
     private Float total_price;
     private SimpleObjectProperty<OrderStatus> status;
-    private Set<OrderProduct> orderProduct;
+    private List<OrderProduct> products;
     private User user;
 
     //Getters and setters
@@ -63,12 +65,13 @@ public class Order implements Serializable {
         this.total_price = total_price;
     }
 
-    public Set<OrderProduct> getOrderProduct() {
-        return orderProduct;
+    @XmlElement(name="products")
+    public List<OrderProduct> getOrderProduct() {
+        return products;
     }
 
-    public void setOrderProduct(Set<OrderProduct> orderProduct) {
-        this.orderProduct = orderProduct;
+    public void setOrderProduct(List<OrderProduct> products) {
+        this.products = products;
     }
 
     public Date getDate() {

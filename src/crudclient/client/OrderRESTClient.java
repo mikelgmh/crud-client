@@ -37,7 +37,7 @@ public class OrderRESTClient implements OrderInterface {
         webTarget = client.target(BASE_URI).path("order");
     }
 
-    public void edit_XML(Object requestEntity) throws ClientErrorException {
+    public void editOrder(Object requestEntity) throws ClientErrorException {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
@@ -57,10 +57,11 @@ public class OrderRESTClient implements OrderInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public Set<Order> findAllOrders(GenericType responseType) throws ClientErrorException {
+    public List<Order> findAllOrders(GenericType responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("order");
-        return (Set<Order>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        List<Order> achuingana = (List<Order>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        return achuingana;
     }
 
     public <T> T findAllOrders_JSON(Class<T> responseType) throws ClientErrorException {

@@ -23,15 +23,12 @@ import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -44,13 +41,18 @@ import crudclient.interfaces.ProductInterface;
 import crudclient.model.OrderProduct;
 import crudclient.model.Product;
 import java.io.IOException;
-import java.util.HashSet;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
+import javafx.util.Callback;
+import javafx.util.converter.IntegerStringConverter;
 
 /**
  * FXML Controller class
@@ -63,8 +65,9 @@ public class OrderManagementController {
     private OrderInterface orderImplementation;
     private Stage stage;
     private ObservableList<Order> orderData;
-    private ObservableSet<OrderProduct> productsData;
+    private ObservableList<OrderProduct> productsData;
     private List<Product> products;
+    private OrderProduct orderProduct;
     private Order order;
     private User user;
 
@@ -97,8 +100,6 @@ public class OrderManagementController {
     @FXML
     private Button btn_deleteOrder;
     @FXML
-    private Button btn_confirmOrder;
-    @FXML
     private TableView<OrderProduct> tableProducts;
     @FXML
     private TableColumn<OrderProduct, String> column_NameProduct;
@@ -107,7 +108,9 @@ public class OrderManagementController {
     @FXML
     private TableColumn<OrderProduct, Float> column_totalPriceProduct;
     @FXML
-    private Button btn_ModifyProduct;
+    private Button btn_OrderMngmt;
+    @FXML
+    private Button btn_deletePro;
 
     public OrderManagementController() {
     }
@@ -123,6 +126,7 @@ public class OrderManagementController {
         stage.setResizable(false);
         stage.setOnShowing(this::handleWindowsShowing);
 
+        setTableOrderProductEditable();
         column_date.setSortType(TableColumn.SortType.DESCENDING);
         combo_statusOrder.setItems(FXCollections.observableArrayList(OrderStatus.values()));
         column_ID.setCellValueFactory(new PropertyValueFactory("id"));
@@ -130,9 +134,8 @@ public class OrderManagementController {
         column_totalPrice.setCellValueFactory(new PropertyValueFactory("total_price"));
         column_status.setCellValueFactory(new PropertyValueFactory("status"));
         column_user.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUser().getName().concat(" " + cellData.getValue().getUser().getSurname())));
-        orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<Set<Order>>() {
-        }));
-        FilteredList<Order> filteredData = new FilteredList<>(orderData, p -> true);
+        orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {}));
+        //FilteredList<Order> filteredData = new FilteredList<>(orderData, p -> true);
 
         tableOrder.setItems(orderData);
         stage.show();
@@ -146,6 +149,8 @@ public class OrderManagementController {
         btn_modifyOrder.disableProperty().bind(Bindings.isEmpty(tableOrder.getSelectionModel().getSelectedItems()));
         btn_deleteOrder.setOnAction(this::handlerDeleteOrder);
         btn_deleteOrder.disableProperty().bind(Bindings.isEmpty(tableOrder.getSelectionModel().getSelectedItems()));
+        btn_deletePro.setOnAction(this::handlerDeleteProductFromOrder);
+        btn_OrderMngmt.setOnAction(this::handlerOrderModification);
     }
 
   
@@ -176,22 +181,24 @@ public class OrderManagementController {
     }
 
     private void handlerModifyOrder(ActionEvent event) {
-        column_NameProduct.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));
-        column_QuantityProduct.setCellValueFactory(new PropertyValueFactory("total_quantity"));
-        column_totalPriceProduct.setCellValueFactory(new PropertyValueFactory("total_price"));
         order = tableOrder.getSelectionModel().getSelectedItem();
-        System.out.println(order.getId().toString());
-        Set<OrderProduct> a = order.getOrderProduct();
-        for (OrderProduct prueba : a){
-            System.out.println(prueba.getTotal_quantity());
-        }
-        productsData = FXCollections.observableSet(order.getOrderProduct());
+        productsData = FXCollections.observableList(order.getOrderProduct());
         tableProducts.setItems((ObservableList<OrderProduct>) productsData);
         
     }
 
+    private void handlerDeleteProductFromOrder(ActionEvent event) {
+        //Poner alerta para confirmar el borrado del producto
+        orderProduct = tableProducts.getSelectionModel().getSelectedItem();
+        tableProducts.getItems().remove(orderProduct);
+    }
+
+    private void handlerOrderModification(ActionEvent event) {
+        this.getOrderImplementation().editOrder(order);
+    }
+        
     private void createOrder(List<Product> products, User user) {
-        order = new Order();
+       /* order = new Order();
         OrderProduct orderProductAuxiliar = new OrderProduct();
         Date date = java.util.Calendar.getInstance().getTime();
         
@@ -199,7 +206,7 @@ public class OrderManagementController {
         order.setUser(user);
         order.setStatus(OrderStatus.REQUESTED);
         Float total_price= 0.0f;
-        Set<OrderProduct> orderProduct = new HashSet<OrderProduct>();;
+        //Set<OrderProduct> orderProduct = new HashSet<OrderProduct>();;
 
         for (Product p : products) {
             orderProductAuxiliar.setProduct(p);
@@ -212,7 +219,7 @@ public class OrderManagementController {
         order.setTotal_price(total_price);
         
         this.getOrderImplementation().createOrder(order);
-        
+        */
     }
 
     public User getUser() {
@@ -246,4 +253,24 @@ public class OrderManagementController {
     public OrderInterface getOrderImplementation() {
         return this.orderImplementation;
     }
+
+    private void setTableOrderProductEditable() {
+        tableProducts.setEditable(true);
+        column_NameProduct.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));
+        //column_QuantityProduct.setCellValueFactory(new PropertyValueFactory("total_quantity"));
+        column_totalPriceProduct.setCellValueFactory(new PropertyValueFactory("total_price"));
+
+        column_QuantityProduct.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        column_QuantityProduct.setOnEditCommit((TableColumn.CellEditEvent<OrderProduct, String> data) -> {
+         
+            Product p = data.getRowValue();
+            ProductRESTClient rest = new ProductRESTClient();
+            p.setName(parseInteger(data.getNewValue()));
+            rest.edit_XML(p);
+            tableInfo();
+            });
+
+    }
+
+    
 }
