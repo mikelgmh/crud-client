@@ -153,6 +153,8 @@ public class CompanyController {
             Object oldValue, Object newValue) {
         if (newValue != null) {
             btnDeleteCompany.setDisable(false);
+        } else {
+            btnDeleteCompany.setDisable(true);
         }
     }
 
