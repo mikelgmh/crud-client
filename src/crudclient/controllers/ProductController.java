@@ -191,7 +191,7 @@ public class ProductController {
             } else {*/
             //data.getRowValue().setWeight(data.getNewValue());
             tv_Tabla.getSelectionModel().getSelectedItem().setWeight(data.getNewValue());
-            productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
+            getProductImplementation().edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
             //  }
         });
 

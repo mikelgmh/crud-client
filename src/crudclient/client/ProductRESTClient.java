@@ -51,9 +51,7 @@ public class ProductRESTClient implements ProductInterface{
     }
 
     public void edit_XML(Object requestEntity) throws ClientErrorException {
-       
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
-        
     }
 
     public void edit_JSON(Object requestEntity) throws ClientErrorException {

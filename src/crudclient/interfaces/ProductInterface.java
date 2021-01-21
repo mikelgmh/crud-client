@@ -18,7 +18,7 @@ import javax.ws.rs.core.GenericType;
 public interface ProductInterface {
     
 
-    public void edit_XML(Object product) throws ClientErrorException;
+    public void edit_XML(Object requestEntity) throws ClientErrorException;
 
     public void edit_JSON(Object requestEntity) throws ClientErrorException;
 
