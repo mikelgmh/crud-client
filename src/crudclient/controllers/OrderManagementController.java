@@ -257,17 +257,15 @@ public class OrderManagementController {
     private void setTableOrderProductEditable() {
         tableProducts.setEditable(true);
         column_NameProduct.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));
-        //column_QuantityProduct.setCellValueFactory(new PropertyValueFactory("total_quantity"));
+        column_QuantityProduct.setCellValueFactory(new PropertyValueFactory("total_quantity"));
+        IntegerStringConverter quantity = new IntegerStringConverter();
         column_totalPriceProduct.setCellValueFactory(new PropertyValueFactory("total_price"));
 
-        column_QuantityProduct.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-        column_QuantityProduct.setOnEditCommit((TableColumn.CellEditEvent<OrderProduct, String> data) -> {
+        column_QuantityProduct.setCellFactory(TextFieldTableCell.<OrderProduct, Integer>forTableColumn(quantity));
+        column_QuantityProduct.setOnEditCommit(data -> {
          
-            Product p = data.getRowValue();
-            ProductRESTClient rest = new ProductRESTClient();
-            p.setName(parseInteger(data.getNewValue()));
-            rest.edit_XML(p);
-            tableInfo();
+            tableProducts.getSelectionModel().getSelectedItem().setTotal_quantity(data.getNewValue());
+            getOrderImplementation().editOrder(order);
             });
 
     }

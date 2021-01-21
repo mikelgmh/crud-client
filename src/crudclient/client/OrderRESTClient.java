@@ -60,8 +60,8 @@ public class OrderRESTClient implements OrderInterface {
     public List<Order> findAllOrders(GenericType responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("order");
-        List<Order> achuingana = (List<Order>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
-        return achuingana;
+        List<Order> allOrders = (List<Order>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        return allOrders;
     }
 
     public <T> T findAllOrders_JSON(Class<T> responseType) throws ClientErrorException {

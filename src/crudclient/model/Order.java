@@ -25,13 +25,7 @@ public class Order implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public Order(){
-        this.status = new SimpleObjectProperty<OrderStatus>();
-    }
-            
-    public Order(OrderStatus status){
-        this.status= new SimpleObjectProperty(status);
-    }
+    
             
     private Integer id;
     private Date date;
@@ -41,6 +35,15 @@ public class Order implements Serializable {
     private User user;
 
     //Getters and setters
+    
+    public Order(){
+        this.status = new SimpleObjectProperty<OrderStatus>();
+    }
+            
+    public Order(OrderStatus status){
+        this.status= new SimpleObjectProperty(status);
+    }
+    
     public User getUser() {
         return user;
     }
