@@ -4,9 +4,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -19,29 +16,7 @@
 
 <VBox fx:id="paneCompanies" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="crudclient.controllers.CompanyController">
   <children>
-    <MenuBar VBox.vgrow="NEVER">
-      <menus>
-        <Menu mnemonicParsing="false" text="Home">
-          <items>
-            <MenuItem fx:id="menuItemLogout" mnemonicParsing="false" text="Logout" />
-                  <MenuItem fx:id="menuItemClose" mnemonicParsing="false" text="Close" />
-          </items>
-        </Menu>
-            <Menu mnemonicParsing="false" text="Management">
-              <items>
-                  <MenuItem fx:id="menuItemCompanies" mnemonicParsing="false" text="Companies" />
-                  <MenuItem fx:id="menuItemUsers" mnemonicParsing="false" text="Users" />
-                  <MenuItem fx:id="menuItemProducts" mnemonicParsing="false" text="Products" />
-                  <Menu mnemonicParsing="false" text="Orders">
-                    <items>
-                      <MenuItem fx:id="menuItemOrderManager" mnemonicParsing="false" text="Order Manager" />
-                        <MenuItem fx:id="menuItemCreateOrder" mnemonicParsing="false" text="Create Order" />
-                    </items>
-                  </Menu>
-              </items>
-            </Menu>
-      </menus>
-    </MenuBar>
+    <fx:include source="menubar.fxml" />
     <SplitPane dividerPositions="0.25073746312684364" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <items>
         <AnchorPane>

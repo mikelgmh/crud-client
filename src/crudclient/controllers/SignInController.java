@@ -96,27 +96,34 @@ public class SignInController {
      * SceneBuilder.
      *
      * @param event
-     *
-     * The following exceptions show an alert according to the message received
-     *
-     * @throws IOException input/output error
-     * @throws exceptions.ErrorConnectingDatabaseException cannot connect to
-     * database
-     * @throws exceptions.PasswordMissmatchException password is not correct
-     * @throws exceptions.ErrorClosingDatabaseResources cannot close the
-     * database
-     * @throws exceptions.QueryException the query is not correct
-     * @throws exceptions.ErrorConnectingServerException cannot connect to the
-     * server side
+     * @throws Exception input/output error.
      */
     @FXML
-    private void handleOnClickLogin(ActionEvent event) throws IOException {
+    private void handleOnClickLogin(ActionEvent event) throws Exception {
         logger.log(Level.INFO, "Attempting to sign in.");
-        User user = new User();
-        user.setUsername(txt_User.getText());
-        user.setPassword(ae.encryptString(txt_Password.getText()));
-        User loggedUser = getSignInImplementation().loginUser_XML(user, User.class);
-        // TODO: Pasar a la ventana dashboard con el user logueado
+        try {
+            User user = new User();
+            user.setUsername(txt_User.getText());
+            user.setPassword(ae.encryptString(txt_Password.getText()));
+            User loggedUser = getSignInImplementation().loginUser_XML(user, User.class);
+            // Create the stage for Dashboard
+            Stage stageDashboard = new Stage();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/Dashboard.fxml"));
+            Parent root = (Parent) loader.load();
+            DashboardController controller = ((DashboardController) loader.getController());
+            // Load the stage
+            controller.setUser(loggedUser);
+            controller.setStage(stageDashboard);
+            controller.initStage(root);
+            // Close the current stage
+            stage.close();
+        } catch (Exception ex) {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Invalid login.");
+            alert.setHeaderText("Wrong username or passwords.");
+            alert.showAndWait();
+        }
+
     }
 
     /**
