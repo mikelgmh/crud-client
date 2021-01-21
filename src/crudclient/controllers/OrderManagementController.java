@@ -111,6 +111,8 @@ public class OrderManagementController {
     private Button btn_OrderMngmt;
     @FXML
     private Button btn_deletePro;
+    @FXML
+    private Button btn_commitOrder;
 
     public OrderManagementController() {
     }
