@@ -10,7 +10,6 @@ package crudclient.model;
  * @author Mikel
  */
 public enum UserPrivilege {
-
     SUPERUSER,
     PROVIDER,
     WORKER,
