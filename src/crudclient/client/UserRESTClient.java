@@ -111,7 +111,8 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
     public void createUser(Object requestEntity) throws ClientErrorException,UsernameAlreadyExistsException, EmailAlreadyExistsException {
         webTarget = client.target(BASE_URI).path("user");
 
-        Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML)
+                .post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
         webTarget = client.target(BASE_URI).path("");
         if (response.getStatus() == 401) {
 

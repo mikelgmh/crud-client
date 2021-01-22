@@ -5,7 +5,10 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.HBox?>
 
-<HBox fx:id="hboxMenu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="32.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="crudclient.controllers.MenuController">
+<HBox fx:id="hboxMenu" maxHeight="-Infinity" maxWidth="-Infinity" 
+      minHeight="-Infinity" minWidth="-Infinity" prefHeight="32.0" prefWidth="600.0" 
+      xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="crudclient.controllers.MenuController">
    <children>
       <MenuBar fx:id="menuBar" prefHeight="32.0" prefWidth="1068.0">
          <menus>
@@ -21,6 +24,7 @@
                   <MenuItem fx:id="menuUsers" mnemonicParsing="false" text="Users" />
 <!--                  <MenuItem mnemonicsParsing="false" text="Products" />-->
                   <MenuItem fx:id="menuOrders" mnemonicParsing="false" text="Orders" />
+                  <MenuItem fx:id="menuProducts" mnemonicParsing="false" text="Products" />
                </items>
             </Menu>
          </menus>
