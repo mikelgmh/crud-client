@@ -6,6 +6,7 @@ import crudclient.interfaces.EmailServiceInterface;
 import crudclient.interfaces.SignInInterface;
 import crudclient.model.User;
 import crudclient.util.security.AsymmetricEncryption;
+import crudclient.util.session.UserSession;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -106,6 +107,7 @@ public class SignInController {
             user.setUsername(txt_User.getText());
             user.setPassword(ae.encryptString(txt_Password.getText()));
             User loggedUser = getSignInImplementation().loginUser_XML(user, User.class);
+            
             // Create the stage for Dashboard
             Stage stageDashboard = new Stage();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/Dashboard.fxml"));
