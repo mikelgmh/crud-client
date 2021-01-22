@@ -7,6 +7,7 @@ package crudclient.controllers;
 
 import crudclient.client.CompanyRESTClient;
 import crudclient.client.ProductRESTClient;
+import crudclient.factories.ProductFactory;
 import crudclient.interfaces.CompanyInterface;
 import crudclient.interfaces.ProductInterface;
 import crudclient.model.Company;
@@ -71,8 +72,9 @@ public class ProductController {
     private Button btn_OrderCreate;
     @FXML
     private Label lbl_Choose;
-     @FXML
+    @FXML
     private TextField tf_company;
+    
     private static final Logger LOG = Logger.getLogger(ProductController.class.getName());
     private TableView<ObservableList<StringProperty>> table = new TableView<>();
     private ObservableList<Product> pr;
@@ -108,32 +110,33 @@ public class ProductController {
         stage.setTitle("Product Managment");
         stage.setResizable(false);
         LOG.log(Level.INFO, "Stage ");
-        
+
         btn_Create.setTooltip(new Tooltip("Create a new product"));
-        
+
         btn_Delete.setTooltip(new Tooltip("Delete a product"));
-        
+
         btn_Delete.setOnAction(this::handleOnClickDelete);
-        
+
+        btn_Create.setOnAction(this::handleOnClickCreate);
+
         btn_OrderCreate.setTooltip(new Tooltip("Create an order"));
-        
+
         tf_company.textProperty().addListener(this::handleTextChange);
-        
+
         tv_Tabla.getSelectionModel().setSelectionMode(
                 SelectionMode.MULTIPLE
         );
-        
-        
+
         LOG.log(Level.INFO, "Tooltip ");
-        
-        tabla();
-        
+
+        editableProductTable();
+
         LOG.log(Level.INFO, "tabla ");
-        
-        tableInfo();
-        
+
+        productTableInfo();
+
         LOG.log(Level.INFO, "tablainfo ");
-        
+
         stage.show();
     }
     
@@ -168,7 +171,7 @@ public class ProductController {
         stage.showAndWait();
     }
 
-    private void tabla() {
+    private void editableProductTable() {
         tv_Tabla.setEditable(true);
 
         tc_Name.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -191,51 +194,74 @@ public class ProductController {
                 tv_Tabla.refresh();
 
             } else {
-            Product p = data.getRowValue();
-            ProductRESTClient rest = new ProductRESTClient();
-            p.setName(data.getNewValue());
-            rest.edit_XML(p);
-            tableInfo();
+                //productImplementation = (ProductInterface) new ProductFactory().getImplementation();
+                //productImplementation = (ProductRESTClient) new ProductFactory().getImplementation();
+                //Product product = (Product) tc_Name.getTableView().getItems().get(data.getTablePosition().getRow());
+                //product.setName(data.getNewValue());
+                //productImplementation.edit_XML(product.getName());
+                //Product product = data.getRowValue();
+                // product.setName(data.getNewValue());
+                //product.setName(data.getNewValue());  
+                LOG.log(Level.INFO, "lore ");
+                //productImplementation.edit_XML(product);
+                productImplementation = (ProductInterface) new ProductFactory().getImplementation();
+                Product p = data.getRowValue();
+                p.setName(data.getNewValue());
+                productImplementation.edit_XML(p);
+                productTableInfo();
+                //tv_Tabla.getSelectionModel().getSelectedItem().setName(data.getNewValue());
+                //productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
+                //Devuelve el dato de la fila
+                //Product p = data.getRowValue();
+                //Añadimos el nuevo valor a la fila
+                //p.setName(data.getNewValue());
+                //getProductImplementation().edit_XML(p);
+                //tableInfo();
+
             }
         });
 
         tc_Weight.setCellValueFactory(new PropertyValueFactory<Product, Float>("weight"));
-        FloatStringConverter converterFloat = new FloatStringConverter();
-        tc_Weight.setCellFactory(TextFieldTableCell.<Product, Float>forTableColumn(converterFloat));
+        FloatStringConverter converterFloatWeight = new FloatStringConverter();
+        tc_Weight.setCellFactory(TextFieldTableCell.<Product, Float>forTableColumn(converterFloatWeight));
         tc_Weight.setOnEditCommit(data -> {
-       /*     if (!Pattern.matches("[a-zA-Z0-9]+", data.getNewValue().toString())) {
+            /*     if (!Pattern.matches("[a-zA-Z0-9]+", data.getNewValue().toString())) {
                 Alert alert = new Alert(AlertType.WARNING);
                 alert.setTitle("Warning Dialog");
                 alert.setHeaderText("Look, a Warning Dialog");
                 alert.setContentText("Careful with the next step!");
                 alert.showAndWait();
                 tv_Tabla.refresh();
+
             } else {*/
-            data.getRowValue().setWeight(data.getNewValue());
-          //  }
+            //data.getRowValue().setWeight(data.getNewValue());
+            tv_Tabla.getSelectionModel().getSelectedItem().setWeight(data.getNewValue());
+            getProductImplementation().edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
+            //  }
         });
 
         tc_Price.setCellValueFactory(new PropertyValueFactory<Product, Float>("price"));
-        tc_Price.setCellFactory(TextFieldTableCell.<Product, Float>forTableColumn(converterFloat));
+        FloatStringConverter converterFloatPrice = new FloatStringConverter();
+        tc_Price.setCellFactory(TextFieldTableCell.<Product, Float>forTableColumn(converterFloatPrice));
         tc_Price.setOnEditCommit(data -> {
-            
-           /*   if (!Pattern.matches("[a-zA-Z0-9]+", data.getNewValue().toString())) {
+
+            /*   if (!Pattern.matches("[a-zA-Z0-9]+", data.getNewValue().toString())) {
                 Alert alert = new Alert(AlertType.WARNING);
                 alert.setTitle("Warning Dialog");
                 alert.setHeaderText("Look, a Warning Dialog");
                 alert.setContentText("Careful with the next step!");
                 alert.showAndWait();
                 tv_Tabla.refresh();
+
             } else {*/
-            data.getRowValue().setPrice(data.getNewValue());
+            //data.getRowValue().setPrice(data.getNewValue());
+            tv_Tabla.getSelectionModel().getSelectedItem().setPrice(data.getNewValue());
+            productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
             //  }
         });
     }
-    
 
-    
-
-    private void tableInfo() {
+    private void productTableInfo() {
         LOG.log(Level.INFO, "pr ");
         //ProductRESTClient rest = new ProductRESTClient();
         //pr =FXCollections.observableArrayList(getProductImplementation().findAllProducts_XML(new GenericType<List<Product>>));
@@ -244,32 +270,35 @@ public class ProductController {
         tv_Tabla.setItems(pr);
     }
 
-    
-    private void edit() {
-
-    }
-
     @FXML
     private void handleOnClickCreate(ActionEvent event) {
+
+        Product newProduct = new Product();
+        newProduct.setName("");
+        newProduct.setPrice(0);
+        newProduct.setWeight(0);
+        productImplementation = (ProductInterface) new ProductFactory().getImplementation();
+        pr.add(newProduct);
         // get current position
-        TablePosition pos = table.getFocusModel().getFocusedCell();
-
+        //TablePosition pos = table.getFocusModel().getFocusedCell();
         // clear current selection
-        table.getSelectionModel().clearSelection();
-
+        // table.getSelectionModel().clearSelection();
         // create new record and add it to the model
-        Product product = new Product();
-        tv_Tabla.getItems().add(product);
-
+        // Product product = new Product();
+        //  tv_Tabla.getItems().add(product);
         // get last row
         int row = table.getItems().size() - 1;
-        tv_Tabla.getFocusModel().focus(pos);
         tv_Tabla.requestFocus();
+        tv_Tabla.getSelectionModel().select(row);
+        tv_Tabla.getFocusModel().focus(row);
+        //tv_Tabla.requestFocus();
         //table.getSelectionModel().select(row, pos.getTableColumn());
         // tv_Tabla.getFocusModel().focus(row, tableColumn);
         // tv_Tabla.requestFocus();
         // scroll to new row
-        tv_Tabla.scrollTo(product);
+        productImplementation.create_XML(newProduct);
+
+        //tv_Tabla.scrollTo(product);
     }
 
     @FXML
@@ -277,14 +306,12 @@ public class ProductController {
         btn_Delete.setDisable(false);
         ProductRESTClient rest = new ProductRESTClient();
         rest.remove(tv_Tabla.getSelectionModel().getSelectedItem().getId().toString());
-        tableInfo();
+        productTableInfo();
     }
 
-    
-      private void handleTextChange(ObservableValue observable, String oldValue, String newValue) {
+    private void handleTextChange(ObservableValue observable, String oldValue, String newValue) {
         FilteredList<Product> filteredData = new FilteredList<>(pr, u -> true);
-        
-        
+
         filteredData.setPredicate(product -> {
             if (newValue == null || newValue.isEmpty()) {
                 return true; // Si el texto del filtro está vacío, muestra todos los utensilios.
@@ -310,7 +337,6 @@ public class ProductController {
         tv_Tabla.setItems(sortedData);
     }
 
-    
     @FXML
     private void handleOnClickCreateOrder(ActionEvent event) {
         List<Product> products = tv_Tabla.getSelectionModel().getSelectedItems();
@@ -319,12 +345,10 @@ public class ProductController {
         stage.close();
     }
 
-    
     public void setProductImplementation(ProductInterface product) {
         this.productImplementation = product;
     }
 
-    
     public ProductInterface getProductImplementation() {
         return this.productImplementation;
     }

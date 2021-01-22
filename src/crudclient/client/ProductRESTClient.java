@@ -90,10 +90,10 @@ public class ProductRESTClient implements ProductInterface{
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
 
-    public <T> T findAllProducts_XML(GenericType<T> responseType) throws ClientErrorException {
+    public List<Product> findAllProducts_XML(GenericType responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("findAllProducts");
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        return (List<Product>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     public <T> T findAllProducts_JSON(Class<T> responseType) throws ClientErrorException {
@@ -108,6 +108,13 @@ public class ProductRESTClient implements ProductInterface{
 
     public void close() {
         client.close();
+    }
+    
+    @Override
+    public List getProducts() {
+        List<Product> productList = this.findAllProducts_XML(new GenericType<List<Product>>() {
+        });
+        return productList;
     }
 
     

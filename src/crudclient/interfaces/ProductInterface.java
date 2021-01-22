@@ -32,7 +32,7 @@ public interface ProductInterface {
 
     public void remove(String id) throws ClientErrorException;
 
-    public <T> T findAllProducts_XML(GenericType<T> responseType) throws ClientErrorException;
+   public List<Product> findAllProducts_XML(GenericType responseType) throws ClientErrorException;
 
     public <T> T findAllProducts_JSON(Class<T> responseType) throws ClientErrorException;
     
@@ -43,6 +43,8 @@ public interface ProductInterface {
     public <T> T findProductByCompany_XML(Class<T> responseType, String company) throws ClientErrorException;
 
     public <T> T findProductByCompany_JSON(Class<T> responseType, String company) throws ClientErrorException;
+    
+    public List getProducts();
     
      public void close();
 
