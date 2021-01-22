@@ -163,7 +163,7 @@ public class ProductController {
         
         LOG.log(Level.INFO, "tabla ");
         
-        tableInfo();
+        productTableInfo();
         
         LOG.log(Level.INFO, "tablainfo ");
         //Inicializar la variable en ordermanagement?

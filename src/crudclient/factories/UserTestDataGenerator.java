@@ -36,7 +36,7 @@ public class UserTestDataGenerator implements UserInterface {
         for (int i = 0; i < numberOfUsers; i++) {
             User userModel = new User();
             userModel.setId(Long.valueOf(i));
-            userModel.setCompany(new Company(i, "Compañia " + i, CompanyType.ADMIN, "Ciudad " + i));
+            userModel.setCompany(new Company("Compañia " + i, CompanyType.ADMIN, "Ciudad " + i));
             userModel.setEmail("email " + i);
             userModel.setName("name " + i);
             userModel.setPrivilege(UserPrivilege.PROVIDER);

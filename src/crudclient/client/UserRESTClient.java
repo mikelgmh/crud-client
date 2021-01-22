@@ -7,6 +7,8 @@ package crudclient.client;
 
 import crudclient.exceptions.EmailAlreadyExistsException;
 import crudclient.exceptions.UsernameAlreadyExistsException;
+import crudclient.interfaces.EmailServiceInterface;
+import crudclient.interfaces.SignInInterface;
 import crudclient.model.Company;
 import crudclient.model.User;
 import java.util.List;
@@ -29,7 +31,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Mikel
  */
-public class UserRESTClient implements UserInterface {
+public class UserRESTClient implements UserInterface, EmailServiceInterface, SignInInterface {
 
     private WebTarget webTarget;
     private Client client;
@@ -46,7 +48,12 @@ public class UserRESTClient implements UserInterface {
         resource = resource.path("user/getAllUsers");
         return (List<User>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(genericType);
     }
-
+    
+    public <T> T loginUser_XML(Object requestEntity, Class<T> responseType) throws ClientErrorException {
+        webTarget = client.target(BASE_URI).path("user");
+        return webTarget.path("loginUser").request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML), responseType);
+    }
+    
     public <T> T getAllUsers_JSON(GenericType<T> responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("getAllUsers");
@@ -115,7 +122,27 @@ public class UserRESTClient implements UserInterface {
         }
 
     }
+    
+    public void sendNewPassword_XML(Object requestEntity, String email) throws ClientErrorException {
+        webTarget = client.target(BASE_URI).path("user");
+        webTarget.path(java.text.MessageFormat.format("sendNewPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+    }
 
+    public void sendNewPassword_JSON(Object requestEntity, String email) throws ClientErrorException {
+        webTarget = client.target(BASE_URI).path("user");
+        webTarget.path(java.text.MessageFormat.format("sendNewPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+    }
+    
+    public void recoverUserPassword_XML(Object requestEntity, String email) throws ClientErrorException {
+        webTarget = client.target(BASE_URI).path("user");
+        webTarget.path(java.text.MessageFormat.format("recoverUserPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+    }
+
+    public void recoverUserPassword_JSON(Object requestEntity, String email) throws ClientErrorException {
+        webTarget = client.target(BASE_URI).path("user");
+        webTarget.path(java.text.MessageFormat.format("recoverUserPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+    }
+    
     public void create_JSON(Object requestEntity) throws ClientErrorException {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
@@ -138,7 +165,7 @@ public class UserRESTClient implements UserInterface {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
         webTarget = client.target(BASE_URI).path("");
     }
-
+    
     public void close() {
         client.close();
     }

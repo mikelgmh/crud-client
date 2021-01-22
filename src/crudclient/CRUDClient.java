@@ -1,29 +1,15 @@
 package crudclient;
 
-import crudclient.controllers.OrderManagementController;
-import crudclient.controllers.ProductController;
-import crudclient.controllers.UserManagementController;
-import crudclient.factories.OrderFactory;
-import crudclient.factories.ProductFactory;
-import crudclient.factories.UserFactory;
-import java.io.IOException;
+import crudclient.controllers.CompanyController;
+import crudclient.controllers.SignInController;
+import crudclient.factories.CompanyFactory;
+import crudclient.factories.SignInFactory;
+import crudclient.interfaces.CompanyInterface;
+import crudclient.interfaces.SignInInterface;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import java.util.logging.Level;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import crudclient.interfaces.OrderInterface;
-import crudclient.interfaces.ProductInterface;
-import crudclient.interfaces.UserInterface;
-import crudclient.model.User;
-import java.util.logging.Logger;
-import javax.ws.rs.core.GenericType;
 
 /**
  *
@@ -31,15 +17,15 @@ import javax.ws.rs.core.GenericType;
  */
 public class CRUDClient extends Application {
 
-    
     @Override
-    public void start(Stage primaryStage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/product.fxml"));
+    public void start(Stage primaryStage) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/SignIn.fxml"));
         Parent root = (Parent) loader.load();
-        ProductController controller = ((ProductController) loader.getController());
-        ProductFactory productFactory = new ProductFactory();
-        ProductInterface productInterface = productFactory.getImplementation();
-        controller.setProductImplementation(productInterface);
+        SignInController controller = ((SignInController) loader.getController());
+        SignInFactory signInFactory = new SignInFactory();
+        SignInInterface signInImplementation = signInFactory.getImplementation();
+        controller.setImplementation(signInImplementation);
+        controller.setStage(primaryStage);
         controller.initStage(root);
     }
 

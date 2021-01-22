@@ -14,5 +14,7 @@ public interface CompanyInterface {
     public void remove(String id) throws ClientErrorException;
 
     public void create_XML(Object requestEntity) throws ClientErrorException;
+    
+    public void edit_XML(Object requestEntity) throws ClientErrorException;
 
 }

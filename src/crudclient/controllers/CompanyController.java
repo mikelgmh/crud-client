@@ -21,7 +21,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -33,13 +33,11 @@ import javax.ws.rs.core.GenericType;
  * @author Iker de la Cruz
  */
 public class CompanyController {
-    
+
     private static final Logger logger = Logger.getLogger("crudclient.controllers.CompanyController");
     private Stage stage;
     private ObservableList<Company> companyData;
     private CompanyInterface companyImplementation;
-    @FXML
-    private Button btnFilter;
     @FXML
     private Button btnCreateCompany;
     @FXML
@@ -51,19 +49,17 @@ public class CompanyController {
     @FXML
     private TextField tfLocalizationFilter;
     @FXML
-    private TableView tableViewCompanies;
+    private TableView<Company> tableViewCompanies;
     @FXML
-    private TableColumn tcIdCompany;
+    private TableColumn<Company, String> tcNameCompany;
     @FXML
-    private TableColumn tcNameCompany;
+    private TableColumn<Company, CompanyType> tcTypeCompany;
     @FXML
-    private TableColumn tcTypeCompany;
-    @FXML
-    private TableColumn tcLocalizationCompany;
-    
+    private TableColumn<Company, String> tcLocalizationCompany;
+
     public CompanyController() {
     }
-    
+
     public void setStage(Stage stage) {
         this.stage = stage;
     }
@@ -80,11 +76,40 @@ public class CompanyController {
         stage.setTitle("Companies");
         stage.setResizable(true);
         stage.setOnShowing(this::handleWindowShowing);
-        // Set handlers
-        tfNameFilter.textProperty().addListener(this::handleFilterButton);
-        tfLocalizationFilter.textProperty().addListener(this::handleFilterButton);
         tableViewCompanies.getSelectionModel().selectedItemProperty()
                 .addListener(this::handleCompaniesTableSelectionChanged);
+        // setOnEditCommit handlers for the columns
+        // TODO: Crear css para el cambio de colores en la tabla
+        tcNameCompany.setOnEditCommit(
+                (CellEditEvent<Company, String> t) -> {
+                    ((Company) t.getTableView().getItems().get(
+                            t.getTablePosition().getRow())).setName(t.getNewValue().trim());
+                    // If all the field are filled, create the Company in the database
+                    Company newCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
+                    if (isCompanyDataFilled(newCompany)) {
+                        getCompanyImplementation().edit_XML(newCompany);
+                    }
+                });
+        tcTypeCompany.setOnEditCommit(
+                (CellEditEvent<Company, CompanyType> t) -> {
+                    ((Company) t.getTableView().getItems().get(
+                            t.getTablePosition().getRow())).setType(t.getNewValue());
+                    // If all the field are filled, create the Company in the database
+                    Company newCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
+                    if (isCompanyDataFilled(newCompany)) {
+                        getCompanyImplementation().edit_XML(newCompany);
+                    }
+                });
+        tcLocalizationCompany.setOnEditCommit(
+                (CellEditEvent<Company, String> t) -> {
+                    ((Company) t.getTableView().getItems().get(
+                            t.getTablePosition().getRow())).setLocalization(t.getNewValue().trim());
+                    // If all the field are filled, create the Company in the database
+                    Company newCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
+                    if (isCompanyDataFilled(newCompany)) {
+                        getCompanyImplementation().edit_XML(newCompany);
+                    }
+                });
         stage.show();
         logger.log(Level.INFO, "Companies stage loaded.");
     }
@@ -95,7 +120,6 @@ public class CompanyController {
      * @param event
      */
     private void handleWindowShowing(WindowEvent event) {
-        btnFilter.setDisable(true);
         btnCreateCompany.setDisable(false);
         btnDeleteCompany.setDisable(true);
         tfNameFilter.clear();
@@ -105,8 +129,6 @@ public class CompanyController {
         cbTypeFilter.getItems().addAll(FXCollections.observableArrayList(CompanyType.values()));
         tfLocalizationFilter.clear();
         // Set the factories to the column values of the table.
-        // ID
-        tcIdCompany.setCellValueFactory(new PropertyValueFactory("id"));
         // Name
         tcNameCompany.setCellValueFactory(new PropertyValueFactory("name"));
         tcNameCompany.setCellFactory(TextFieldTableCell.<Company>forTableColumn());
@@ -117,52 +139,11 @@ public class CompanyController {
         tcLocalizationCompany.setCellValueFactory(new PropertyValueFactory("localization"));
         tcLocalizationCompany.setCellFactory(TextFieldTableCell.<Company>forTableColumn());
         // Load the data from the database into the TableView.
-        try {
-            companyData = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
-            }));
-        } catch (Exception ex) {
-            // Change the default message in the tableview with an error.
-            tableViewCompanies.setPlaceholder(new Label(ex.getMessage()));
-        }
-        tableViewCompanies.setItems(companyData);
+        loadTableView();
     }
 
     /**
-     * Combo box change event handler. It validates the name, type or
-     * localization fields has any content to enable/disable the filter button.
-     *
-     * @param event
-     */
-    @FXML
-    private void handleFilterButtonComboBox(ActionEvent event) {
-        if (!tfNameFilter.getText().trim().isEmpty()
-                || !tfLocalizationFilter.getText().trim().isEmpty()
-                || !(cbTypeFilter.getValue() == null)) {
-            btnFilter.setDisable(false);
-        } else {
-            btnFilter.setDisable(true);
-        }
-    }
-
-    /**
-     * Name and localization text changed event. It validates the name, type or
-     * localization fields has any content to enable/disable the filter button.
-     *
-     * @param observable
-     * @param oldValue
-     * @param newValue
-     */
-    private void handleFilterButton(ObservableValue observable, String oldValue, String newValue) {
-        if (!tfNameFilter.getText().trim().isEmpty()
-                || !tfLocalizationFilter.getText().trim().isEmpty()
-                || !(cbTypeFilter.getValue() == null)) {
-            btnFilter.setDisable(false);
-        } else {
-            btnFilter.setDisable(true);
-        }
-    }
-
-    /**
+     * Method to handle the delete button, to enable/disable the button.
      *
      * @param observable
      * @param oldValue
@@ -172,6 +153,8 @@ public class CompanyController {
             Object oldValue, Object newValue) {
         if (newValue != null) {
             btnDeleteCompany.setDisable(false);
+        } else {
+            btnDeleteCompany.setDisable(true);
         }
     }
 
@@ -182,13 +165,13 @@ public class CompanyController {
      */
     @FXML
     private void createCompanyAction(ActionEvent event) {
-        // Count the Companies from the database and input the amount + 1 in the new row ID column
-        Integer amountCompanies = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
-        })).size();
-        Company newCompany = new Company(amountCompanies + 1, null, CompanyType.ADMIN, null);
+        // Create the Company in the table and in the database with data
+        // filled, to comprobate the CRUD is working fine.
+        Company newCompany = new Company("Test", CompanyType.CLIENT, "Test");
         tableViewCompanies.getItems().add(newCompany);
-        // TODO: Añadir nueva Company a la base de datos.
-        //companyImplementation.create_XML(newCompany);
+        getCompanyImplementation().create_XML(newCompany);
+        // Load again the table to load the Company's ids correctly
+        loadTableView();
     }
 
     /**
@@ -199,40 +182,59 @@ public class CompanyController {
     @FXML
     private void deleteCompanyAction(ActionEvent event) {
         // Delete selected Company in the database.
-        // Get the selected ID cell
-        TablePosition pos = (TablePosition) tableViewCompanies.getSelectionModel().getSelectedCells().get(0);
-        Integer row = pos.getRow();
-        // Get items of the selected row
-        Company item = (Company) tableViewCompanies.getItems().get(row);
-        TableColumn col = pos.getTableColumn();
-        // Delete the selected Company sending the ID value
-        companyImplementation.remove(col.getCellObservableValue(item).getValue().toString());
+        Company delCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
+        getCompanyImplementation().remove(delCompany.getId().toString());
+        // Delete selected Company in the TableView
         tableViewCompanies.getItems().remove(tableViewCompanies.getSelectionModel().getSelectedItem());
-        tableViewCompanies.refresh();
+        // Load again the table to load the Company's ids correctly
+        loadTableView();
     }
 
     /**
+     * Method to verify if are the field in Company are not empty or null.
      *
+     * @param newCompany The selected Company in the TableView.
      * @return
+     */
+    public boolean isCompanyDataFilled(Company newCompany) {
+        // If there are all the Company data filled create the Company in the database
+        return newCompany.getName() != null && newCompany.getType()
+                != null && newCompany.getLocalization() != null
+                && !newCompany.getName().trim().equals("")
+                && !newCompany.getType().equals("")
+                && !newCompany.getLocalization().trim().equals("");
+    }
+
+    /**
+     * Method to load the TableView from the database.
+     */
+    public void loadTableView() {
+        try {
+            companyData = FXCollections.observableArrayList(getCompanyImplementation().findAllCompanies_XML(new GenericType<List<Company>>() {
+            }));
+        } catch (Exception ex) {
+            // Change the default message in the tableview with an error.
+            tableViewCompanies.setPlaceholder(new Label(ex.getMessage()));
+        }
+        tableViewCompanies.setItems(companyData);
+    }
+
+    /**
+     * Method to return the Company implementation.
+     *
+     * @return The Company implementation.
      */
     public CompanyInterface getCompanyImplementation() {
         return companyImplementation;
     }
 
     /**
-     *
-     * @param companyImplementation
-     */
-    public void setCompanyImplementation(CompanyInterface companyImplementation) {
-        this.companyImplementation = companyImplementation;
-    }
-
-    /**
+     * Method to set the Company implementation getting the Company interface.
      *
      * @param companyInterface
      */
     public void setImplementation(CompanyInterface companyInterface) {
         this.companyImplementation = companyInterface;
     }
-    
+
 }
