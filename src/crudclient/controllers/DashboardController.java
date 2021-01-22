@@ -41,6 +41,9 @@ public class DashboardController {
     private Label lbl_Connection;
     @FXML
     private Button btn_Logout;
+    @FXML
+    private MenuController menuController;
+    
 
     public DashboardController() {
     }
@@ -62,6 +65,7 @@ public class DashboardController {
         logger.log(Level.INFO, "Loading the Dashboard stage.");
         Scene scene = new Scene(root);
         stage.setScene(scene);
+        menuController.setUser(user);
         stage.setTitle("Dashboard");
         stage.setResizable(false);
         stage.setOnShowing(this::handleWindowShowing);
@@ -91,6 +95,14 @@ public class DashboardController {
             controller.initStage(root);
             stage.close();
         }
+    }
+    
+    public MenuController getMenuManagementController() {
+        return menuController;
+    }
+
+    public void setMenuManagementController(MenuController menuController) {
+        this.menuController = menuController;
     }
 
 }
