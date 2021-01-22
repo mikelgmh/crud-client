@@ -49,6 +49,7 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
         return (List<User>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(genericType);
     }
     
+    @Override
     public <T> T loginUser_XML(Object requestEntity, Class<T> responseType) throws ClientErrorException {
         return webTarget.path("loginUser").request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML), responseType);
     }
@@ -117,18 +118,22 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
 
     }
     
+    @Override
     public void sendNewPassword_XML(Object requestEntity, String email) throws ClientErrorException {
         webTarget.path(java.text.MessageFormat.format("sendNewPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
+    @Override
     public void sendNewPassword_JSON(Object requestEntity, String email) throws ClientErrorException {
         webTarget.path(java.text.MessageFormat.format("sendNewPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
     
+    @Override
     public void recoverUserPassword_XML(Object requestEntity, String email) throws ClientErrorException {
         webTarget.path(java.text.MessageFormat.format("recoverUserPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
+    @Override
     public void recoverUserPassword_JSON(Object requestEntity, String email) throws ClientErrorException {
         webTarget.path(java.text.MessageFormat.format("recoverUserPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
