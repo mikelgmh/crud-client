@@ -65,7 +65,7 @@ public class DashboardController {
         logger.log(Level.INFO, "Loading the Dashboard stage.");
         Scene scene = new Scene(root);
         stage.setScene(scene);
-        menuController.setUser(user);
+//        menuController.setUser(user);
         stage.setTitle("Dashboard");
         stage.setResizable(false);
         stage.setOnShowing(this::handleWindowShowing);
@@ -74,7 +74,7 @@ public class DashboardController {
     }
 
     private void handleWindowShowing(WindowEvent event) {
-        lbl_Welcome.setText(user.getPassword());
+//        lbl_Welcome.setText(user.getPassword());
     }
 
     @FXML

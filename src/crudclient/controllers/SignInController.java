@@ -107,7 +107,7 @@ public class SignInController {
             user.setUsername(txt_User.getText());
             user.setPassword(ae.encryptString(txt_Password.getText()));
             User loggedUser = getSignInImplementation().loginUser_XML(user, User.class);
-            
+
             // Create the stage for Dashboard
             Stage stageDashboard = new Stage();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/Dashboard.fxml"));
@@ -120,6 +120,7 @@ public class SignInController {
             // Close the current stage
             stage.close();
         } catch (Exception ex) {
+            ex.printStackTrace();
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Invalid login.");
             alert.setHeaderText("Wrong username or passwords.");
