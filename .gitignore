@@ -14,3 +14,13 @@ nb-configuration.xml
 *.jar
 *.war
 *.ear
+nbproject/project.xml
+nbproject/project.properties
+nbproject/jfx-impl.xml
+nbproject/genfiles.properties
+nbproject/configs/Run_in_Browser.properties
+nbproject/configs/Run_as_WebStart.properties
+nbproject/build-impl.xml
+manifest.mf
+build.xml
+nbproject/project.properties~master

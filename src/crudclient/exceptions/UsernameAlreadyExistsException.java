@@ -3,14 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package crudclient.model;
+package crudclient.exceptions;
 
 /**
  *
  * @author Mikel
  */
-public enum UserPrivilege {
-    SUPERUSER,
-    PROVIDER,
-    WORKER,
+public class UsernameAlreadyExistsException extends Exception {
+
+    public UsernameAlreadyExistsException() {
+        super("The username already exists.");
+    }
 }

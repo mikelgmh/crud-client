@@ -5,6 +5,8 @@
  */
 package crudclient.interfaces;
 
+import crudclient.exceptions.EmailAlreadyExistsException;
+import crudclient.exceptions.UsernameAlreadyExistsException;
 import java.util.List;
 import java.util.Set;
 import static javafx.scene.input.KeyCode.T;
@@ -31,21 +33,21 @@ public interface UserInterface {
      * @param user
      * @return the edited user.
      */
-    public UserInterface editUser(UserInterface user);
+    public void editUser(Object user) throws ClientErrorException;
 
     /**
      * Deletes a user.
      *
      * @param user
      */
-    public void deleteUser(UserInterface user);
+    public void deleteUser(String userId);
 
     /**
      * Creates a new user.
      *
      * @param user The entity to insert. User in this case.
      */
-    public void createUser(Object user) throws ClientErrorException;
+    public void createUser(Object user) throws ClientErrorException,UsernameAlreadyExistsException,EmailAlreadyExistsException;
     
     public List getAllCompanies (GenericType genericType) throws ClientErrorException;
 

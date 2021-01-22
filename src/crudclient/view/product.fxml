@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="622.0" prefWidth="764.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="crudclient.controllers.ProductController">
@@ -18,9 +18,8 @@
       </TableView>
       <Button fx:id="btn_Create" layoutX="214.0" layoutY="132.0" mnemonicParsing="false" onAction="#handleOnClickCreate" prefHeight="21.0" prefWidth="123.0" text="Create product" />
       <Button fx:id="btn_Delete" layoutX="424.0" layoutY="132.0" mnemonicParsing="false" onAction="#handleOnClickDelete" prefHeight="31.0" prefWidth="123.0" text="Delete product" />
-      <Button fx:id="btn_Filter" disable="true" layoutX="317.0" layoutY="46.0" mnemonicParsing="false" onAction="#handleOnClickFilter" text="Search Company" />
       <Label fx:id="lbl_Choose" disable="true" layoutX="38.0" layoutY="47.0" text="Choose company:" />
-      <ComboBox fx:id="combo_Company" layoutX="154.0" layoutY="46.0" prefHeight="25.0" prefWidth="140.0" />
       <Button fx:id="btn_OrderCreate" layoutX="513.0" layoutY="43.0" mnemonicParsing="false" onAction="#handleOnClickCreateOrder" prefHeight="31.0" prefWidth="207.0" text="Create Order" />
+      <TextField fx:id="tf_company" layoutX="172.0" layoutY="42.0" />
    </children>
 </Pane>

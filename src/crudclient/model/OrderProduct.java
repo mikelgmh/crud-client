@@ -6,6 +6,7 @@
 package crudclient.model;
 
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -17,8 +18,9 @@ public class OrderProduct implements Serializable {
     
     private static final long serialVersionUID = 1L;
 
+    private OrderProductId id;
     private Product product;
-    
+    private Order order;
     private Float total_price;
     private Integer total_quantity;
 
@@ -26,6 +28,16 @@ public class OrderProduct implements Serializable {
     /**
      * Getters and setters
      */
+    
+    public OrderProductId getId() {
+        return id;
+    }
+
+    public void setId(OrderProductId id) {
+        this.id = id;
+    }
+    
+    @XmlElement(name="product")
     public Product getProduct() {
         return product;
     }
@@ -33,7 +45,17 @@ public class OrderProduct implements Serializable {
     public void setProduct(Product product) {
         this.product = product;
     }
+    
+    @XmlElement(name="order")
+    public Order getOrder() {
+        return order;
+    }
 
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+    
+    @XmlElement(name="total_price")
     public Float getTotal_price() {
         return total_price;
     }
@@ -49,6 +71,5 @@ public class OrderProduct implements Serializable {
     public void setTotal_quantity(Integer total_quantity) {
         this.total_quantity = total_quantity;
     }
- 
-    
+
 }

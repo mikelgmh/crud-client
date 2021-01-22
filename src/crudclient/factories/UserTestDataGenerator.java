@@ -52,15 +52,6 @@ public class UserTestDataGenerator implements UserInterface {
         return userList;
     }
 
-    @Override
-    public UserInterface editUser(UserInterface user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void deleteUser(UserInterface user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
     @Override
     public String getPublicKey() {
@@ -74,6 +65,16 @@ public class UserTestDataGenerator implements UserInterface {
 
     @Override
     public List getAllCompanies(GenericType genericType) throws ClientErrorException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void deleteUser(String userId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void editUser(Object user) throws ClientErrorException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
