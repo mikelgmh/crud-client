@@ -50,7 +50,7 @@
             <Font size="11.0" />
          </font>
       </Label>
-      <Label fx:id="hint_password" layoutX="109.0" layoutY="681.0" text="fferfer" textFill="#686464">
+      <Label fx:id="hint_password" layoutX="109.0" layoutY="681.0" textFill="#686464">
          <font>
             <Font size="11.0" />
          </font>

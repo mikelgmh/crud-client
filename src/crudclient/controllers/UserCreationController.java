@@ -35,6 +35,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Background;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javax.ws.rs.ClientErrorException;
@@ -130,6 +131,8 @@ public class UserCreationController {
         txt_password.getProperties().put("passwordRequirements", false);
         txt_repeatPassword.getProperties().put("passwordRequirements", false);
         txt_repeatPassword.getProperties().put("passwordsMatch", false);
+        this.hint_password.setText("The passwords shoud match the requirements:\n" + genericValidations.PASSWORD_CONDITIONS);
+
         // Set listeners
         this.setListeners();
 
@@ -173,7 +176,7 @@ public class UserCreationController {
         this.txt_username.textProperty().addListener((obs, oldText, newText) -> {
             this.genericValidations.textLimiter(this.txt_username, 200, newText); // Limits the input to 200 characters
             Boolean minlengthValidator = this.genericValidations.minLength(this.txt_username, 3, newText, "minLengthValidator"); // Adds a min lenght validator
-
+            this.hint_username.setText("3 characters min");
             setInputError(minlengthValidator, txt_username, hint_username);
             this.validate(); // Executes the validation.
         });
@@ -187,13 +190,8 @@ public class UserCreationController {
             this.genericValidations.textLimiter(this.txt_email, 254, newText);
             boolean emailValidator = this.genericValidations.regexValidator(this.genericValidations.EMAIL_REGEXP, this.txt_email, newText.toLowerCase(), "emailValidator"); // Adds a regex validation to check if the email is correct
             this.hint_email.setText(this.genericValidations.TXT_ENTER_VALID_EMAIL);
-            if (!emailValidator) {
 
-                this.genericValidations.addClass(this.txt_email, "error", Boolean.TRUE);
-            } else {
-                this.hint_email.setTextFill(this.genericValidations.greyColor);
-                this.genericValidations.addClass(this.txt_email, "error", Boolean.FALSE);
-            }
+            setInputError(emailValidator, txt_email, hint_email);
             this.validate();
         });
 
@@ -246,9 +244,10 @@ public class UserCreationController {
     }
 
     public void setInputError(boolean validatorStatus, TextField tf, Label hint) {
-        if (!validatorStatus) {
+        if (!validatorStatus) { // Si Hay error
             this.genericValidations.addClass(tf, "error", Boolean.TRUE);
-        } else {
+            hint.setTextFill(Color.RED);
+        } else { // si no hay error
             hint.setTextFill(this.genericValidations.greyColor);
             this.genericValidations.addClass(tf, "error", Boolean.FALSE);
         }
@@ -287,8 +286,11 @@ public class UserCreationController {
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UsernameAlreadyExistsException ex) {
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+            hint_username.setText("The username already exists.");
+            setInputError(false, txt_username, hint_username);
         } catch (EmailAlreadyExistsException ex) {
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+            hint_email.setText("The email already exists.");
             setInputError(false, txt_email, hint_email);
         }
     }
