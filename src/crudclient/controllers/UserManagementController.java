@@ -6,6 +6,8 @@
 package crudclient.controllers;
 
 import crudclient.exceptions.CellMaxLengthException;
+import crudclient.factories.CompanyFactory;
+import crudclient.interfaces.CompanyInterface;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Parent;
@@ -52,6 +54,8 @@ public class UserManagementController {
     private final GenericValidations genericValidations;
     private UserInterface userImplementation;
     private ObservableList<User> masterData = FXCollections.observableArrayList();
+    private ObservableList<Company> companiesList = FXCollections.observableArrayList();
+    private CompanyInterface companyImplementation;
     private User currentUser;
 
     @FXML
@@ -118,6 +122,10 @@ public class UserManagementController {
 
         // Set stage
         this.setStage(stage);
+
+        // Company implementation
+        CompanyFactory companyFactory = new CompanyFactory();
+        this.companyImplementation = companyFactory.getImplementation();
 
         // Set some properties of the stage
         stage.setScene(scene);
@@ -215,14 +223,17 @@ public class UserManagementController {
         });
 
         // Company column
-        ObservableList companies = FXCollections.observableArrayList(userImplementation.getAllCompanies(new GenericType<List<Company>>() {
-        }));
-        tc_company.setCellFactory(ComboBoxTableCell.forTableColumn(companies));
+        tc_company.setCellFactory(ComboBoxTableCell.forTableColumn(companiesList));
         tc_company.setOnEditCommit((TableColumn.CellEditEvent<User, Company> data) -> {
             table.getSelectionModel().getSelectedItem().setCompany(data.getNewValue());
             table.refresh();
             userImplementation.editUser(table.getSelectionModel().getSelectedItem());
         });
+    }
+
+    public void getCompanies() {
+        companiesList = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
+        }));
     }
 
     public void checkCellMaxLength(int maxLength, int currentLength) throws CellMaxLengthException {
@@ -287,6 +298,7 @@ public class UserManagementController {
         this.chb_privilege.getSelectionModel().selectFirst();
         // Se obtiene la lista de usuarios utilizando la implementación que hay en la propiedad de la clase. Se necesita pasar desde la ventana anterior o desde el método main.
         this.getUsers();
+        this.getCompanies();
 
         // Crea las listas de filtrado y llama al método que crea los listeners.
         FilteredList<User> filteredData = new FilteredList<>(masterData, p -> true);

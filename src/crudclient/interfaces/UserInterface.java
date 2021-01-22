@@ -49,8 +49,6 @@ public interface UserInterface {
      */
     public void createUser(Object user) throws ClientErrorException,UsernameAlreadyExistsException,EmailAlreadyExistsException;
     
-    public List getAllCompanies (GenericType genericType) throws ClientErrorException;
-
     /**
      * Gets the public encryption key.
      *

@@ -64,11 +64,6 @@ public class UserTestDataGenerator implements UserInterface {
     }
 
     @Override
-    public List getAllCompanies(GenericType genericType) throws ClientErrorException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public void deleteUser(String userId) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

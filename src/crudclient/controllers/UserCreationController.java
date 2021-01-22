@@ -7,6 +7,8 @@ package crudclient.controllers;
 
 import crudclient.exceptions.EmailAlreadyExistsException;
 import crudclient.exceptions.UsernameAlreadyExistsException;
+import crudclient.factories.CompanyFactory;
+import crudclient.interfaces.CompanyInterface;
 import crudclient.interfaces.UserInterface;
 import crudclient.model.Company;
 import crudclient.model.User;
@@ -47,6 +49,7 @@ public class UserCreationController {
     private Stage stage;
     private static final Logger logger = Logger.getLogger("signupsignin.controllers.SignUpController");
     private UserInterface userImplementation;
+    private CompanyInterface companyImplementation;
     private final GenericValidations genericValidations = new GenericValidations();
     private AsymmetricEncryption enc;
     private ObservableList companyList;
@@ -103,10 +106,15 @@ public class UserCreationController {
         // Creates a scena and a stage and opens the window.
         Scene scene = new Scene(parent);
         Stage stage = new Stage();
-        setDefaultFieldValues();
 
         // Set stage
         this.setStage(stage);
+
+        // Company implementation
+        CompanyFactory companyFactory = new CompanyFactory();
+        this.companyImplementation = companyFactory.getImplementation();
+
+        setDefaultFieldValues();
 
         // Set some properties of the stage
         stage.setScene(scene);
@@ -137,7 +145,7 @@ public class UserCreationController {
         this.chb_privilege.setItems(FXCollections.observableArrayList(UserPrivilege.values()));
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
 
-        this.companyList = FXCollections.observableArrayList(this.getUserImplementation().getAllCompanies(new GenericType<List<Company>>() {
+        this.companyList = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
         }));
 
         this.chb_company.getItems().setAll(companyList);
