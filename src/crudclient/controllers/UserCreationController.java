@@ -5,6 +5,8 @@
  */
 package crudclient.controllers;
 
+import crudclient.exceptions.EmailAlreadyExistsException;
+import crudclient.exceptions.UsernameAlreadyExistsException;
 import crudclient.interfaces.UserInterface;
 import crudclient.model.Company;
 import crudclient.model.User;
@@ -33,6 +35,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -270,7 +273,16 @@ public class UserCreationController {
         AsymmetricEncryption asymmetricEncryption = new AsymmetricEncryption(getUserImplementation().getPublicKey());
         String encryptedPassword = asymmetricEncryption.encryptString(txt_password.getText());
         user.setPassword(encryptedPassword);
-        this.userImplementation.createUser(user);
+        try {
+            this.userImplementation.createUser(user);
+        } catch (ClientErrorException ex) {
+            Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UsernameAlreadyExistsException ex) {
+            Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (EmailAlreadyExistsException ex) {
+            Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+            setInputError(false, txt_email, hint_email);
+        }
     }
 
     public void closeWindow() {

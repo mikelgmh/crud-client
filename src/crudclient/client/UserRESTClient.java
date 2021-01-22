@@ -5,6 +5,8 @@
  */
 package crudclient.client;
 
+import crudclient.exceptions.EmailAlreadyExistsException;
+import crudclient.exceptions.UsernameAlreadyExistsException;
 import crudclient.model.Company;
 import crudclient.model.User;
 import java.util.List;
@@ -13,6 +15,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import crudclient.interfaces.UserInterface;
+import javax.ws.rs.core.Response;
 
 /**
  * Jersey REST client generated for REST resource:UserFacadeREST [user]<br>
@@ -98,11 +101,18 @@ public class UserRESTClient implements UserInterface {
     }
 
     @Override
-    public void createUser(Object requestEntity) throws ClientErrorException {
+    public void createUser(Object requestEntity) throws ClientErrorException,UsernameAlreadyExistsException, EmailAlreadyExistsException {
         webTarget = client.target(BASE_URI).path("user");
 
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
         webTarget = client.target(BASE_URI).path("");
+        if (response.getStatus() == 401) {
+
+            throw new UsernameAlreadyExistsException();
+        }
+        if (response.getStatus() == 403) {
+           throw new EmailAlreadyExistsException();
+        }
 
     }
 
