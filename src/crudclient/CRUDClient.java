@@ -18,7 +18,9 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import crudclient.interfaces.OrderInterface;
 import crudclient.interfaces.UserInterface;
+import crudclient.model.User;
 import java.util.logging.Logger;
+import javax.ws.rs.core.GenericType;
 
 /**
  *
@@ -26,33 +28,25 @@ import java.util.logging.Logger;
  */
 public class CRUDClient extends Application {
 
-    private static final Logger logger = Logger.getLogger("crudclient.CRUDClient");
-
-    /**
-     * The start method in which the JavaFX starts.
-     *
-     * @param stage the first stage of the JavaFX application.
-     * @throws Exception if there ocurred something wrong creating the first
-     * stage.
-     */
+    
     @Override
     public void start(Stage primaryStage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/UserManagement.fxml"));
+        User user= new User();
+        user.setId((long)9);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/orders.fxml"));
         Parent root = (Parent) loader.load();
-        UserManagementController controller = ((UserManagementController) loader.getController());
-        UserFactory userFactory = new UserFactory();
-        UserInterface user = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
-        controller.setUserImplementation(user);
+        OrderManagementController controller = ((OrderManagementController) loader.getController());
+        OrderFactory orderFactory = new OrderFactory();
+        OrderInterface order = orderFactory.getImplementation();
+        controller.setOrderImplementation(order);
+        controller.setUser(user);
         controller.initStage(root);
     }
 
     /**
-     * The main method in which the program starts.
-     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        logger.log(Level.INFO, "Initializing the program.");
         launch(args);
     }
 
