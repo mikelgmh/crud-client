@@ -39,18 +39,18 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
 
     public UserRESTClient() {
         client = javax.ws.rs.client.ClientBuilder.newClient();
-        webTarget = client.target(BASE_URI).path("");
+        webTarget = client.target(BASE_URI).path("user");
     }
 
     @Override
     public List<User> getUsers(GenericType genericType) throws ClientErrorException {
         WebTarget resource = webTarget;
-        resource = resource.path("user/getAllUsers");
+        resource = resource.path("getAllUsers");
         return (List<User>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(genericType);
     }
     
+    @Override
     public <T> T loginUser_XML(Object requestEntity, Class<T> responseType) throws ClientErrorException {
-        webTarget = client.target(BASE_URI).path("user");
         return webTarget.path("loginUser").request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML), responseType);
     }
     
@@ -74,9 +74,7 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
 
     @Override
     public void editUser(Object requestEntity) throws ClientErrorException {
-        webTarget = client.target(BASE_URI).path("user");
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
-        webTarget = client.target(BASE_URI).path("");
     }
 
     public void edit_JSON(Object requestEntity) throws ClientErrorException {
@@ -85,13 +83,13 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
 
     public <T> T findUsersByCompanyName_XML(Class<T> responseType, String companyName) throws ClientErrorException {
         WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("user/getUsersByCompanyName/{0}", new Object[]{companyName}));
+        resource = resource.path(java.text.MessageFormat.format("getUsersByCompanyName/{0}", new Object[]{companyName}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     public <T> T findUsersByCompanyName_JSON(Class<T> responseType, String companyName) throws ClientErrorException {
         WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("user/getUsersByCompanyName/{0}", new Object[]{companyName}));
+        resource = resource.path(java.text.MessageFormat.format("getUsersByCompanyName/{0}", new Object[]{companyName}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
@@ -109,11 +107,7 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
 
     @Override
     public void createUser(Object requestEntity) throws ClientErrorException,UsernameAlreadyExistsException, EmailAlreadyExistsException {
-        webTarget = client.target(BASE_URI).path("user");
-
-        Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML)
-                .post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
-        webTarget = client.target(BASE_URI).path("");
+        Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
         if (response.getStatus() == 401) {
 
             throw new UsernameAlreadyExistsException();
@@ -124,23 +118,23 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
 
     }
     
+    @Override
     public void sendNewPassword_XML(Object requestEntity, String email) throws ClientErrorException {
-        webTarget = client.target(BASE_URI).path("user");
         webTarget.path(java.text.MessageFormat.format("sendNewPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
+    @Override
     public void sendNewPassword_JSON(Object requestEntity, String email) throws ClientErrorException {
-        webTarget = client.target(BASE_URI).path("user");
         webTarget.path(java.text.MessageFormat.format("sendNewPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
     
+    @Override
     public void recoverUserPassword_XML(Object requestEntity, String email) throws ClientErrorException {
-        webTarget = client.target(BASE_URI).path("user");
         webTarget.path(java.text.MessageFormat.format("recoverUserPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
+    @Override
     public void recoverUserPassword_JSON(Object requestEntity, String email) throws ClientErrorException {
-        webTarget = client.target(BASE_URI).path("user");
         webTarget.path(java.text.MessageFormat.format("recoverUserPassword/{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
     
@@ -150,21 +144,19 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
 
     public String getPublicKey_XML() throws ClientErrorException {
         WebTarget resource = webTarget;
-        resource = resource.path("user/getPublicKey");
+        resource = resource.path("getPublicKey");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(String.class);
     }
 
     public String getPublicKey_JSON() throws ClientErrorException {
         WebTarget resource = webTarget;
-        resource = resource.path("user/getPublicKey");
+        resource = resource.path("getPublicKey");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(String.class);
     }
 
     @Override
     public void deleteUser(String id) throws ClientErrorException {
-        webTarget = client.target(BASE_URI).path("user");
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
-        webTarget = client.target(BASE_URI).path("");
     }
     
     public void close() {
