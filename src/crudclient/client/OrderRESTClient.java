@@ -37,7 +37,7 @@ public class OrderRESTClient implements OrderInterface {
         webTarget = client.target(BASE_URI).path("order");
     }
 
-    public void edit_XML(Object requestEntity) throws ClientErrorException {
+    public void editOrder(Object requestEntity) throws ClientErrorException {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
@@ -57,10 +57,11 @@ public class OrderRESTClient implements OrderInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public <T> T findAllOrders_XML(GenericType<T> responseType) throws ClientErrorException {
+    public List<Order> findAllOrders(GenericType responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("order");
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        List<Order> allOrders = (List<Order>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        return allOrders;
     }
 
     public <T> T findAllOrders_JSON(Class<T> responseType) throws ClientErrorException {
@@ -69,7 +70,7 @@ public class OrderRESTClient implements OrderInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public void create_XML(Object requestEntity) throws ClientErrorException {
+    public void createOrder(Object requestEntity) throws ClientErrorException {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
@@ -89,7 +90,7 @@ public class OrderRESTClient implements OrderInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public void remove(String id) throws ClientErrorException {
+    public void removeOrder(String id) throws ClientErrorException {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
     }
 
@@ -97,11 +98,5 @@ public class OrderRESTClient implements OrderInterface {
         client.close();
     }
 
-    @Override
-    public Set getOrders() {
-        Set<Order> orderList = this.findAllOrders_XML(new GenericType<Set<Order>>() {
-        });
-        return orderList;
-    }
     
 }
