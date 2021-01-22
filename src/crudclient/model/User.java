@@ -8,6 +8,7 @@ package crudclient.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -23,7 +24,8 @@ public class User implements Serializable {
         this.name = new SimpleStringProperty();
         this.surname = new SimpleStringProperty();
         this.username = new SimpleStringProperty();
-
+        this.status = new SimpleObjectProperty();
+        this.privilege = new SimpleObjectProperty();
     }
 
     private static final long serialVersionUID = 1L;
@@ -51,11 +53,11 @@ public class User implements Serializable {
     /**
      * The status of the user. Enum.
      */
-    private UserStatus status;
+    private SimpleObjectProperty<UserStatus> status;
     /**
      * The privilege of the user.
      */
-    private UserPrivilege privilege;
+    private SimpleObjectProperty<UserPrivilege> privilege;
     /**
      * The password of the user.
      */
@@ -115,19 +117,19 @@ public class User implements Serializable {
     }
 
     public UserStatus getStatus() {
-        return status;
+        return status.get();
     }
 
     public void setStatus(UserStatus status) {
-        this.status = status;
+        this.status.set(status);
     }
 
     public UserPrivilege getPrivilege() {
-        return privilege;
+        return privilege.get();
     }
 
     public void setPrivilege(UserPrivilege privilege) {
-        this.privilege = privilege;
+        this.privilege.set(privilege);
     }
 
     public String getPassword() {

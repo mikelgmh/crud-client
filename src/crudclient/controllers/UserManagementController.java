@@ -5,6 +5,7 @@
  */
 package crudclient.controllers;
 
+import crudclient.exceptions.CellMaxLengthException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Parent;
@@ -27,13 +28,17 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import crudclient.interfaces.UserInterface;
+import crudclient.model.Company;
 import java.io.IOException;
+import javafx.scene.control.cell.TextFieldTableCell;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -47,6 +52,7 @@ public class UserManagementController {
     private final GenericValidations genericValidations;
     private UserInterface userImplementation;
     private ObservableList<User> masterData = FXCollections.observableArrayList();
+    private User currentUser;
 
     @FXML
     private TextField txt_name;
@@ -65,7 +71,6 @@ public class UserManagementController {
     @FXML
     private Label hint_email;
 
-    
     @FXML
     private Button btn_delete;
     @FXML
@@ -83,11 +88,11 @@ public class UserManagementController {
     @FXML
     private TableColumn<User, String> tc_email;
     @FXML
-    private TableColumn<User, String> tc_company;
+    private TableColumn<User, Company> tc_company;
     @FXML
-    private TableColumn<User, String> tc_status;
+    private TableColumn<User, UserStatus> tc_status;
     @FXML
-    private TableColumn<User, String> tc_privilege;
+    private TableColumn<User, UserPrivilege> tc_privilege;
 
     public UserManagementController() {
         this.genericValidations = new GenericValidations();
@@ -103,12 +108,13 @@ public class UserManagementController {
         Scene scene = new Scene(parent);
         Stage stage = new Stage();
 
-
         // Set listeners
         this.setListeners();
 
         // Set factories
         this.setCellValueFactories();
+
+        this.configTableView();
 
         // Set stage
         this.setStage(stage);
@@ -123,23 +129,107 @@ public class UserManagementController {
         this.setDefaultFieldValues();
         this.btn_delete.setDisable(true);
         stage.show(); // Show the stage
-
-        // PRUEBAS DE ENCRIPTAR Y RECIBIR LA CLAVE PÚBLICA DEL SERVIDOR
-//        String prueba = this.userImplementation.getPublicKey();
-//        AsymmetricEncryption enc = new AsymmetricEncryption(prueba);
-//        String encryptedString = enc.encryptString("EEEE");
-//        System.out.println(encryptedString);
-//        System.out.println(prueba);
     }
 
     public void setCellValueFactories() {
         tc_name.setCellValueFactory(new PropertyValueFactory<>("name"));
         tc_surname.setCellValueFactory(new PropertyValueFactory<>("surname"));
         tc_username.setCellValueFactory(new PropertyValueFactory<>("username"));
-        tc_company.setCellValueFactory(new PropertyValueFactory<>("username"));
+        tc_company.setCellValueFactory(new PropertyValueFactory<>("company"));
         tc_email.setCellValueFactory(new PropertyValueFactory<>("email"));
         tc_privilege.setCellValueFactory(new PropertyValueFactory<>("privilege"));
         tc_status.setCellValueFactory(new PropertyValueFactory<>("status"));
+    }
+
+    public void configTableView() {
+        table.setEditable(true);
+
+        // Name column
+        tc_name.setCellFactory(TextFieldTableCell.forTableColumn());
+        tc_name.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
+            try {
+                checkCellMaxLength(254, data.getNewValue().length());
+                table.getSelectionModel().getSelectedItem().setName(data.getNewValue());
+                userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            } catch (CellMaxLengthException ex) {
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        });
+
+        // Surname column
+        tc_surname.setCellFactory(TextFieldTableCell.forTableColumn());
+        tc_surname.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
+            try {
+                checkCellMaxLength(254, data.getNewValue().length());
+                table.getSelectionModel().getSelectedItem().setSurname(data.getNewValue());
+                userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            } catch (CellMaxLengthException ex) {
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        });
+
+        // Username column
+        tc_username.setCellFactory(TextFieldTableCell.forTableColumn());
+        tc_username.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
+            try {
+                checkCellMaxLength(254, data.getNewValue().length());
+                table.getSelectionModel().getSelectedItem().setUsername(data.getNewValue());
+                userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            } catch (CellMaxLengthException ex) {
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        });
+
+        // Email column
+        tc_email.setCellFactory(TextFieldTableCell.forTableColumn());
+        tc_email.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
+            try {
+                checkCellMaxLength(254, data.getNewValue().length());
+                table.getSelectionModel().getSelectedItem().setEmail(data.getNewValue());
+                userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            } catch (CellMaxLengthException ex) {
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        });
+
+        // User Status column
+        ObservableList userStatuses = FXCollections.observableArrayList(UserStatus.values());
+        tc_status.setCellFactory(ComboBoxTableCell.forTableColumn(userStatuses));
+        tc_status.setOnEditCommit((TableColumn.CellEditEvent<User, UserStatus> data) -> {
+            table.getSelectionModel().getSelectedItem().setStatus(data.getNewValue());
+            table.refresh();
+            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+        });
+
+        // User Privilege column
+        ObservableList userPrivileges = FXCollections.observableArrayList(UserPrivilege.values());
+        tc_privilege.setCellFactory(ComboBoxTableCell.forTableColumn(userPrivileges));
+        tc_privilege.setOnEditCommit((TableColumn.CellEditEvent<User, UserPrivilege> data) -> {
+            table.getSelectionModel().getSelectedItem().setPrivilege(data.getNewValue());
+            table.refresh();
+            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+        });
+
+        // Company column
+        ObservableList companies = FXCollections.observableArrayList(userImplementation.getAllCompanies(new GenericType<List<Company>>() {
+        }));
+        tc_company.setCellFactory(ComboBoxTableCell.forTableColumn(companies));
+        tc_company.setOnEditCommit((TableColumn.CellEditEvent<User, Company> data) -> {
+            table.getSelectionModel().getSelectedItem().setCompany(data.getNewValue());
+            table.refresh();
+            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+        });
+    }
+
+    public void checkCellMaxLength(int maxLength, int currentLength) throws CellMaxLengthException {
+        if (currentLength > maxLength) {
+            showAlert(Alert.AlertType.WARNING, "Character limit reached", "", "The max length allowed for this field is " + maxLength);
+            throw new CellMaxLengthException();
+        }
     }
 
     /**
@@ -148,7 +238,6 @@ public class UserManagementController {
     public void setListeners() {
         logger.log(Level.INFO, "Setting listeners for the components of the window.");
         this.txt_name.textProperty().addListener((obs, oldText, newText) -> {
-            //this.genericValidations.minLength(this.txt_name, 3, newText, "minLengthValidator"); // Adds a min lenght validator
             this.genericValidations.textLimiter(this.txt_name, 200, newText); // Limits the input to 200 characters
             this.validate(); // Executes the validation.
         });
@@ -171,19 +260,7 @@ public class UserManagementController {
 
         // Validation for the Email field
         this.txt_email.textProperty().addListener((obs, oldText, newText) -> {
-            //this.genericValidations.minLength(this.txt_email, 3, newText, "minLengthValidator");
             this.genericValidations.textLimiter(this.txt_email, 254, newText);
-//            boolean emailValidator = this.genericValidations.regexValidator(this.genericValidations.EMAIL_REGEXP, this.txt_email, newText.toLowerCase(), "emailValidator"); // Adds a regex validation to check if the email is correct
-//            this.hint_email.setText(this.genericValidations.TXT_ENTER_VALID_EMAIL);
-//            if (!emailValidator) {
-//
-//                this.genericValidations.addClass(this.txt_email, "error", Boolean.TRUE);
-//            } else {
-//                this.hint_email.setTextFill(this.genericValidations.greyColor);
-//                this.genericValidations.addClass(this.txt_email, "error", Boolean.FALSE);
-//            }
-            // Changes the color of the inputs when the user types.
-
             this.validate();
         });
     }
@@ -197,6 +274,7 @@ public class UserManagementController {
      */
     private void handleUsersTableSelectionChanged(ObservableValue observable, User oldValue, User newValue) {
         // System.out.println(newValue.getEmail());
+
         this.btn_delete.setDisable(false);
     }
 
@@ -208,7 +286,7 @@ public class UserManagementController {
         this.chb_status.getSelectionModel().selectFirst();
         this.chb_privilege.getSelectionModel().selectFirst();
         // Se obtiene la lista de usuarios utilizando la implementación que hay en la propiedad de la clase. Se necesita pasar desde la ventana anterior o desde el método main.
-        getUsers();
+        this.getUsers();
 
         // Crea las listas de filtrado y llama al método que crea los listeners.
         FilteredList<User> filteredData = new FilteredList<>(masterData, p -> true);
@@ -235,15 +313,12 @@ public class UserManagementController {
     }
 
     public void setSearchFilterListeners(FilteredList<User> filteredData) {
-        if (chb_status.getSelectionModel() == null) {
-            System.out.println("El modelo del checkboz es null");
-        }
         filteredData.predicateProperty().bind(Bindings.createObjectBinding(()
-                -> user -> user.getName().contains(txt_name.getText().toLowerCase().trim())
-                && user.getSurname().contains(txt_surname.getText().toLowerCase().trim())
-                && user.getEmail().contains(txt_email.getText().toLowerCase().trim())
-                && user.getUsername().contains(txt_username.getText())
-                && user.getCompany().getName().contains(txt_company.getText().toLowerCase().trim())
+                -> user -> user.getName().toLowerCase().contains(txt_name.getText().toLowerCase().trim())
+                && user.getSurname().toLowerCase().contains(txt_surname.getText().toLowerCase().trim())
+                && user.getEmail().toLowerCase().contains(txt_email.getText().toLowerCase().trim())
+                && user.getUsername().toLowerCase().contains(txt_username.getText())
+                && user.getCompany().getName().toLowerCase().contains(txt_company.getText().toLowerCase().trim())
                 && user.getStatus().toString().equalsIgnoreCase(chb_status.getSelectionModel().getSelectedItem().toString())
                 && user.getPrivilege().toString().equalsIgnoreCase(chb_privilege.getSelectionModel().getSelectedItem().toString()),
                 txt_name.textProperty(),
@@ -254,81 +329,21 @@ public class UserManagementController {
                 chb_status.getSelectionModel().selectedItemProperty(),
                 chb_privilege.getSelectionModel().selectedItemProperty()
         ));
-
-//        txt_name.textProperty().addListener((obsVal, oldValue, newValue) -> {
-//            filteredData.setPredicate(user -> user.getName().contains(txt_name.getText().toLowerCase().trim()));
-//        });
-//
-//        txt_surname.textProperty().addListener((obsVal, oldValue, newValue) -> {
-//            filteredData.setPredicate(user -> user.getSurname().contains(txt_surname.getText().toLowerCase().trim()));
-//        });
-//        txt_email.textProperty().addListener((obsVal, oldValue, newValue) -> {
-//            filteredData.setPredicate(user -> user.getEmail().contains(txt_email.getText().toLowerCase().trim()));
-//        });
-//        txt_name.textProperty().addListener((observable, oldValue, newValue) -> {
-//            filteredData.setPredicate(user -> {
-//                // If filter text is empty, display all persons.
-//                if (newValue == null || newValue.isEmpty()) {
-//                    return true;
-//                }
-//
-//                // Returns true if matches, else returns false
-//                return user.getName().toLowerCase().contains(newValue.toLowerCase());
-//            });
-//        });
-//        txt_surname.textProperty().addListener((observable, oldValue, newValue) -> {
-//            filteredData.setPredicate(user -> {
-//                // If filter text is empty, display all persons.
-//                if (newValue == null || newValue.isEmpty()) {
-//                    return true;
-//                }
-//
-//                // Returns true if matches, else returns false
-//                return user.getSurname().toLowerCase().contains(newValue.toLowerCase());
-//            });
-//        });
-//        txt_company.textProperty().addListener((observable, oldValue, newValue) -> {
-//            filteredData.setPredicate(user -> {
-//                // If filter text is empty, display all persons.
-//                if (newValue == null || newValue.isEmpty()) {
-//                    return true;
-//                }
-//
-//                // Returns true if matches, else returns false
-//                return user.getCompany().getName().toLowerCase().contains(newValue.toLowerCase());
-//            });
-//        });
-//
-//        txt_username.textProperty().addListener((observable, oldValue, newValue) -> {
-//            filteredData.setPredicate(user -> {
-//                // If filter text is empty, display all persons.
-//                if (newValue == null || newValue.isEmpty()) {
-//                    return true;
-//                }
-//
-//                // Returns true if matches, else returns false
-//                return user.getUsername().toLowerCase().contains(newValue.toLowerCase());
-//            });
-//        });
-//        txt_email.textProperty().addListener((observable, oldValue, newValue) -> {
-//            filteredData.setPredicate(user -> {
-//                // If filter text is empty, display all persons.
-//                if (newValue == null || newValue.isEmpty()) {
-//                    return true;
-//                }
-//
-//                // Returns true if matches, else returns false
-//                return user.getEmail().toLowerCase().contains(newValue.toLowerCase());
-//            });
-//        });
     }
 
-    public void searchByProperty() {
-
+    public void onDeleteButtonClickAction() {
+        User u = table.getSelectionModel().getSelectedItem();
+        this.getUserImplementation().deleteUser(u.getId().toString());
+        masterData.remove(u);
     }
-    
-    public void onDeleteButtonClickAction(){
-        
+
+    public void showAlert(Alert.AlertType type, String title, String header, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+
+        alert.showAndWait();
     }
 
     public void validate() {
@@ -349,6 +364,14 @@ public class UserManagementController {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
     }
 
 }
