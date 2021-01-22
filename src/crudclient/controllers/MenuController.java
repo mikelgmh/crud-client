@@ -62,6 +62,9 @@ public class MenuController implements Initializable {
 
     private User user;
 
+    public MenuController() {
+    }
+
 
     public User getUser() {
         return user;
