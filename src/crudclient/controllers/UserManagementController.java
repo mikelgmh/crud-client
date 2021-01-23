@@ -394,6 +394,7 @@ public class UserManagementController {
                 txt_username.textProperty(),
                 txt_company.textProperty(),
                 chb_status.getSelectionModel().selectedItemProperty(),
+                txt_lastAccess.getEditor().textProperty(),
                 chb_privilege.getSelectionModel().selectedItemProperty()
         ));
     }
