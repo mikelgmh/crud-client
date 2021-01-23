@@ -32,7 +32,11 @@ import javafx.stage.Stage;
 import crudclient.interfaces.UserInterface;
 import crudclient.model.Company;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import javafx.scene.control.cell.TextFieldTableCell;
 
@@ -61,6 +65,8 @@ public class UserManagementController {
     private CompanyInterface companyImplementation;
     private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
     private User currentUser;
+    private ZoneId defaultZoneId = ZoneId.systemDefault();
+     DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
     @FXML
     private TextField txt_name;
@@ -235,7 +241,7 @@ public class UserManagementController {
         });
 
         // Company column
-          CompanyFactory companyFactory = new CompanyFactory();
+        CompanyFactory companyFactory = new CompanyFactory();
         this.companyImplementation = companyFactory.getImplementation();
         ObservableList<Company> companies = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
         }));
@@ -318,7 +324,16 @@ public class UserManagementController {
 
     }
 
+    public static final LocalDate LOCAL_DATE(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate localDate = LocalDate.parse(dateString, formatter);
+        return localDate;
+    }
+
     public void setDefaultFieldValues() {
+
+        txt_lastAccess.setValue(LOCAL_DATE("29/01/2021"));
+
         this.chb_privilege.setItems(FXCollections.observableArrayList(UserPrivilege.values()));
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
 
@@ -357,6 +372,13 @@ public class UserManagementController {
     }
 
     public void setSearchFilterListeners(FilteredList<User> filteredData) {
+        txt_lastAccess.getValue();
+        System.out.println("Field value:");
+        System.out.println(txt_lastAccess.getValue().toString());
+        System.out.println("Row value:");
+        System.out.println(masterData.get(0).getLastAccess());
+        System.out.println("Row value CONVERTED:");
+        System.out.println(formatter.format(masterData.get(0).getLastAccess()));
         filteredData.predicateProperty().bind(Bindings.createObjectBinding(()
                 -> user -> user.getName().toLowerCase().contains(txt_name.getText().toLowerCase().trim())
                 && user.getSurname().toLowerCase().contains(txt_surname.getText().toLowerCase().trim())
@@ -364,7 +386,7 @@ public class UserManagementController {
                 && user.getUsername().toLowerCase().contains(txt_username.getText())
                 && user.getCompany().getName().toLowerCase().contains(txt_company.getText().toLowerCase().trim())
                 && user.getStatus().toString().equalsIgnoreCase(chb_status.getSelectionModel().getSelectedItem().toString())
-                //              && user.getLastAccess().equals(txt_lastAccess.getValue())
+                && formatter.format(user.getLastAccess()).contains(txt_lastAccess.getValue().toString())
                 && user.getPrivilege().toString().equalsIgnoreCase(chb_privilege.getSelectionModel().getSelectedItem().toString()),
                 txt_name.textProperty(),
                 txt_surname.textProperty(),
