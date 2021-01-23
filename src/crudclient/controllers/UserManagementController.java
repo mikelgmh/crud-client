@@ -378,24 +378,37 @@ public class UserManagementController {
     }
 
     public void setSearchFilterListeners(FilteredList<User> filteredData) {
-        filteredData.predicateProperty().bind(Bindings.createObjectBinding(()
-                -> user -> user.getName().toLowerCase().contains(txt_name.getText().toLowerCase().trim())
-                && user.getSurname().toLowerCase().contains(txt_surname.getText().toLowerCase().trim())
-                && user.getEmail().toLowerCase().contains(txt_email.getText().toLowerCase().trim())
-                && user.getUsername().toLowerCase().contains(txt_username.getText())
-                && user.getCompany().getName().toLowerCase().contains(txt_company.getText().toLowerCase().trim())
-                && user.getStatus().toString().equalsIgnoreCase(chb_status.getSelectionModel().getSelectedItem().toString())
-                && formatter.format(user.getLastAccess()).contains(txt_lastAccess.getValue().toString())
-                && user.getPrivilege().toString().equalsIgnoreCase(chb_privilege.getSelectionModel().getSelectedItem().toString()),
-                txt_name.textProperty(),
-                txt_surname.textProperty(),
-                txt_email.textProperty(),
-                txt_username.textProperty(),
-                txt_company.textProperty(),
-                chb_status.getSelectionModel().selectedItemProperty(),
-                txt_lastAccess.getEditor().textProperty(),
-                chb_privilege.getSelectionModel().selectedItemProperty()
-        ));
+        try {
+            filteredData.predicateProperty().bind(Bindings.createObjectBinding(()
+                    -> user -> user.getName().toLowerCase().contains(txt_name.getText().toLowerCase().trim())
+                    && user.getSurname().toLowerCase().contains(txt_surname.getText().toLowerCase().trim())
+                    && user.getEmail().toLowerCase().contains(txt_email.getText().toLowerCase().trim())
+                    && user.getUsername().toLowerCase().contains(txt_username.getText())
+                    && user.getCompany().getName().toLowerCase().contains(txt_company.getText().toLowerCase().trim())
+                    && user.getStatus().toString().equalsIgnoreCase(chb_status.getSelectionModel().getSelectedItem().toString())
+                    && datePickerChecker(user)
+                    && user.getPrivilege().toString().equalsIgnoreCase(chb_privilege.getSelectionModel().getSelectedItem().toString()),
+                    txt_name.textProperty(),
+                    txt_surname.textProperty(),
+                    txt_email.textProperty(),
+                    txt_username.textProperty(),
+                    txt_company.textProperty(),
+                    chb_status.getSelectionModel().selectedItemProperty(),
+                    txt_lastAccess.getEditor().textProperty(),
+                    chb_privilege.getSelectionModel().selectedItemProperty()
+            ));
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Empty date", "The date can't be empty", "Select a date to continue");
+        }
+    }
+
+    public boolean datePickerChecker(User user) {
+        try {
+            return formatter.format(user.getLastAccess()).contains(txt_lastAccess.getValue().toString());
+        } catch (Exception e) {
+            return true;
+        }
+
     }
 
     public void onDeleteButtonClickAction() {
