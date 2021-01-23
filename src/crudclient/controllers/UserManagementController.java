@@ -235,7 +235,11 @@ public class UserManagementController {
         });
 
         // Company column
-        tc_company.setCellFactory(ComboBoxTableCell.forTableColumn(companiesList));
+          CompanyFactory companyFactory = new CompanyFactory();
+        this.companyImplementation = companyFactory.getImplementation();
+        ObservableList<Company> companies = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
+        }));
+        tc_company.setCellFactory(ComboBoxTableCell.forTableColumn(companies));
         tc_company.setOnEditCommit((TableColumn.CellEditEvent<User, Company> data) -> {
             table.getSelectionModel().getSelectedItem().setCompany(data.getNewValue());
             table.refresh();
@@ -360,7 +364,7 @@ public class UserManagementController {
                 && user.getUsername().toLowerCase().contains(txt_username.getText())
                 && user.getCompany().getName().toLowerCase().contains(txt_company.getText().toLowerCase().trim())
                 && user.getStatus().toString().equalsIgnoreCase(chb_status.getSelectionModel().getSelectedItem().toString())
-                // && user.getLastAccessAsString().equalsIgnoreCase(format.format(txt_lastAccess.getValue()))
+                //              && user.getLastAccess().equals(txt_lastAccess.getValue())
                 && user.getPrivilege().toString().equalsIgnoreCase(chb_privilege.getSelectionModel().getSelectedItem().toString()),
                 txt_name.textProperty(),
                 txt_surname.textProperty(),
