@@ -32,6 +32,8 @@ import javafx.stage.Stage;
 import crudclient.interfaces.UserInterface;
 import crudclient.model.Company;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import javafx.beans.binding.Bindings;
@@ -40,6 +42,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javax.ws.rs.core.GenericType;
 
@@ -56,6 +59,7 @@ public class UserManagementController {
     private ObservableList<User> masterData = FXCollections.observableArrayList();
     private ObservableList<Company> companiesList = FXCollections.observableArrayList();
     private CompanyInterface companyImplementation;
+    private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
     private User currentUser;
 
     @FXML
@@ -68,6 +72,8 @@ public class UserManagementController {
     private TextField txt_email;
     @FXML
     private TextField txt_company;
+    @FXML
+    private DatePicker txt_lastAccess;
     @FXML
     private ChoiceBox chb_status;
     @FXML
@@ -97,6 +103,9 @@ public class UserManagementController {
     private TableColumn<User, UserStatus> tc_status;
     @FXML
     private TableColumn<User, UserPrivilege> tc_privilege;
+
+    @FXML
+    private TableColumn<User, String> tc_lastAccess;
 
     public UserManagementController() {
         this.genericValidations = new GenericValidations();
@@ -147,6 +156,7 @@ public class UserManagementController {
         tc_email.setCellValueFactory(new PropertyValueFactory<>("email"));
         tc_privilege.setCellValueFactory(new PropertyValueFactory<>("privilege"));
         tc_status.setCellValueFactory(new PropertyValueFactory<>("status"));
+        tc_lastAccess.setCellValueFactory(new PropertyValueFactory<>("lastAccess"));
     }
 
     public void configTableView() {
@@ -313,6 +323,8 @@ public class UserManagementController {
     public void getUsers() {
         this.masterData = FXCollections.observableArrayList(getUserImplementation().getUsers(new GenericType<List<User>>() {
         }));
+        this.table.refresh();
+        System.out.println("Refreshing table");
     }
 
     public void handleOnClickCreateButton() throws IOException {
@@ -320,6 +332,7 @@ public class UserManagementController {
         Parent root = (Parent) loader.load();
         UserCreationController controller = ((UserCreationController) loader.getController());
         controller.setUserImplementation(getUserImplementation());
+        controller.setUserManagementController(this);
         controller.setStage(getStage());
         controller.initStage(root);
     }
@@ -332,6 +345,7 @@ public class UserManagementController {
                 && user.getUsername().toLowerCase().contains(txt_username.getText())
                 && user.getCompany().getName().toLowerCase().contains(txt_company.getText().toLowerCase().trim())
                 && user.getStatus().toString().equalsIgnoreCase(chb_status.getSelectionModel().getSelectedItem().toString())
+               // && user.getLastAccessAsString().equalsIgnoreCase(format.format(txt_lastAccess.getValue()))
                 && user.getPrivilege().toString().equalsIgnoreCase(chb_privilege.getSelectionModel().getSelectedItem().toString()),
                 txt_name.textProperty(),
                 txt_surname.textProperty(),

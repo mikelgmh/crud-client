@@ -54,6 +54,7 @@ public class UserCreationController {
     private final GenericValidations genericValidations = new GenericValidations();
     private AsymmetricEncryption enc;
     private ObservableList companyList;
+    private UserManagementController userManagementController;
 
     @FXML
     private TextField txt_firstname;
@@ -144,6 +145,10 @@ public class UserCreationController {
 
     }
 
+    /**
+     * Sets the default values for some of the JavaFX components. It also
+     * retrieves some data from the server.
+     */
     public void setDefaultFieldValues() {
         this.chb_privilege.setItems(FXCollections.observableArrayList(UserPrivilege.values()));
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
@@ -157,6 +162,9 @@ public class UserCreationController {
         this.chb_privilege.getSelectionModel().selectFirst();
     }
 
+    /**
+     * Sets the listeners for the inputs in the form.
+     */
     public void setListeners() {
         logger.log(Level.INFO, "Setting listeners for the components of the window.");
         this.txt_firstname.textProperty().addListener((obs, oldText, newText) -> {
@@ -253,6 +261,10 @@ public class UserCreationController {
         }
     }
 
+    /**
+     * Executes the validation task for each component in the form. If all true,
+     * then create a new user.
+     */
     public void validate() {
         if (Boolean.parseBoolean(this.txt_email.getProperties().get("emailValidator").toString())
                 && Boolean.parseBoolean(this.txt_firstname.getProperties().get("minLengthValidator").toString())
@@ -282,6 +294,19 @@ public class UserCreationController {
         user.setPassword(encryptedPassword);
         try {
             this.userImplementation.createUser(user);
+            userManagementController.getUsers();
+            // Show an alert if the user has been created
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Go back to the user management screen?");
+            alert.setHeaderText("User successfully created");
+            alert.setContentText("You will go back to the management window if you press OK");
+            alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get().equals(ButtonType.OK)) {
+                stage.close();
+            } else {
+                alert.close();
+            }
         } catch (ClientErrorException ex) {
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UsernameAlreadyExistsException ex) {
@@ -305,7 +330,6 @@ public class UserCreationController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get().equals(ButtonType.OK)) {
             stage.close();
-
         } else {
             alert.close();
         }
@@ -334,6 +358,14 @@ public class UserCreationController {
 
     public void setUserImplementation(UserInterface userImplementation) {
         this.userImplementation = userImplementation;
+    }
+
+    public UserManagementController getUserManagementController() {
+        return userManagementController;
+    }
+
+    public void setUserManagementController(UserManagementController userManagementController) {
+        this.userManagementController = userManagementController;
     }
 
 }
