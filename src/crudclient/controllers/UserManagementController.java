@@ -66,7 +66,7 @@ public class UserManagementController {
     private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
     private User currentUser;
     private ZoneId defaultZoneId = ZoneId.systemDefault();
-     DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
     @FXML
     private TextField txt_name;
@@ -310,15 +310,21 @@ public class UserManagementController {
         User loggedUser = DashboardController.loggedUser;
         // If the logged user's id is 1, it means it is superuser, the master one
         if (loggedUser.getId() == 1) {
-            // Disable delete button if the selected user is the logger user.
+            // Disable delete button if the selected user is the logged user.
             if (loggedUser.getId() == newValue.getId()) {
                 this.btn_delete.setDisable(true);
+                this.table.setEditable(false);
             } else { // Enable the delete button if the selected user is not the logged one.
                 this.btn_delete.setDisable(false);
+                this.table.setEditable(true);
             }
         } else { // If the logged user's id it is not 1, it mean it's a superuser, but not the master one
             if (newValue.getPrivilege().equals(UserPrivilege.SUPERUSER)) {
                 this.btn_delete.setDisable(true);
+                this.table.setEditable(false);
+            } else {
+                this.table.setEditable(true);
+                this.btn_delete.setDisable(false);
             }
         }
 
