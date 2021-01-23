@@ -372,13 +372,6 @@ public class UserManagementController {
     }
 
     public void setSearchFilterListeners(FilteredList<User> filteredData) {
-        txt_lastAccess.getValue();
-        System.out.println("Field value:");
-        System.out.println(txt_lastAccess.getValue().toString());
-        System.out.println("Row value:");
-        System.out.println(masterData.get(0).getLastAccess());
-        System.out.println("Row value CONVERTED:");
-        System.out.println(formatter.format(masterData.get(0).getLastAccess()));
         filteredData.predicateProperty().bind(Bindings.createObjectBinding(()
                 -> user -> user.getName().toLowerCase().contains(txt_name.getText().toLowerCase().trim())
                 && user.getSurname().toLowerCase().contains(txt_surname.getText().toLowerCase().trim())
