@@ -7,6 +7,8 @@ package crudclient.controllers;
 
 import crudclient.exceptions.EmailAlreadyExistsException;
 import crudclient.exceptions.UsernameAlreadyExistsException;
+import crudclient.factories.CompanyFactory;
+import crudclient.interfaces.CompanyInterface;
 import crudclient.interfaces.UserInterface;
 import crudclient.model.Company;
 import crudclient.model.User;
@@ -33,6 +35,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Background;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javax.ws.rs.ClientErrorException;
@@ -47,9 +50,11 @@ public class UserCreationController {
     private Stage stage;
     private static final Logger logger = Logger.getLogger("signupsignin.controllers.SignUpController");
     private UserInterface userImplementation;
+    private CompanyInterface companyImplementation;
     private final GenericValidations genericValidations = new GenericValidations();
     private AsymmetricEncryption enc;
     private ObservableList companyList;
+    private UserManagementController userManagementController;
 
     @FXML
     private TextField txt_firstname;
@@ -103,10 +108,15 @@ public class UserCreationController {
         // Creates a scena and a stage and opens the window.
         Scene scene = new Scene(parent);
         Stage stage = new Stage();
-        setDefaultFieldValues();
 
         // Set stage
         this.setStage(stage);
+
+        // Company implementation
+        CompanyFactory companyFactory = new CompanyFactory();
+        this.companyImplementation = companyFactory.getImplementation();
+
+        setDefaultFieldValues();
 
         // Set some properties of the stage
         stage.setScene(scene);
@@ -122,6 +132,8 @@ public class UserCreationController {
         txt_password.getProperties().put("passwordRequirements", false);
         txt_repeatPassword.getProperties().put("passwordRequirements", false);
         txt_repeatPassword.getProperties().put("passwordsMatch", false);
+        this.hint_password.setText("The passwords shoud match the requirements:\n" + genericValidations.PASSWORD_CONDITIONS);
+
         // Set listeners
         this.setListeners();
 
@@ -133,11 +145,15 @@ public class UserCreationController {
 
     }
 
+    /**
+     * Sets the default values for some of the JavaFX components. It also
+     * retrieves some data from the server.
+     */
     public void setDefaultFieldValues() {
         this.chb_privilege.setItems(FXCollections.observableArrayList(UserPrivilege.values()));
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
 
-        this.companyList = FXCollections.observableArrayList(this.getUserImplementation().getAllCompanies(new GenericType<List<Company>>() {
+        this.companyList = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
         }));
 
         this.chb_company.getItems().setAll(companyList);
@@ -146,6 +162,9 @@ public class UserCreationController {
         this.chb_privilege.getSelectionModel().selectFirst();
     }
 
+    /**
+     * Sets the listeners for the inputs in the form.
+     */
     public void setListeners() {
         logger.log(Level.INFO, "Setting listeners for the components of the window.");
         this.txt_firstname.textProperty().addListener((obs, oldText, newText) -> {
@@ -165,7 +184,7 @@ public class UserCreationController {
         this.txt_username.textProperty().addListener((obs, oldText, newText) -> {
             this.genericValidations.textLimiter(this.txt_username, 200, newText); // Limits the input to 200 characters
             Boolean minlengthValidator = this.genericValidations.minLength(this.txt_username, 3, newText, "minLengthValidator"); // Adds a min lenght validator
-
+            this.hint_username.setText("3 characters min");
             setInputError(minlengthValidator, txt_username, hint_username);
             this.validate(); // Executes the validation.
         });
@@ -179,13 +198,8 @@ public class UserCreationController {
             this.genericValidations.textLimiter(this.txt_email, 254, newText);
             boolean emailValidator = this.genericValidations.regexValidator(this.genericValidations.EMAIL_REGEXP, this.txt_email, newText.toLowerCase(), "emailValidator"); // Adds a regex validation to check if the email is correct
             this.hint_email.setText(this.genericValidations.TXT_ENTER_VALID_EMAIL);
-            if (!emailValidator) {
 
-                this.genericValidations.addClass(this.txt_email, "error", Boolean.TRUE);
-            } else {
-                this.hint_email.setTextFill(this.genericValidations.greyColor);
-                this.genericValidations.addClass(this.txt_email, "error", Boolean.FALSE);
-            }
+            setInputError(emailValidator, txt_email, hint_email);
             this.validate();
         });
 
@@ -238,14 +252,19 @@ public class UserCreationController {
     }
 
     public void setInputError(boolean validatorStatus, TextField tf, Label hint) {
-        if (!validatorStatus) {
+        if (!validatorStatus) { // Si Hay error
             this.genericValidations.addClass(tf, "error", Boolean.TRUE);
-        } else {
+            hint.setTextFill(Color.RED);
+        } else { // si no hay error
             hint.setTextFill(this.genericValidations.greyColor);
             this.genericValidations.addClass(tf, "error", Boolean.FALSE);
         }
     }
 
+    /**
+     * Executes the validation task for each component in the form. If all true,
+     * then create a new user.
+     */
     public void validate() {
         if (Boolean.parseBoolean(this.txt_email.getProperties().get("emailValidator").toString())
                 && Boolean.parseBoolean(this.txt_firstname.getProperties().get("minLengthValidator").toString())
@@ -275,12 +294,28 @@ public class UserCreationController {
         user.setPassword(encryptedPassword);
         try {
             this.userImplementation.createUser(user);
+            userManagementController.getUsers();
+            // Show an alert if the user has been created
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Go back to the user management screen?");
+            alert.setHeaderText("User successfully created");
+            alert.setContentText("You will go back to the management window if you press OK");
+            alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get().equals(ButtonType.OK)) {
+                stage.close();
+            } else {
+                alert.close();
+            }
         } catch (ClientErrorException ex) {
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UsernameAlreadyExistsException ex) {
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+            hint_username.setText("The username already exists.");
+            setInputError(false, txt_username, hint_username);
         } catch (EmailAlreadyExistsException ex) {
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+            hint_email.setText("The email already exists.");
             setInputError(false, txt_email, hint_email);
         }
     }
@@ -295,7 +330,6 @@ public class UserCreationController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get().equals(ButtonType.OK)) {
             stage.close();
-
         } else {
             alert.close();
         }
@@ -324,6 +358,14 @@ public class UserCreationController {
 
     public void setUserImplementation(UserInterface userImplementation) {
         this.userImplementation = userImplementation;
+    }
+
+    public UserManagementController getUserManagementController() {
+        return userManagementController;
+    }
+
+    public void setUserManagementController(UserManagementController userManagementController) {
+        this.userManagementController = userManagementController;
     }
 
 }

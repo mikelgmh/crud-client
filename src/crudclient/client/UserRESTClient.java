@@ -46,7 +46,8 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
     public List<User> getUsers(GenericType genericType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("getAllUsers");
-        return (List<User>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(genericType);
+        List<User> ee =  (List<User>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(genericType);
+        return ee;
     }
     
     @Override
@@ -168,11 +169,5 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
         return this.getPublicKey_JSON();
     }
 
-    @Override
-    public List getAllCompanies(GenericType genericType) throws ClientErrorException {
-        WebTarget resource = webTarget;
-        resource = resource.path("company/findAllCompanies");
-        return (List<Company>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(genericType);
-    }
 
 }

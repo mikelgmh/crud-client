@@ -6,6 +6,8 @@
 package crudclient.controllers;
 
 import crudclient.exceptions.CellMaxLengthException;
+import crudclient.factories.CompanyFactory;
+import crudclient.interfaces.CompanyInterface;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Parent;
@@ -30,6 +32,8 @@ import javafx.stage.Stage;
 import crudclient.interfaces.UserInterface;
 import crudclient.model.Company;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import javafx.beans.binding.Bindings;
@@ -38,6 +42,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javax.ws.rs.core.GenericType;
 
@@ -52,6 +57,9 @@ public class UserManagementController {
     private final GenericValidations genericValidations;
     private UserInterface userImplementation;
     private ObservableList<User> masterData = FXCollections.observableArrayList();
+    private ObservableList<Company> companiesList = FXCollections.observableArrayList();
+    private CompanyInterface companyImplementation;
+    private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
     private User currentUser;
 
     @FXML
@@ -64,6 +72,8 @@ public class UserManagementController {
     private TextField txt_email;
     @FXML
     private TextField txt_company;
+    @FXML
+    private DatePicker txt_lastAccess;
     @FXML
     private ChoiceBox chb_status;
     @FXML
@@ -93,6 +103,11 @@ public class UserManagementController {
     private TableColumn<User, UserStatus> tc_status;
     @FXML
     private TableColumn<User, UserPrivilege> tc_privilege;
+    @FXML
+    private TableColumn<User, String> tc_lastAccess;
+
+    @FXML
+    private MenuController menuController;
 
     public UserManagementController() {
         this.genericValidations = new GenericValidations();
@@ -119,6 +134,10 @@ public class UserManagementController {
         // Set stage
         this.setStage(stage);
 
+        // Company implementation
+        CompanyFactory companyFactory = new CompanyFactory();
+        this.companyImplementation = companyFactory.getImplementation();
+
         // Set some properties of the stage
         stage.setScene(scene);
         stage.setTitle("User Management"); // Sets the title of the window
@@ -139,6 +158,7 @@ public class UserManagementController {
         tc_email.setCellValueFactory(new PropertyValueFactory<>("email"));
         tc_privilege.setCellValueFactory(new PropertyValueFactory<>("privilege"));
         tc_status.setCellValueFactory(new PropertyValueFactory<>("status"));
+        tc_lastAccess.setCellValueFactory(new PropertyValueFactory<>("lastAccess"));
     }
 
     public void configTableView() {
@@ -215,7 +235,9 @@ public class UserManagementController {
         });
 
         // Company column
-        ObservableList companies = FXCollections.observableArrayList(userImplementation.getAllCompanies(new GenericType<List<Company>>() {
+          CompanyFactory companyFactory = new CompanyFactory();
+        this.companyImplementation = companyFactory.getImplementation();
+        ObservableList<Company> companies = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
         }));
         tc_company.setCellFactory(ComboBoxTableCell.forTableColumn(companies));
         tc_company.setOnEditCommit((TableColumn.CellEditEvent<User, Company> data) -> {
@@ -223,6 +245,11 @@ public class UserManagementController {
             table.refresh();
             userImplementation.editUser(table.getSelectionModel().getSelectedItem());
         });
+    }
+
+    public void getCompanies() {
+        companiesList = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
+        }));
     }
 
     public void checkCellMaxLength(int maxLength, int currentLength) throws CellMaxLengthException {
@@ -273,9 +300,22 @@ public class UserManagementController {
      * @param newValue
      */
     private void handleUsersTableSelectionChanged(ObservableValue observable, User oldValue, User newValue) {
-        // System.out.println(newValue.getEmail());
+        // User loggedUser = menuController.getUser();
+        User loggedUser = DashboardController.loggedUser;
+        // If the logged user's id is 1, it means it is superuser, the master one
+        if (loggedUser.getId() == 1) {
+            // Disable delete button if the selected user is the logger user.
+            if (loggedUser.getId() == newValue.getId()) {
+                this.btn_delete.setDisable(true);
+            } else { // Enable the delete button if the selected user is not the logged one.
+                this.btn_delete.setDisable(false);
+            }
+        } else { // If the logged user's id it is not 1, it mean it's a superuser, but not the master one
+            if (newValue.getPrivilege().equals(UserPrivilege.SUPERUSER)) {
+                this.btn_delete.setDisable(true);
+            }
+        }
 
-        this.btn_delete.setDisable(false);
     }
 
     public void setDefaultFieldValues() {
@@ -287,6 +327,7 @@ public class UserManagementController {
         this.chb_privilege.getSelectionModel().selectFirst();
         // Se obtiene la lista de usuarios utilizando la implementación que hay en la propiedad de la clase. Se necesita pasar desde la ventana anterior o desde el método main.
         this.getUsers();
+        this.getCompanies();
 
         // Crea las listas de filtrado y llama al método que crea los listeners.
         FilteredList<User> filteredData = new FilteredList<>(masterData, p -> true);
@@ -301,6 +342,8 @@ public class UserManagementController {
     public void getUsers() {
         this.masterData = FXCollections.observableArrayList(getUserImplementation().getUsers(new GenericType<List<User>>() {
         }));
+        this.table.refresh();
+        System.out.println("Refreshing table");
     }
 
     public void handleOnClickCreateButton() throws IOException {
@@ -308,6 +351,7 @@ public class UserManagementController {
         Parent root = (Parent) loader.load();
         UserCreationController controller = ((UserCreationController) loader.getController());
         controller.setUserImplementation(getUserImplementation());
+        controller.setUserManagementController(this);
         controller.setStage(getStage());
         controller.initStage(root);
     }
@@ -320,6 +364,7 @@ public class UserManagementController {
                 && user.getUsername().toLowerCase().contains(txt_username.getText())
                 && user.getCompany().getName().toLowerCase().contains(txt_company.getText().toLowerCase().trim())
                 && user.getStatus().toString().equalsIgnoreCase(chb_status.getSelectionModel().getSelectedItem().toString())
+                //              && user.getLastAccess().equals(txt_lastAccess.getValue())
                 && user.getPrivilege().toString().equalsIgnoreCase(chb_privilege.getSelectionModel().getSelectedItem().toString()),
                 txt_name.textProperty(),
                 txt_surname.textProperty(),
@@ -374,4 +419,11 @@ public class UserManagementController {
         this.currentUser = currentUser;
     }
 
+    public MenuController getMenuManagementController() {
+        return menuController;
+    }
+
+    public void setMenuManagementController(MenuController menuController) {
+        this.menuController = menuController;
+    }
 }

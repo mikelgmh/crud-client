@@ -6,6 +6,7 @@
 package crudclient.model;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 import javafx.beans.property.SimpleObjectProperty;
@@ -142,6 +143,11 @@ public class User implements Serializable {
 
     public Date getLastAccess() {
         return lastAccess;
+    }
+
+    public String getLastAccessAsString() {
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        return format.format(lastAccess);
     }
 
     public void setLastAccess(Date lastAccess) {

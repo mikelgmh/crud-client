@@ -43,6 +43,8 @@ public class DashboardController {
     private Button btn_Logout;
     @FXML
     private MenuController menuController;
+    
+    public static User loggedUser;
 
     public User getUser() {
         return this.user;
@@ -78,7 +80,8 @@ public class DashboardController {
     private void handleWindowShowing(WindowEvent event) {
         lbl_Welcome.setText(user.getPassword());
         menuController = new MenuController();
-        menuController.setUser(getUser());
+        menuController.setUser(user);
+        loggedUser = user;
     }
 
     @FXML
