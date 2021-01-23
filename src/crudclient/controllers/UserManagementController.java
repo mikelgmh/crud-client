@@ -103,9 +103,11 @@ public class UserManagementController {
     private TableColumn<User, UserStatus> tc_status;
     @FXML
     private TableColumn<User, UserPrivilege> tc_privilege;
-
     @FXML
     private TableColumn<User, String> tc_lastAccess;
+
+    @FXML
+    private MenuController menuController;
 
     public UserManagementController() {
         this.genericValidations = new GenericValidations();
@@ -294,9 +296,22 @@ public class UserManagementController {
      * @param newValue
      */
     private void handleUsersTableSelectionChanged(ObservableValue observable, User oldValue, User newValue) {
-        // System.out.println(newValue.getEmail());
+        // User loggedUser = menuController.getUser();
+        User loggedUser = DashboardController.loggedUser;
+        // If the logged user's id is 1, it means it is superuser, the master one
+        if (loggedUser.getId() == 1) {
+            // Disable delete button if the selected user is the logger user.
+            if (loggedUser.getId() == newValue.getId()) {
+                this.btn_delete.setDisable(true);
+            } else { // Enable the delete button if the selected user is not the logged one.
+                this.btn_delete.setDisable(false);
+            }
+        } else { // If the logged user's id it is not 1, it mean it's a superuser, but not the master one
+            if (newValue.getPrivilege().equals(UserPrivilege.SUPERUSER)) {
+                this.btn_delete.setDisable(true);
+            }
+        }
 
-        this.btn_delete.setDisable(false);
     }
 
     public void setDefaultFieldValues() {
@@ -345,7 +360,7 @@ public class UserManagementController {
                 && user.getUsername().toLowerCase().contains(txt_username.getText())
                 && user.getCompany().getName().toLowerCase().contains(txt_company.getText().toLowerCase().trim())
                 && user.getStatus().toString().equalsIgnoreCase(chb_status.getSelectionModel().getSelectedItem().toString())
-               // && user.getLastAccessAsString().equalsIgnoreCase(format.format(txt_lastAccess.getValue()))
+                // && user.getLastAccessAsString().equalsIgnoreCase(format.format(txt_lastAccess.getValue()))
                 && user.getPrivilege().toString().equalsIgnoreCase(chb_privilege.getSelectionModel().getSelectedItem().toString()),
                 txt_name.textProperty(),
                 txt_surname.textProperty(),
@@ -400,4 +415,11 @@ public class UserManagementController {
         this.currentUser = currentUser;
     }
 
+    public MenuController getMenuManagementController() {
+        return menuController;
+    }
+
+    public void setMenuManagementController(MenuController menuController) {
+        this.menuController = menuController;
+    }
 }

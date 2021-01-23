@@ -57,6 +57,7 @@ public class MenuController implements Initializable {
     private MenuItem menuOrders;
     @FXML
     private MenuItem menuProducts;
+
     
     private Stage stage;
 
@@ -113,6 +114,7 @@ public class MenuController implements Initializable {
                         UserInterface userImplementation = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
                         controller.setUserImplementation(userImplementation);
                         controller.setStage(new Stage());
+                        controller.setCurrentUser(user);
                         controller.initStage(root);
                         
                     } catch (IOException ex) {
