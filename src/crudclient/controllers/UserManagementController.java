@@ -6,6 +6,8 @@
 package crudclient.controllers;
 
 import crudclient.exceptions.CellMaxLengthException;
+import crudclient.exceptions.EmailAlreadyExistsException;
+import crudclient.exceptions.UsernameAlreadyExistsException;
 import crudclient.factories.CompanyFactory;
 import crudclient.interfaces.CompanyInterface;
 import java.util.logging.Level;
@@ -38,6 +40,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 import javafx.scene.control.cell.TextFieldTableCell;
 
@@ -181,6 +184,7 @@ public class UserManagementController {
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
             } catch (CellMaxLengthException ex) {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+                table.refresh();
             }
 
         });
@@ -194,6 +198,7 @@ public class UserManagementController {
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
             } catch (CellMaxLengthException ex) {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+                table.refresh();
             }
 
         });
@@ -203,10 +208,15 @@ public class UserManagementController {
         tc_username.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
             try {
                 checkCellMaxLength(254, data.getNewValue().length());
+                searchUsernameAlreadyExists(table.getSelectionModel().getSelectedItem(), data.getNewValue());
                 table.getSelectionModel().getSelectedItem().setUsername(data.getNewValue());
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
             } catch (CellMaxLengthException ex) {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UsernameAlreadyExistsException ex) {
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+                showAlert(Alert.AlertType.ERROR, "Can't update this user", "Username already exists", "The username already exists, pick another username.");
+                table.refresh();
             }
 
         });
@@ -216,12 +226,16 @@ public class UserManagementController {
         tc_email.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
             try {
                 checkCellMaxLength(254, data.getNewValue().length());
+                searchEmailAlreadyExists(table.getSelectionModel().getSelectedItem(), data.getNewValue());
                 table.getSelectionModel().getSelectedItem().setEmail(data.getNewValue());
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
             } catch (CellMaxLengthException ex) {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (EmailAlreadyExistsException ex) {
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+                showAlert(Alert.AlertType.ERROR, "Can't update this user", "Email already exists", "The email already exists, pick another email.");
+                table.refresh();
             }
-
         });
 
         // User Status column
@@ -258,6 +272,22 @@ public class UserManagementController {
     public void getCompanies() {
         companiesList = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
         }));
+    }
+
+    public void searchEmailAlreadyExists(User user, String email) throws EmailAlreadyExistsException {
+        for (int i = 0; i < masterData.size(); i++) {
+            if (email.equalsIgnoreCase(masterData.get(i).getEmail()) && !Objects.equals(user.getId(), masterData.get(i).getId())) {
+                throw new EmailAlreadyExistsException();
+            }
+        }
+    }
+
+    public void searchUsernameAlreadyExists(User user, String username) throws UsernameAlreadyExistsException {
+        for (int i = 0; i < masterData.size(); i++) {
+            if (username.equalsIgnoreCase(masterData.get(i).getUsername()) && !Objects.equals(user.getId(), masterData.get(i).getId())) {
+                throw new UsernameAlreadyExistsException();
+            }
+        }
     }
 
     public void checkCellMaxLength(int maxLength, int currentLength) throws CellMaxLengthException {
@@ -313,7 +343,7 @@ public class UserManagementController {
         // If the logged user's id is 1, it means it is superuser, the master one
         if (loggedUser.getId() == 1) {
             // Disable delete button if the selected user is the logged user.
-            if (loggedUser.getId() == newValue.getId()) {
+            if (Objects.equals(loggedUser.getId(), newValue.getId())) {
                 this.btn_delete.setDisable(true);
                 this.table.setEditable(false);
             } else { // Enable the delete button if the selected user is not the logged one.
