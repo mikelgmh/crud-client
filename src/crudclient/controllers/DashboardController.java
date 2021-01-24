@@ -10,6 +10,8 @@ import crudclient.interfaces.EmailServiceInterface;
 import crudclient.interfaces.SignInInterface;
 import crudclient.model.User;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,7 +45,6 @@ public class DashboardController {
     private Button btn_Logout;
     @FXML
     private MenuController menuController;
-    
 
     public DashboardController() {
     }
@@ -65,6 +66,7 @@ public class DashboardController {
         logger.log(Level.INFO, "Loading the Dashboard stage.");
         Scene scene = new Scene(root);
         stage.setScene(scene);
+        menuController = new MenuController();
         menuController.setUser(user);
         stage.setTitle("Dashboard");
         stage.setResizable(false);
@@ -74,7 +76,10 @@ public class DashboardController {
     }
 
     private void handleWindowShowing(WindowEvent event) {
-        lbl_Welcome.setText(user.getPassword());
+        // Output example with the user's information
+        lbl_Welcome.setText(user.getEmail() + "\n" + user.getPassword() + "\n" + user.getName() + "\n" + user.getSurname() + "\n" + user.getUsername());
+        // Output the last access date
+        lbl_Connection.setText(dateFormat(user.getLastAccess()));
     }
 
     @FXML
@@ -96,7 +101,12 @@ public class DashboardController {
             stage.close();
         }
     }
-    
+
+    private String dateFormat(Date date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return formatter.format(date);
+    }
+
     public MenuController getMenuManagementController() {
         return menuController;
     }

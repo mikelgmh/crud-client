@@ -6,8 +6,9 @@ import crudclient.interfaces.EmailServiceInterface;
 import crudclient.interfaces.SignInInterface;
 import crudclient.model.User;
 import crudclient.util.security.AsymmetricEncryption;
-import crudclient.util.session.UserSession;
-import java.io.IOException;
+import java.text.ParseException;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,7 +69,6 @@ public class SignInController {
     public void initStage(Parent root) {
         logger.log(Level.INFO, "Loading the SignIn stage.");
         Scene scene = new Scene(root);
-        //this.setListeners();
         stage.setScene(scene);
         stage.setTitle("Login");
         stage.setResizable(false);
@@ -100,14 +100,18 @@ public class SignInController {
      * @throws Exception input/output error.
      */
     @FXML
-    private void handleOnClickLogin(ActionEvent event) throws Exception {
+    private void handleOnClickLogin(ActionEvent event) {
         logger.log(Level.INFO, "Attempting to sign in.");
         try {
             User user = new User();
             user.setUsername(txt_User.getText());
             user.setPassword(ae.encryptString(txt_Password.getText()));
+            // Get the current Date
+            Date currentDate = new Date();
+            // Set to the logged user the current Date
+            user.setLastAccess(currentDate);
             User loggedUser = getSignInImplementation().loginUser_XML(user, User.class);
-            
+
             // Create the stage for Dashboard
             Stage stageDashboard = new Stage();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/Dashboard.fxml"));

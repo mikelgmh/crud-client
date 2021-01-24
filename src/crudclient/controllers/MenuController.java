@@ -92,7 +92,7 @@ public class MenuController implements Initializable {
                         controller.setImplementation(signInImplementation);
                         controller.setStage(new Stage());
                         controller.initStage(root);
-                        
+                        stage.close();
                     } catch (IOException ex) {
                         Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -111,7 +111,7 @@ public class MenuController implements Initializable {
                         controller.setUserImplementation(userImplementation);
                         controller.setStage(new Stage());
                         controller.initStage(root);
-                        
+                        stage.close();
                     } catch (IOException ex) {
                         Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
                     }
