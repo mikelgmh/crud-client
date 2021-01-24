@@ -104,6 +104,7 @@ public class SignInController {
         logger.log(Level.INFO, "Attempting to sign in.");
         try {
             User user = new User();
+            MenuController menuController = new MenuController();
             user.setUsername(txt_User.getText());
             user.setPassword(ae.encryptString(txt_Password.getText()));
             User loggedUser = getSignInImplementation().loginUser_XML(user, User.class);
@@ -114,6 +115,7 @@ public class SignInController {
             Parent root = (Parent) loader.load();
             DashboardController controller = ((DashboardController) loader.getController());
             // Load the stage
+            controller.setMenuManagementController(menuController);
             controller.setUser(loggedUser);
             controller.setStage(stageDashboard);
             controller.initStage(root);
