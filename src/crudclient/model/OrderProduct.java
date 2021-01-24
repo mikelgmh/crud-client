@@ -20,7 +20,6 @@ public class OrderProduct implements Serializable {
 
     private OrderProductId id;
     private Product product;
-    private Order order;
     private Float total_price;
     private Integer total_quantity;
 
@@ -44,15 +43,6 @@ public class OrderProduct implements Serializable {
 
     public void setProduct(Product product) {
         this.product = product;
-    }
-    
-    @XmlElement(name="order")
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
     }
     
     @XmlElement(name="total_price")
