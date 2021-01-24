@@ -197,7 +197,7 @@ public class UserManagementController {
                 table.getSelectionModel().getSelectedItem().setSurname(data.getNewValue());
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
             } catch (CellMaxLengthException ex) {
-                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.WARNING, null, ex);
                 table.refresh();
             }
 
@@ -343,12 +343,16 @@ public class UserManagementController {
         // If the logged user's id is 1, it means it is superuser, the master one
         if (loggedUser.getId() == 1) {
             // Disable delete button if the selected user is the logged user.
-            if (Objects.equals(loggedUser.getId(), newValue.getId())) {
-                this.btn_delete.setDisable(true);
-                this.table.setEditable(false);
-            } else { // Enable the delete button if the selected user is not the logged one.
-                this.btn_delete.setDisable(false);
-                this.table.setEditable(true);
+            try {
+                if (Objects.equals(loggedUser.getId(), newValue.getId())) {
+                    this.btn_delete.setDisable(true);
+                    this.table.setEditable(false);
+                } else { // Enable the delete button if the selected user is not the logged one.
+                    this.btn_delete.setDisable(false);
+                    this.table.setEditable(true);
+                }
+            } catch (Exception e) {
+                Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, e);
             }
         } else { // If the logged user's id it is not 1, it mean it's a superuser, but not the master one
             if (newValue.getPrivilege().equals(UserPrivilege.SUPERUSER)) {
