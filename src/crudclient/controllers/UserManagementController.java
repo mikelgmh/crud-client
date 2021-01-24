@@ -38,6 +38,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Optional;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import javafx.beans.binding.Bindings;
@@ -46,6 +47,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javax.ws.rs.core.GenericType;
@@ -347,7 +349,7 @@ public class UserManagementController {
         // Se obtiene la lista de usuarios utilizando la implementación que hay en la propiedad de la clase. Se necesita pasar desde la ventana anterior o desde el método main.
         this.getUsers();
         this.getCompanies();
- createFilteredListAndTableListeners();
+        createFilteredListAndTableListeners();
 
     }
 
@@ -355,9 +357,9 @@ public class UserManagementController {
         this.masterData = FXCollections.observableArrayList(getUserImplementation().getUsers(new GenericType<List<User>>() {
         }));
     }
-    
-    public void createFilteredListAndTableListeners(){
-                // Crea las listas de filtrado y llama al método que crea los listeners.
+
+    public void createFilteredListAndTableListeners() {
+        // Crea las listas de filtrado y llama al método que crea los listeners.
         FilteredList<User> filteredData = new FilteredList<>(masterData, p -> true);
         setSearchFilterListeners(filteredData);
         SortedList<User> sortedData = new SortedList<>(filteredData);
@@ -413,8 +415,19 @@ public class UserManagementController {
 
     public void onDeleteButtonClickAction() {
         User u = table.getSelectionModel().getSelectedItem();
-        this.getUserImplementation().deleteUser(u.getId().toString());
-        masterData.remove(u);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete row?");
+        alert.setHeaderText("Delete?");
+        alert.setContentText("If you are sure you want to delete this user, click OK. This will delete every single data related to this user. Be sure if you really want to delete it!.");
+        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get().equals(ButtonType.OK)) {
+            this.getUserImplementation().deleteUser(u.getId().toString());
+            masterData.remove(u);
+        } else {
+            alert.close();
+        }
+
     }
 
     public void showAlert(Alert.AlertType type, String title, String header, String content) {
@@ -469,6 +482,5 @@ public class UserManagementController {
     public void setMasterData(ObservableList<User> masterData) {
         this.masterData = masterData;
     }
-    
-    
+
 }
