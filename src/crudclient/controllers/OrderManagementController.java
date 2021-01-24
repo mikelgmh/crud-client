@@ -75,6 +75,9 @@ public class OrderManagementController {
     private ObservableList<Order> orderData;
     private ObservableList<OrderProduct> productsData;
     private List<Product> products;
+    private OrderProduct addProducts = null;
+    private ArrayList<OrderProduct> auxOrderProduct = null;
+    private OrderProductId addId = null;
     private OrderProduct orderProduct;
     private Order order;
     private User currentUser;
@@ -165,32 +168,15 @@ public class OrderManagementController {
 
         column_QuantityProduct.setCellFactory(TextFieldTableCell.<OrderProduct, Integer>forTableColumn(quantity));
         column_QuantityProduct.setOnEditCommit(data -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Edit value");
-            String a = "Your changes will be edited in the database. Are you sure?";
-            alert.setContentText(a);
-            Optional<ButtonType> result = alert.showAndWait();
-            if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
-                tableProducts.getSelectionModel().getSelectedItem().setTotal_quantity(data.getNewValue());
-                Float unitPrice = tableProducts.getSelectionModel().getSelectedItem().getProduct().getPrice();
-                tableProducts.getSelectionModel().getSelectedItem().setTotal_price(unitPrice * tableProducts.getSelectionModel().getSelectedItem().getTotal_quantity());//ERROR
-                order.setOrderProduct(productsData);
-                Float totalOrderPrice = 0.0f;
-                for (OrderProduct op : order.getOrderProduct()) {
-                    totalOrderPrice = totalOrderPrice + op.getTotal_price();
-                }
-                order.setTotal_price(totalOrderPrice);
-                getOrderImplementation().editOrder(order);
-                orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {}));
-                tableOrder.setItems(orderData);
-                tableOrder.refresh();
-                order = tableOrder.getSelectionModel().getSelectedItem();
-                productsData = FXCollections.observableList(order.getOrderProduct());
-                tableProducts.setItems((ObservableList<OrderProduct>) productsData);
-                tableOrder.refresh();
-            } else {
-                tableProducts.getSelectionModel().getSelectedItem().setTotal_quantity(data.getOldValue());
+            tableProducts.getSelectionModel().getSelectedItem().setTotal_quantity(data.getNewValue());
+            Float unitPrice = tableProducts.getSelectionModel().getSelectedItem().getProduct().getPrice();
+            tableProducts.getSelectionModel().getSelectedItem().setTotal_price(unitPrice * tableProducts.getSelectionModel().getSelectedItem().getTotal_quantity());//ERROR
+            order.setOrderProduct(productsData);
+            Float totalOrderPrice = 0.0f;
+            for (OrderProduct op : order.getOrderProduct()) {
+                totalOrderPrice = totalOrderPrice + op.getTotal_price();
             }
+            order.setTotal_price(totalOrderPrice);
 
         });
 
@@ -207,8 +193,9 @@ public class OrderManagementController {
         btn_deletePro.setOnAction(this::handlerDeleteProductFromOrder);
         btn_deletePro.setVisible(false);
         btn_OrderMngmt.setOnAction(this::handlerOrderModification);
+        btn_commitOrder.setOnAction(this::handlerCommitNewOrder);
         btn_deletePro.setVisible(false);
-        
+
         column_status.setOnEditCommit((TableColumn.CellEditEvent<Order, OrderStatus> data) -> {
             tableOrder.getSelectionModel().getSelectedItem().setStatus(data.getNewValue());
             tableOrder.refresh();
@@ -234,7 +221,7 @@ public class OrderManagementController {
             pController.setOrdermanagementController(this);
             pController.initStageCreateOrder(root);
             LOG.log(Level.INFO, "Regresa a Order ");
-            createOrder(products, currentUser);
+            createOrder(products);
 
         } catch (IOException ex) {
             Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
@@ -255,58 +242,57 @@ public class OrderManagementController {
     }
 
     private void handlerOrderModification(ActionEvent event) {
-        this.getOrderImplementation().editOrder(order);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Edit value");
+        String a = "Your changes will be edited in the database. Are you sure?";
+        alert.setContentText(a);
+        Optional<ButtonType> result = alert.showAndWait();
+        if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
+            getOrderImplementation().editOrder(order);
+            orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
+            }));
+            tableOrder.setItems(orderData);
+            tableOrder.refresh();
+            order = tableOrder.getSelectionModel().getSelectedItem();
+            productsData = FXCollections.observableList(order.getOrderProduct());
+            tableProducts.setItems((ObservableList<OrderProduct>) productsData);
+            tableOrder.refresh();
+        }
     }
 
-    private void createOrder(List<Product> products, User user) {
+    private void createOrder(List<Product> products) {
         Order lastOrder = orderData.get(orderData.size() - 1);
         Integer newId = lastOrder.getId();
 
         order = new Order();
-        Date date = java.util.Calendar.getInstance().getTime();
+        order.setId(newId+1);
 
+        User loggedUser = DashboardController.loggedUser;
+        order.setUser(loggedUser);
+        Date date = java.util.Calendar.getInstance().getTime();
         order.setDate(date);
-        order.setUser(user);
+        
         order.setStatus(OrderStatus.REQUESTED);
+
         orderProduct = new OrderProduct();
-        List<OrderProduct> prueba = null;
-        OrderProduct addProducts = new OrderProduct();
-        OrderProductId addId = new OrderProductId();
+        auxOrderProduct = new ArrayList<OrderProduct>();
         for (Product o : products) {
-            addProducts.setOrder(order);
+            addProducts = new OrderProduct();
+            addId = new OrderProductId();
             addId.setOrderId(newId + 1);
             addId.setProductId(o.getId());
             addProducts.setId(addId);
             addProducts.setProduct(o);
             addProducts.setTotal_price(o.getPrice());
             addProducts.setTotal_quantity(1);
-            prueba.add(addProducts);
+            auxOrderProduct.add(addProducts);
         }
 
-        productsData = FXCollections.observableList(addProductsToTable);
+        order.setOrderProduct(auxOrderProduct);
+        productsData = FXCollections.observableList(auxOrderProduct);
         tableProducts.setItems(productsData);
-        //tableProducts.setItems((ObservableList<OrderProduct>) productsData);
+        tableProducts.setItems((ObservableList<OrderProduct>) productsData);
 
-        /*OrderProduct orderProductAuxiliar = new OrderProduct();
-        Date date = java.util.Calendar.getInstance().getTime();
-        
-        order.setDate(date);
-        order.setUser(user);
-        order.setStatus(OrderStatus.REQUESTED);
-        
-        //Set<OrderProduct> orderProduct = new HashSet<OrderProduct>();;
-
-        for (Product p : products) {
-             orderProductAuxiliar.setProduct(p);
-            orderProductAuxiliar.setTotal_price(p.getPrice());
-            //total_price=p.getPrice()+total_price;
-            //orderProduct.add(orderProductAuxiliar);
-        }
-        
-        //order.setOrderProduct(orderProduct);
-       // order.setTotal_price(total_price);
-        
-        this.getOrderImplementation().createOrder(order);*/
     }
 
     public User getCurrentUser() {
@@ -348,6 +334,21 @@ public class OrderManagementController {
         alert.setContentText(content);
 
         alert.showAndWait();
+    }
+
+    private void handlerCommitNewOrder(ActionEvent event) {
+        Order prueba = new Order();
+        Float totalOrderPrice = 0.0f;
+            for (OrderProduct op : order.getOrderProduct()) {
+                totalOrderPrice = totalOrderPrice + op.getTotal_price();
+            }
+        order.setTotal_price(totalOrderPrice);
+        prueba = order;
+        
+        order.getUser();
+        
+        
+        this.getOrderImplementation().createOrder(order);
     }
 
 }
