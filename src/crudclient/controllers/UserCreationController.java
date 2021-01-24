@@ -132,7 +132,7 @@ public class UserCreationController {
         txt_password.getProperties().put("passwordRequirements", false);
         txt_repeatPassword.getProperties().put("passwordRequirements", false);
         txt_repeatPassword.getProperties().put("passwordsMatch", false);
-        this.hint_password.setText("The passwords shoud match the requirements:\n" + genericValidations.PASSWORD_CONDITIONS);
+        hint_password.setText("The passwords shoud match the requirements:\n" + genericValidations.PASSWORD_CONDITIONS);
 
         // Set listeners
         this.setListeners();
@@ -303,6 +303,8 @@ public class UserCreationController {
             alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get().equals(ButtonType.OK)) {
+                userManagementController.getUsers();
+                userManagementController.createFilteredListAndTableListeners();
                 stage.close();
             } else {
                 alert.close();
@@ -329,6 +331,7 @@ public class UserCreationController {
         alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get().equals(ButtonType.OK)) {
+
             stage.close();
         } else {
             alert.close();

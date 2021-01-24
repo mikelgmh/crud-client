@@ -338,8 +338,6 @@ public class UserManagementController {
 
     public void setDefaultFieldValues() {
 
-        txt_lastAccess.setValue(LOCAL_DATE("29/01/2021"));
-
         this.chb_privilege.setItems(FXCollections.observableArrayList(UserPrivilege.values()));
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
 
@@ -349,8 +347,17 @@ public class UserManagementController {
         // Se obtiene la lista de usuarios utilizando la implementación que hay en la propiedad de la clase. Se necesita pasar desde la ventana anterior o desde el método main.
         this.getUsers();
         this.getCompanies();
+ createFilteredListAndTableListeners();
 
-        // Crea las listas de filtrado y llama al método que crea los listeners.
+    }
+
+    public void getUsers() {
+        this.masterData = FXCollections.observableArrayList(getUserImplementation().getUsers(new GenericType<List<User>>() {
+        }));
+    }
+    
+    public void createFilteredListAndTableListeners(){
+                // Crea las listas de filtrado y llama al método que crea los listeners.
         FilteredList<User> filteredData = new FilteredList<>(masterData, p -> true);
         setSearchFilterListeners(filteredData);
         SortedList<User> sortedData = new SortedList<>(filteredData);
@@ -358,13 +365,6 @@ public class UserManagementController {
         // Bindea de 
         sortedData.comparatorProperty().bind(table.comparatorProperty());
         this.table.setItems(sortedData);
-    }
-
-    public void getUsers() {
-        this.masterData = FXCollections.observableArrayList(getUserImplementation().getUsers(new GenericType<List<User>>() {
-        }));
-        this.table.refresh();
-        System.out.println("Refreshing table");
     }
 
     public void handleOnClickCreateButton() throws IOException {
@@ -461,4 +461,14 @@ public class UserManagementController {
     public void setMenuManagementController(MenuController menuController) {
         this.menuController = menuController;
     }
+
+    public ObservableList<User> getMasterData() {
+        return masterData;
+    }
+
+    public void setMasterData(ObservableList<User> masterData) {
+        this.masterData = masterData;
+    }
+    
+    
 }
