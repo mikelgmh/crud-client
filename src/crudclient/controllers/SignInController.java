@@ -1,19 +1,14 @@
 package crudclient.controllers;
 
-// Java
 import crudclient.factories.EmailServiceFactory;
 import crudclient.interfaces.EmailServiceInterface;
 import crudclient.interfaces.SignInInterface;
 import crudclient.model.User;
 import crudclient.util.security.AsymmetricEncryption;
-import java.text.ParseException;
 import java.util.Date;
-import java.text.SimpleDateFormat;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-// JavaFX
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -39,7 +34,7 @@ import javafx.stage.Modality;
  * @author Iker, Aketza
  */
 public class SignInController {
-
+    
     private static final Logger logger = Logger.getLogger("crudclient.controllers.SignInController");
     private Stage stage;
     private SignInInterface signInImplementation;
@@ -52,11 +47,11 @@ public class SignInController {
     private PasswordField txt_Password;
     @FXML
     private Hyperlink hlRecoverPassword;
-
+    
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-
+    
     public SignInController() {
     }
 
@@ -74,8 +69,20 @@ public class SignInController {
         stage.setResizable(false);
         stage.setOnShowing(this::handleWindowShowing);
         stage.onCloseRequestProperty().set(this::handleCloseRequest);
-        ae = new AsymmetricEncryption(getSignInImplementation().getPublicKey());
         stage.show();
+        // Try to get the public key from the server
+        try {
+            ae = new AsymmetricEncryption(getSignInImplementation().getPublicKey());
+            logger.log(Level.INFO, "Got the public key successfully.");
+        } // If can not get the public key, show an alert
+        catch (Exception ex) {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Cannot connect to the server");
+            alert.setHeaderText("Cannot connect to the server, restart the application \n"
+                    + "or contact the server Administrator.");
+            alert.setContentText(ex.getMessage());
+            alert.showAndWait();
+        }
         logger.log(Level.INFO, "SignIn stage loaded.");
     }
 
@@ -125,11 +132,11 @@ public class SignInController {
             stage.close();
         } catch (Exception ex) {
             Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Invalid login.");
-            alert.setHeaderText("Wrong username or passwords.");
+            alert.setTitle("Invalid login");
+            alert.setHeaderText("Wrong username or passwords");
             alert.showAndWait();
         }
-
+        
     }
 
     /**
@@ -162,7 +169,7 @@ public class SignInController {
     private void handleOnClickRecoverPassword(ActionEvent event) throws Exception {
         // Create the stage for RecoverPassword.
         Stage stageRecoverPassword = new Stage();
-
+        
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/EmailService.fxml"));
         Parent root = (Parent) loader.load();
         EmailServiceController controller = ((EmailServiceController) loader.getController());
@@ -193,5 +200,5 @@ public class SignInController {
     public void setImplementation(SignInInterface signInInterface) {
         this.signInImplementation = signInInterface;
     }
-
+    
 }
