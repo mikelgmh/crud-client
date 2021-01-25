@@ -39,16 +39,24 @@ import javax.ws.rs.core.GenericType;
 import crudclient.interfaces.OrderInterface;
 import crudclient.interfaces.ProductInterface;
 import crudclient.model.OrderProduct;
+import crudclient.model.OrderProductId;
 import crudclient.model.Product;
+import crudclient.model.UserStatus;
 import java.io.IOException;
+import java.util.Optional;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableColumn.CellEditEvent;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.util.Callback;
@@ -67,9 +75,12 @@ public class OrderManagementController {
     private ObservableList<Order> orderData;
     private ObservableList<OrderProduct> productsData;
     private List<Product> products;
+    private OrderProduct addProducts = null;
+    private ArrayList<OrderProduct> auxOrderProduct = null;
+    private OrderProductId addId = null;
     private OrderProduct orderProduct;
     private Order order;
-    private User user;
+    private User currentUser;
 
     @FXML
     private TableView<Order> tableOrder;
@@ -80,7 +91,7 @@ public class OrderManagementController {
     @FXML
     private TableColumn<Order, Float> column_totalPrice;
     @FXML
-    private TableColumn<Order, String> column_status;
+    private TableColumn<Order, OrderStatus> column_status;
     @FXML
     private TableColumn<Order, String> column_user;
     @FXML
@@ -114,6 +125,8 @@ public class OrderManagementController {
     @FXML
     private Button btn_commitOrder;
 
+    private static final Logger LOG = Logger.getLogger(OrderManagementController.class.getName());
+
     public OrderManagementController() {
     }
 
@@ -121,7 +134,6 @@ public class OrderManagementController {
         logger.log(Level.INFO, "Loading the OrderManagement stage.");
         Scene scene = new Scene(parent);
         stage = new Stage();
-        //this.setListeners();
         this.setStage(stage);
         stage.setScene(scene);
         stage.setTitle("Order Management");
@@ -129,22 +141,49 @@ public class OrderManagementController {
         stage.setOnShowing(this::handleWindowsShowing);
 
         setTableOrderProductEditable();
+
         column_date.setSortType(TableColumn.SortType.DESCENDING);
         combo_statusOrder.setItems(FXCollections.observableArrayList(OrderStatus.values()));
         column_ID.setCellValueFactory(new PropertyValueFactory("id"));
         column_date.setCellValueFactory(new PropertyValueFactory("date"));
         column_totalPrice.setCellValueFactory(new PropertyValueFactory("total_price"));
-        column_status.setCellValueFactory(new PropertyValueFactory("status"));
+        column_status.setCellValueFactory(new PropertyValueFactory<>("status"));
+        ObservableList statusOrders = FXCollections.observableArrayList(OrderStatus.values());
+        column_status.setCellFactory(ComboBoxTableCell.forTableColumn(statusOrders));
         column_user.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUser().getName().concat(" " + cellData.getValue().getUser().getSurname())));
-        orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {}));
-        //FilteredList<Order> filteredData = new FilteredList<>(orderData, p -> true);
+        orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
+        }));
 
         tableOrder.setItems(orderData);
         stage.show();
         logger.log(Level.INFO, "OrderManagement stage loaded.");
     }
 
+    private void setTableOrderProductEditable() {
+        tableProducts.setEditable(true);
+        column_NameProduct.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));
+        column_QuantityProduct.setCellValueFactory(new PropertyValueFactory("total_quantity"));
+        IntegerStringConverter quantity = new IntegerStringConverter();
+        column_totalPriceProduct.setCellValueFactory(new PropertyValueFactory("total_price"));
+
+        column_QuantityProduct.setCellFactory(TextFieldTableCell.<OrderProduct, Integer>forTableColumn(quantity));
+        column_QuantityProduct.setOnEditCommit(data -> {
+            tableProducts.getSelectionModel().getSelectedItem().setTotal_quantity(data.getNewValue());
+            Float unitPrice = tableProducts.getSelectionModel().getSelectedItem().getProduct().getPrice();
+            tableProducts.getSelectionModel().getSelectedItem().setTotal_price(unitPrice * tableProducts.getSelectionModel().getSelectedItem().getTotal_quantity());//ERROR
+            order.setOrderProduct(productsData);
+            Float totalOrderPrice = 0.0f;
+            for (OrderProduct op : order.getOrderProduct()) {
+                totalOrderPrice = totalOrderPrice + op.getTotal_price();
+            }
+            order.setTotal_price(totalOrderPrice);
+
+        });
+
+    }
+
     private void handleWindowsShowing(WindowEvent event) {
+        tableOrder.setEditable(true);
         txt_IDOrder.requestFocus();
         btn_newOrder.setOnAction(this::handlerCreateOrder);
         btn_modifyOrder.setOnAction(this::handlerModifyOrder);
@@ -152,10 +191,17 @@ public class OrderManagementController {
         btn_deleteOrder.setOnAction(this::handlerDeleteOrder);
         btn_deleteOrder.disableProperty().bind(Bindings.isEmpty(tableOrder.getSelectionModel().getSelectedItems()));
         btn_deletePro.setOnAction(this::handlerDeleteProductFromOrder);
+        btn_deletePro.setVisible(false);
         btn_OrderMngmt.setOnAction(this::handlerOrderModification);
-    }
+        btn_commitOrder.setOnAction(this::handlerCommitNewOrder);
+        btn_deletePro.setVisible(false);
 
-  
+        column_status.setOnEditCommit((TableColumn.CellEditEvent<Order, OrderStatus> data) -> {
+            tableOrder.getSelectionModel().getSelectedItem().setStatus(data.getNewValue());
+            tableOrder.refresh();
+            orderImplementation.editOrder(tableOrder.getSelectionModel().getSelectedItem());
+        });
+    }
 
     private void handlerDeleteOrder(ActionEvent event) {
         order = tableOrder.getSelectionModel().getSelectedItem();
@@ -174,8 +220,8 @@ public class OrderManagementController {
             pController.setProductImplementation(product);
             pController.setOrdermanagementController(this);
             pController.initStageCreateOrder(root);
-
-            createOrder(products, user);
+            LOG.log(Level.INFO, "Regresa a Order ");
+            createOrder(products);
 
         } catch (IOException ex) {
             Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
@@ -186,7 +232,7 @@ public class OrderManagementController {
         order = tableOrder.getSelectionModel().getSelectedItem();
         productsData = FXCollections.observableList(order.getOrderProduct());
         tableProducts.setItems((ObservableList<OrderProduct>) productsData);
-        
+
     }
 
     private void handlerDeleteProductFromOrder(ActionEvent event) {
@@ -196,40 +242,65 @@ public class OrderManagementController {
     }
 
     private void handlerOrderModification(ActionEvent event) {
-        this.getOrderImplementation().editOrder(order);
-    }
-        
-    private void createOrder(List<Product> products, User user) {
-       /* order = new Order();
-        OrderProduct orderProductAuxiliar = new OrderProduct();
-        Date date = java.util.Calendar.getInstance().getTime();
-        
-        order.setDate(date);
-        order.setUser(user);
-        order.setStatus(OrderStatus.REQUESTED);
-        Float total_price= 0.0f;
-        //Set<OrderProduct> orderProduct = new HashSet<OrderProduct>();;
-
-        for (Product p : products) {
-            orderProductAuxiliar.setProduct(p);
-            orderProductAuxiliar.setTotal_price(p.getPrice());
-            total_price=p.getPrice()+total_price;
-            orderProduct.add(orderProductAuxiliar);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Edit value");
+        String a = "Your changes will be edited in the database. Are you sure?";
+        alert.setContentText(a);
+        Optional<ButtonType> result = alert.showAndWait();
+        if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
+            getOrderImplementation().editOrder(order);
+            orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
+            }));
+            tableOrder.setItems(orderData);
+            tableOrder.refresh();
+            order = tableOrder.getSelectionModel().getSelectedItem();
+            productsData = FXCollections.observableList(order.getOrderProduct());
+            tableProducts.setItems((ObservableList<OrderProduct>) productsData);
+            tableOrder.refresh();
         }
-        
-        order.setOrderProduct(orderProduct);
-        order.setTotal_price(total_price);
-        
-        this.getOrderImplementation().createOrder(order);
-        */
     }
 
-    public User getUser() {
-        return user;
+    private void createOrder(List<Product> products) {
+        Order lastOrder = orderData.get(orderData.size() - 1);
+        Integer newId = lastOrder.getId();
+
+        order = new Order();
+        order.setId(newId+1);
+
+        User loggedUser = DashboardController.loggedUser;
+        order.setUser(loggedUser);
+        Date date = java.util.Calendar.getInstance().getTime();
+        order.setDate(date);
+        
+        order.setStatus(OrderStatus.REQUESTED);
+
+        orderProduct = new OrderProduct();
+        auxOrderProduct = new ArrayList<OrderProduct>();
+        for (Product o : products) {
+            addProducts = new OrderProduct();
+            addId = new OrderProductId();
+            addId.setOrderId(newId + 1);
+            addId.setProductId(o.getId());
+            addProducts.setId(addId);
+            addProducts.setProduct(o);
+            addProducts.setTotal_price(o.getPrice());
+            addProducts.setTotal_quantity(1);
+            auxOrderProduct.add(addProducts);
+        }
+
+        order.setOrderProduct(auxOrderProduct);
+        productsData = FXCollections.observableList(auxOrderProduct);
+        tableProducts.setItems(productsData);
+        tableProducts.setItems((ObservableList<OrderProduct>) productsData);
+
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
     }
 
     public List<Product> getProducts() {
@@ -239,7 +310,7 @@ public class OrderManagementController {
     public void setProducts(List<Product> products) {
         this.products = products;
     }
-    
+
     public void setStage(Stage stage) {
         this.stage = stage;
     }
@@ -256,21 +327,28 @@ public class OrderManagementController {
         return this.orderImplementation;
     }
 
-    private void setTableOrderProductEditable() {
-        tableProducts.setEditable(true);
-        column_NameProduct.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));
-        column_QuantityProduct.setCellValueFactory(new PropertyValueFactory("total_quantity"));
-        IntegerStringConverter quantity = new IntegerStringConverter();
-        column_totalPriceProduct.setCellValueFactory(new PropertyValueFactory("total_price"));
+    public void showAlert(Alert.AlertType type, String title, String header, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
 
-        column_QuantityProduct.setCellFactory(TextFieldTableCell.<OrderProduct, Integer>forTableColumn(quantity));
-        column_QuantityProduct.setOnEditCommit(data -> {
-         
-            tableProducts.getSelectionModel().getSelectedItem().setTotal_quantity(data.getNewValue());
-            getOrderImplementation().editOrder(order);
-            });
-
+        alert.showAndWait();
     }
 
-    
+    private void handlerCommitNewOrder(ActionEvent event) {
+        Order prueba = new Order();
+        Float totalOrderPrice = 0.0f;
+            for (OrderProduct op : order.getOrderProduct()) {
+                totalOrderPrice = totalOrderPrice + op.getTotal_price();
+            }
+        order.setTotal_price(totalOrderPrice);
+        prueba = order;
+        
+        order.getUser();
+        
+        
+        this.getOrderImplementation().createOrder(order);
+    }
+
 }

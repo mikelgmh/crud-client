@@ -12,13 +12,16 @@ import crudclient.interfaces.CompanyInterface;
 import crudclient.interfaces.ProductInterface;
 import crudclient.model.Company;
 import crudclient.model.Product;
+import crudclient.model.User;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -33,6 +36,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
@@ -44,6 +48,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.FloatStringConverter;
 import javax.ws.rs.core.GenericType;
@@ -74,14 +79,14 @@ public class ProductController {
     private Label lbl_Choose;
     @FXML
     private TextField tf_company;
-    
+
     private static final Logger LOG = Logger.getLogger(ProductController.class.getName());
     private TableView<ObservableList<StringProperty>> table = new TableView<>();
-    private ObservableList<Product> pr;
-    private ObservableList<Company> co;
+    private ObservableList<Product> productList;
+    
     private ProductInterface productImplementation;
-    private OrderManagementController orderManagementController ;
-
+    private OrderManagementController orderManagementController;
+    private User currentUser;
 
     public OrderManagementController getOrdermanagementController() {
         return orderManagementController;
@@ -90,7 +95,7 @@ public class ProductController {
     public void setOrdermanagementController(OrderManagementController ordermanagementController) {
         this.orderManagementController = ordermanagementController;
     }
-   
+
     /**
      * Initializes the controller class.
      */
@@ -110,7 +115,10 @@ public class ProductController {
         stage.setTitle("Product Managment");
         stage.setResizable(false);
         LOG.log(Level.INFO, "Stage ");
-
+        tf_company.setVisible(false);
+        btn_OrderCreate.setVisible(false);
+        lbl_Choose.setVisible(false);
+        
         btn_Create.setTooltip(new Tooltip("Create a new product"));
 
         btn_Delete.setTooltip(new Tooltip("Delete a product"));
@@ -120,6 +128,8 @@ public class ProductController {
         btn_Create.setOnAction(this::handleOnClickCreate);
 
         btn_OrderCreate.setTooltip(new Tooltip("Create an order"));
+        
+        stage.onCloseRequestProperty().set(this::handleCloseRequest);
 
         tf_company.textProperty().addListener(this::handleTextChange);
 
@@ -139,7 +149,7 @@ public class ProductController {
 
         stage.show();
     }
-    
+
     public void initStageCreateOrder(Parent root) {
         LOG.log(Level.INFO, "Inicio Creado Orden ");
         Scene scene = new Scene(root);
@@ -153,21 +163,20 @@ public class ProductController {
         btn_Create.setVisible(false);
         btn_OrderCreate.setOnAction(this::handleOnClickCreateOrder);
         btn_OrderCreate.setTooltip(new Tooltip("Create an order"));
-        
+
         tf_company.textProperty().addListener(this::handleTextChange);
-        
+
         tv_Tabla.getSelectionModel().setSelectionMode(
                 SelectionMode.MULTIPLE
         );
-        
-        
+
         LOG.log(Level.INFO, "tabla ");
-        
+
         productTableInfo();
-        
+
         LOG.log(Level.INFO, "tablainfo ");
         //Inicializar la variable en ordermanagement?
-       
+
         stage.showAndWait();
     }
 
@@ -194,30 +203,8 @@ public class ProductController {
                 tv_Tabla.refresh();
 
             } else {
-                //productImplementation = (ProductInterface) new ProductFactory().getImplementation();
-                //productImplementation = (ProductRESTClient) new ProductFactory().getImplementation();
-                //Product product = (Product) tc_Name.getTableView().getItems().get(data.getTablePosition().getRow());
-                //product.setName(data.getNewValue());
-                //productImplementation.edit_XML(product.getName());
-                //Product product = data.getRowValue();
-                // product.setName(data.getNewValue());
-                //product.setName(data.getNewValue());  
-                LOG.log(Level.INFO, "lore ");
-                //productImplementation.edit_XML(product);
-                productImplementation = (ProductInterface) new ProductFactory().getImplementation();
-                Product p = data.getRowValue();
-                p.setName(data.getNewValue());
-                productImplementation.edit_XML(p);
-                productTableInfo();
-                //tv_Tabla.getSelectionModel().getSelectedItem().setName(data.getNewValue());
-                //productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
-                //Devuelve el dato de la fila
-                //Product p = data.getRowValue();
-                //Añadimos el nuevo valor a la fila
-                //p.setName(data.getNewValue());
-                //getProductImplementation().edit_XML(p);
-                //tableInfo();
-
+                tv_Tabla.getSelectionModel().getSelectedItem().setName(data.getNewValue());
+                productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
             }
         });
 
@@ -225,7 +212,10 @@ public class ProductController {
         FloatStringConverter converterFloatWeight = new FloatStringConverter();
         tc_Weight.setCellFactory(TextFieldTableCell.<Product, Float>forTableColumn(converterFloatWeight));
         tc_Weight.setOnEditCommit(data -> {
-            /*     if (!Pattern.matches("[a-zA-Z0-9]+", data.getNewValue().toString())) {
+            try {             
+                tv_Tabla.getSelectionModel().getSelectedItem().setWeight(data.getNewValue());
+                getProductImplementation().edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
+            } catch (Exception e) {
                 Alert alert = new Alert(AlertType.WARNING);
                 alert.setTitle("Warning Dialog");
                 alert.setHeaderText("Look, a Warning Dialog");
@@ -233,11 +223,9 @@ public class ProductController {
                 alert.showAndWait();
                 tv_Tabla.refresh();
 
-            } else {*/
-            //data.getRowValue().setWeight(data.getNewValue());
-            tv_Tabla.getSelectionModel().getSelectedItem().setWeight(data.getNewValue());
-            getProductImplementation().edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
-            //  }
+
+            }
+
         });
 
         tc_Price.setCellValueFactory(new PropertyValueFactory<Product, Float>("price"));
@@ -254,7 +242,6 @@ public class ProductController {
                 tv_Tabla.refresh();
 
             } else {*/
-            //data.getRowValue().setPrice(data.getNewValue());
             tv_Tabla.getSelectionModel().getSelectedItem().setPrice(data.getNewValue());
             productImplementation.edit_XML(tv_Tabla.getSelectionModel().getSelectedItem());
             //  }
@@ -263,22 +250,21 @@ public class ProductController {
 
     private void productTableInfo() {
         LOG.log(Level.INFO, "pr ");
-        //ProductRESTClient rest = new ProductRESTClient();
-        //pr =FXCollections.observableArrayList(getProductImplementation().findAllProducts_XML(new GenericType<List<Product>>));
-        pr = FXCollections.observableArrayList(getProductImplementation().findAllProducts_XML(new GenericType<List<Product>>() {
+        productList = FXCollections.observableArrayList(getProductImplementation().findAllProducts_XML(new GenericType<List<Product>>() {
         }));
-        tv_Tabla.setItems(pr);
+        tv_Tabla.setItems(productList);
     }
 
     @FXML
     private void handleOnClickCreate(ActionEvent event) {
-
         Product newProduct = new Product();
         newProduct.setName("");
         newProduct.setPrice(0);
         newProduct.setWeight(0);
+        User loggedUser = DashboardController.loggedUser;
+        newProduct.setUser(loggedUser);
         productImplementation = (ProductInterface) new ProductFactory().getImplementation();
-        pr.add(newProduct);
+        productList.add(newProduct);
         // get current position
         //TablePosition pos = table.getFocusModel().getFocusedCell();
         // clear current selection
@@ -297,8 +283,7 @@ public class ProductController {
         // tv_Tabla.requestFocus();
         // scroll to new row
         productImplementation.create_XML(newProduct);
-
-        //tv_Tabla.scrollTo(product);
+        tv_Tabla.scrollTo(newProduct);
     }
 
     @FXML
@@ -310,30 +295,26 @@ public class ProductController {
     }
 
     private void handleTextChange(ObservableValue observable, String oldValue, String newValue) {
-        FilteredList<Product> filteredData = new FilteredList<>(pr, u -> true);
+        FilteredList<Product> filteredData = new FilteredList<>(productList, u -> true);
 
         filteredData.setPredicate(product -> {
             if (newValue == null || newValue.isEmpty()) {
-                return true; // Si el texto del filtro está vacío, muestra todos los utensilios.
+                return true; 
             }
 
-            // Cojo el valor del campo de busqueda y lo pongo en minuscula.
             String lowerCaseFilter = newValue.toLowerCase();
 
             if (product.getUser().getCompany().getName().toLowerCase().contains(lowerCaseFilter)) {
                 tableOrder();
-                return true; // Filtrado por nombre.
+                return true;
             }
 
-            return false; // No existen resultados.
+            return false;
         });
-        // Envuelve la FilteredList en una SortedList.
         SortedList<Product> sortedData = new SortedList<>(filteredData);
 
-        // Vincula el comparador SortedList al comparador TableView.
         sortedData.comparatorProperty().bind(tv_Tabla.comparatorProperty());
 
-        // Agrega datos ordenados (y filtrados) a la tabla.
         tv_Tabla.setItems(sortedData);
     }
 
@@ -341,8 +322,24 @@ public class ProductController {
     private void handleOnClickCreateOrder(ActionEvent event) {
         List<Product> products = tv_Tabla.getSelectionModel().getSelectedItems();
         orderManagementController.setProducts(products);
-        
+
         stage.close();
+    }
+    
+     private void handleCloseRequest(WindowEvent event){
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Close confirmation");
+        alert.setHeaderText("Application will be closed");
+        alert.setContentText("You will close the application");
+        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+        Optional<ButtonType> result = alert.showAndWait();
+        if(result.get().equals(ButtonType.OK)){
+            stage.close();
+            Platform.exit();
+        }else {
+            event.consume();
+            alert.close();
+        }
     }
 
     public void setProductImplementation(ProductInterface product) {
@@ -357,12 +354,18 @@ public class ProductController {
         tc_Name.setCellValueFactory(new PropertyValueFactory<>("name"));
         tc_Weight.setCellValueFactory(new PropertyValueFactory<>("weight"));
         tc_Price.setCellValueFactory(new PropertyValueFactory<>("price"));
-        
-        pr = FXCollections.observableArrayList(getProductImplementation().findAllProducts_XML(new GenericType<List<Product>>() {
+
+        productList = FXCollections.observableArrayList(getProductImplementation().findAllProducts_XML(new GenericType<List<Product>>() {
         }));
-        tv_Tabla.setItems(pr);
-        
+        tv_Tabla.setItems(productList);
+
     }
-    
-  
+      public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+    }
+
 }

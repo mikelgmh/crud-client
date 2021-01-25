@@ -18,7 +18,7 @@
       </TableView>
       <Button fx:id="btn_Create" layoutX="214.0" layoutY="132.0" mnemonicParsing="false" onAction="#handleOnClickCreate" prefHeight="21.0" prefWidth="123.0" text="Create product" />
       <Button fx:id="btn_Delete" layoutX="424.0" layoutY="132.0" mnemonicParsing="false" onAction="#handleOnClickDelete" prefHeight="31.0" prefWidth="123.0" text="Delete product" />
-      <Label fx:id="lbl_Choose" disable="true" layoutX="38.0" layoutY="47.0" text="Choose company:" />
+      <Label fx:id="lbl_Choose" layoutX="38.0" layoutY="47.0" text="Choose company:" />
       <Button fx:id="btn_OrderCreate" layoutX="513.0" layoutY="43.0" mnemonicParsing="false" onAction="#handleOnClickCreateOrder" prefHeight="31.0" prefWidth="207.0" text="Create Order" />
       <TextField fx:id="tf_company" layoutX="172.0" layoutY="42.0" />
    </children>

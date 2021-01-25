@@ -82,6 +82,7 @@ public class DashboardController {
         menuController = new MenuController();
         menuController.setUser(user);
         loggedUser = user;
+        //setButtons();
     }
 
     @FXML
@@ -110,6 +111,18 @@ public class DashboardController {
 
     public void setMenuManagementController(MenuController menuController) {
         this.menuController = menuController;
+    }
+    
+    private void setButtons() {
+        switch(getUser().getPrivilege()){
+            case PROVIDER:
+                menuController.getMenuCompanies().setDisable(true);
+                break;
+            case WORKER:
+                menuController.getMenuCompanies().setDisable(true);
+                menuController.getMenuUsers().setDisable(true);
+                break;
+        }
     }
 
 }
