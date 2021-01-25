@@ -5,6 +5,7 @@ package crudclient.controllers;
  * @author Imanol
  */
 import crudclient.client.OrderRESTClient;
+import crudclient.exceptions.ServerConnectionException;
 import crudclient.factories.OrderFactory;
 import crudclient.factories.ProductFactory;
 import crudclient.model.Order;
@@ -61,6 +62,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.util.Callback;
 import javafx.util.converter.IntegerStringConverter;
+import javax.ws.rs.ClientErrorException;
 
 /**
  * FXML Controller class
@@ -141,7 +143,7 @@ public class OrderManagementController {
         stage.setOnShowing(this::handleWindowsShowing);
 
         setTableOrderProductEditable();
-
+        
         column_date.setSortType(TableColumn.SortType.DESCENDING);
         combo_statusOrder.setItems(FXCollections.observableArrayList(OrderStatus.values()));
         column_ID.setCellValueFactory(new PropertyValueFactory("id"));
@@ -151,8 +153,13 @@ public class OrderManagementController {
         ObservableList statusOrders = FXCollections.observableArrayList(OrderStatus.values());
         column_status.setCellFactory(ComboBoxTableCell.forTableColumn(statusOrders));
         column_user.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUser().getName().concat(" " + cellData.getValue().getUser().getSurname())));
-        orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
+        try{
+            orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
         }));
+        }catch(ServerConnectionException e){
+            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, e);
+            showAlert(Alert.AlertType.WARNING, "Server ERROR", "", "Can´t connect to server!");
+        }
 
         filteredListAndTableListeners();
 
@@ -197,19 +204,33 @@ public class OrderManagementController {
         btn_OrderMngmt.setOnAction(this::handlerOrderModification);
         btn_commitOrder.setOnAction(this::handlerCommitNewOrder);
         btn_deletePro.setVisible(false);
-
+        
+        setButtons();
+        
         column_status.setOnEditCommit((TableColumn.CellEditEvent<Order, OrderStatus> data) -> {
             tableOrder.getSelectionModel().getSelectedItem().setStatus(data.getNewValue());
             tableOrder.refresh();
-            orderImplementation.editOrder(tableOrder.getSelectionModel().getSelectedItem());
+            try {
+                orderImplementation.editOrder(tableOrder.getSelectionModel().getSelectedItem());
+            } catch (ClientErrorException ex) {
+                Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ServerConnectionException ex) {
+                Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
 
     }
 
     private void handlerDeleteOrder(ActionEvent event) {
-        order = tableOrder.getSelectionModel().getSelectedItem();
-        this.getOrderImplementation().removeOrder(order.getId().toString());
-        tableOrder.getItems().remove(order);
+        try {
+            order = tableOrder.getSelectionModel().getSelectedItem();
+            this.getOrderImplementation().removeOrder(order.getId().toString());
+            tableOrder.getItems().remove(order);
+        } catch (ClientErrorException ex) {
+            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ServerConnectionException ex) {
+            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void handlerCreateOrder(ActionEvent event) {
@@ -225,7 +246,6 @@ public class OrderManagementController {
             pController.initStageCreateOrder(root);
             LOG.log(Level.INFO, "Regresa a Order ");
             createOrder(products);
-
         } catch (IOException ex) {
             Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -251,15 +271,21 @@ public class OrderManagementController {
         alert.setContentText(a);
         Optional<ButtonType> result = alert.showAndWait();
         if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
-            getOrderImplementation().editOrder(order);
-            orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
-            }));
-            tableOrder.setItems(orderData);
-            tableOrder.refresh();
-            order = tableOrder.getSelectionModel().getSelectedItem();
-            productsData = FXCollections.observableList(order.getOrderProduct());
-            tableProducts.setItems((ObservableList<OrderProduct>) productsData);
-            tableOrder.refresh();
+            try {
+                getOrderImplementation().editOrder(order);
+                orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
+                }));
+                tableOrder.setItems(orderData);
+                tableOrder.refresh();
+                order = tableOrder.getSelectionModel().getSelectedItem();
+                productsData = FXCollections.observableList(order.getOrderProduct());
+                tableProducts.setItems((ObservableList<OrderProduct>) productsData);
+                tableOrder.refresh();
+            } catch (ClientErrorException ex) {
+                Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ServerConnectionException ex) {
+                Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -350,7 +376,13 @@ public class OrderManagementController {
 
         order.getUser();
 
-        this.getOrderImplementation().createOrder(order);
+        try {
+            this.getOrderImplementation().createOrder(order);
+        } catch (ClientErrorException ex) {
+            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ServerConnectionException ex) {
+            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void filteredListAndTableListeners() {
@@ -376,4 +408,13 @@ public class OrderManagementController {
         ));
     }
 
+    private void setButtons() {
+        currentUser = DashboardController.loggedUser;
+        if(currentUser.getPrivilege().toString().equalsIgnoreCase("WORKER")){
+            btn_modifyOrder.setDisable(true);
+            btn_deleteOrder.setDisable(true);
+        }
+    }
+
+    
 }
