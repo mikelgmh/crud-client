@@ -14,13 +14,10 @@ import static org.testfx.matcher.base.NodeMatchers.isVisible;
 
 import crudclient.CRUDClient;
 import crudclient.model.User;
-import java.nio.charset.Charset;
-import java.util.Random;
 import java.util.concurrent.TimeoutException;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import static org.testfx.matcher.control.ButtonMatchers.isCancelButton;
-
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.PasswordField;
@@ -35,10 +32,8 @@ import static org.testfx.matcher.control.ButtonMatchers.isDefaultButton;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import static org.testfx.api.FxAssert.verifyThat;
-import static org.testfx.matcher.control.TextInputControlMatchers.hasText;
 
 import org.testfx.framework.junit.ApplicationTest;
-import org.testfx.matcher.base.NodeMatchers;
 import static org.testfx.matcher.base.NodeMatchers.isEnabled;
 
 import static org.testfx.matcher.base.NodeMatchers.isDisabled;
@@ -50,12 +45,7 @@ import static org.testfx.matcher.base.NodeMatchers.isDisabled;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserManagerTest extends ApplicationTest {
 
-    private static final String OVERSIZED_TEXT = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-            + "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-            + "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-            + "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-            + "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-            + "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+    private static final String OVERSIZED_TEXT = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX ";
     private static final String VALID_EMAIL = "validEmail@gmail.com";
     private static final boolean VALDIATE_MAX_LENGTH = false;
 
@@ -418,6 +408,31 @@ public class UserManagerTest extends ApplicationTest {
         clickOn(isCancelButton());
         clickOn("#btn_delete");
         clickOn(isDefaultButton());
+
     }
 
+    @Test
+    public void test021_testTableCellsMaxLength() {
+        testColumnLength("tc_name");
+        testColumnLength("tc_surname");
+        testColumnLength("tc_email");
+        testColumnLength("tc_username");
+    }
+
+    public void writeColumnText() {
+        write(OVERSIZED_TEXT);
+        type(KeyCode.ENTER);
+        verifyThat("The max length allowed for this field is 254", isVisible());
+        clickOn(isDefaultButton());
+    }
+
+    public void testColumnLength(String column) {
+        table = lookup("#table").queryTableView();
+        int rowCount = table.getItems().size();
+        Node node = lookup("#" + column).nth(rowCount).query();
+        clickOn(node);
+        node = lookup("#" + column).nth(rowCount).query();
+        clickOn(node);
+        writeColumnText();
+    }
 }
