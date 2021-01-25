@@ -6,6 +6,8 @@
 package crudclient.controllers;
 
 import crudclient.exceptions.CellMaxLengthException;
+import crudclient.exceptions.EmailAlreadyExistsException;
+import crudclient.exceptions.UsernameAlreadyExistsException;
 import crudclient.factories.CompanyFactory;
 import crudclient.interfaces.CompanyInterface;
 import java.util.logging.Level;
@@ -32,8 +34,14 @@ import javafx.stage.Stage;
 import crudclient.interfaces.UserInterface;
 import crudclient.model.Company;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import javafx.beans.binding.Bindings;
@@ -42,6 +50,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javax.ws.rs.core.GenericType;
@@ -61,6 +70,8 @@ public class UserManagementController {
     private CompanyInterface companyImplementation;
     private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
     private User currentUser;
+    private ZoneId defaultZoneId = ZoneId.systemDefault();
+    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
     @FXML
     private TextField txt_name;
@@ -173,6 +184,7 @@ public class UserManagementController {
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
             } catch (CellMaxLengthException ex) {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+                table.refresh();
             }
 
         });
@@ -185,7 +197,8 @@ public class UserManagementController {
                 table.getSelectionModel().getSelectedItem().setSurname(data.getNewValue());
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
             } catch (CellMaxLengthException ex) {
-                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.WARNING, null, ex);
+                table.refresh();
             }
 
         });
@@ -195,10 +208,15 @@ public class UserManagementController {
         tc_username.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
             try {
                 checkCellMaxLength(254, data.getNewValue().length());
+                searchUsernameAlreadyExists(table.getSelectionModel().getSelectedItem(), data.getNewValue());
                 table.getSelectionModel().getSelectedItem().setUsername(data.getNewValue());
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
             } catch (CellMaxLengthException ex) {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UsernameAlreadyExistsException ex) {
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+                showAlert(Alert.AlertType.ERROR, "Can't update this user", "Username already exists", "The username already exists, pick another username.");
+                table.refresh();
             }
 
         });
@@ -208,12 +226,16 @@ public class UserManagementController {
         tc_email.setOnEditCommit((TableColumn.CellEditEvent<User, String> data) -> {
             try {
                 checkCellMaxLength(254, data.getNewValue().length());
+                searchEmailAlreadyExists(table.getSelectionModel().getSelectedItem(), data.getNewValue());
                 table.getSelectionModel().getSelectedItem().setEmail(data.getNewValue());
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
             } catch (CellMaxLengthException ex) {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (EmailAlreadyExistsException ex) {
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+                showAlert(Alert.AlertType.ERROR, "Can't update this user", "Email already exists", "The email already exists, pick another email.");
+                table.refresh();
             }
-
         });
 
         // User Status column
@@ -235,7 +257,7 @@ public class UserManagementController {
         });
 
         // Company column
-          CompanyFactory companyFactory = new CompanyFactory();
+        CompanyFactory companyFactory = new CompanyFactory();
         this.companyImplementation = companyFactory.getImplementation();
         ObservableList<Company> companies = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
         }));
@@ -250,6 +272,22 @@ public class UserManagementController {
     public void getCompanies() {
         companiesList = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
         }));
+    }
+
+    public void searchEmailAlreadyExists(User user, String email) throws EmailAlreadyExistsException {
+        for (int i = 0; i < masterData.size(); i++) {
+            if (email.equalsIgnoreCase(masterData.get(i).getEmail()) && !Objects.equals(user.getId(), masterData.get(i).getId())) {
+                throw new EmailAlreadyExistsException();
+            }
+        }
+    }
+
+    public void searchUsernameAlreadyExists(User user, String username) throws UsernameAlreadyExistsException {
+        for (int i = 0; i < masterData.size(); i++) {
+            if (username.equalsIgnoreCase(masterData.get(i).getUsername()) && !Objects.equals(user.getId(), masterData.get(i).getId())) {
+                throw new UsernameAlreadyExistsException();
+            }
+        }
     }
 
     public void checkCellMaxLength(int maxLength, int currentLength) throws CellMaxLengthException {
@@ -304,21 +342,38 @@ public class UserManagementController {
         User loggedUser = DashboardController.loggedUser;
         // If the logged user's id is 1, it means it is superuser, the master one
         if (loggedUser.getId() == 1) {
-            // Disable delete button if the selected user is the logger user.
-            if (loggedUser.getId() == newValue.getId()) {
-                this.btn_delete.setDisable(true);
-            } else { // Enable the delete button if the selected user is not the logged one.
-                this.btn_delete.setDisable(false);
+            // Disable delete button if the selected user is the logged user.
+            try {
+                if (Objects.equals(loggedUser.getId(), newValue.getId())) {
+                    this.btn_delete.setDisable(true);
+                    this.table.setEditable(false);
+                } else { // Enable the delete button if the selected user is not the logged one.
+                    this.btn_delete.setDisable(false);
+                    this.table.setEditable(true);
+                }
+            } catch (Exception e) {
+                Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, e);
             }
         } else { // If the logged user's id it is not 1, it mean it's a superuser, but not the master one
             if (newValue.getPrivilege().equals(UserPrivilege.SUPERUSER)) {
                 this.btn_delete.setDisable(true);
+                this.table.setEditable(false);
+            } else {
+                this.table.setEditable(true);
+                this.btn_delete.setDisable(false);
             }
         }
 
     }
 
+    public static final LocalDate LOCAL_DATE(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate localDate = LocalDate.parse(dateString, formatter);
+        return localDate;
+    }
+
     public void setDefaultFieldValues() {
+
         this.chb_privilege.setItems(FXCollections.observableArrayList(UserPrivilege.values()));
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
 
@@ -328,7 +383,16 @@ public class UserManagementController {
         // Se obtiene la lista de usuarios utilizando la implementación que hay en la propiedad de la clase. Se necesita pasar desde la ventana anterior o desde el método main.
         this.getUsers();
         this.getCompanies();
+        createFilteredListAndTableListeners();
 
+    }
+
+    public void getUsers() {
+        this.masterData = FXCollections.observableArrayList(getUserImplementation().getUsers(new GenericType<List<User>>() {
+        }));
+    }
+
+    public void createFilteredListAndTableListeners() {
         // Crea las listas de filtrado y llama al método que crea los listeners.
         FilteredList<User> filteredData = new FilteredList<>(masterData, p -> true);
         setSearchFilterListeners(filteredData);
@@ -337,13 +401,6 @@ public class UserManagementController {
         // Bindea de 
         sortedData.comparatorProperty().bind(table.comparatorProperty());
         this.table.setItems(sortedData);
-    }
-
-    public void getUsers() {
-        this.masterData = FXCollections.observableArrayList(getUserImplementation().getUsers(new GenericType<List<User>>() {
-        }));
-        this.table.refresh();
-        System.out.println("Refreshing table");
     }
 
     public void handleOnClickCreateButton() throws IOException {
@@ -357,29 +414,54 @@ public class UserManagementController {
     }
 
     public void setSearchFilterListeners(FilteredList<User> filteredData) {
-        filteredData.predicateProperty().bind(Bindings.createObjectBinding(()
-                -> user -> user.getName().toLowerCase().contains(txt_name.getText().toLowerCase().trim())
-                && user.getSurname().toLowerCase().contains(txt_surname.getText().toLowerCase().trim())
-                && user.getEmail().toLowerCase().contains(txt_email.getText().toLowerCase().trim())
-                && user.getUsername().toLowerCase().contains(txt_username.getText())
-                && user.getCompany().getName().toLowerCase().contains(txt_company.getText().toLowerCase().trim())
-                && user.getStatus().toString().equalsIgnoreCase(chb_status.getSelectionModel().getSelectedItem().toString())
-                //              && user.getLastAccess().equals(txt_lastAccess.getValue())
-                && user.getPrivilege().toString().equalsIgnoreCase(chb_privilege.getSelectionModel().getSelectedItem().toString()),
-                txt_name.textProperty(),
-                txt_surname.textProperty(),
-                txt_email.textProperty(),
-                txt_username.textProperty(),
-                txt_company.textProperty(),
-                chb_status.getSelectionModel().selectedItemProperty(),
-                chb_privilege.getSelectionModel().selectedItemProperty()
-        ));
+        try {
+            filteredData.predicateProperty().bind(Bindings.createObjectBinding(()
+                    -> user -> user.getName().toLowerCase().contains(txt_name.getText().toLowerCase().trim())
+                    && user.getSurname().toLowerCase().contains(txt_surname.getText().toLowerCase().trim())
+                    && user.getEmail().toLowerCase().contains(txt_email.getText().toLowerCase().trim())
+                    && user.getUsername().toLowerCase().contains(txt_username.getText())
+                    && user.getCompany().getName().toLowerCase().contains(txt_company.getText().toLowerCase().trim())
+                    && user.getStatus().toString().equalsIgnoreCase(chb_status.getSelectionModel().getSelectedItem().toString())
+                    && datePickerChecker(user)
+                    && user.getPrivilege().toString().equalsIgnoreCase(chb_privilege.getSelectionModel().getSelectedItem().toString()),
+                    txt_name.textProperty(),
+                    txt_surname.textProperty(),
+                    txt_email.textProperty(),
+                    txt_username.textProperty(),
+                    txt_company.textProperty(),
+                    chb_status.getSelectionModel().selectedItemProperty(),
+                    txt_lastAccess.getEditor().textProperty(),
+                    chb_privilege.getSelectionModel().selectedItemProperty()
+            ));
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Empty date", "The date can't be empty", "Select a date to continue");
+        }
+    }
+
+    public boolean datePickerChecker(User user) {
+        try {
+            return formatter.format(user.getLastAccess()).contains(txt_lastAccess.getValue().toString());
+        } catch (Exception e) {
+            return true;
+        }
+
     }
 
     public void onDeleteButtonClickAction() {
         User u = table.getSelectionModel().getSelectedItem();
-        this.getUserImplementation().deleteUser(u.getId().toString());
-        masterData.remove(u);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete row?");
+        alert.setHeaderText("Delete?");
+        alert.setContentText("If you are sure you want to delete this user, click OK. This will delete every single data related to this user. Be sure if you really want to delete it!.");
+        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get().equals(ButtonType.OK)) {
+            this.getUserImplementation().deleteUser(u.getId().toString());
+            masterData.remove(u);
+        } else {
+            alert.close();
+        }
+
     }
 
     public void showAlert(Alert.AlertType type, String title, String header, String content) {
@@ -426,4 +508,13 @@ public class UserManagementController {
     public void setMenuManagementController(MenuController menuController) {
         this.menuController = menuController;
     }
+
+    public ObservableList<User> getMasterData() {
+        return masterData;
+    }
+
+    public void setMasterData(ObservableList<User> masterData) {
+        this.masterData = masterData;
+    }
+
 }

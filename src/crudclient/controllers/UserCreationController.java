@@ -61,9 +61,9 @@ public class UserCreationController {
     @FXML
     private TextField txt_lastname;
     @FXML
-    private TextField txt_username;
+    private TextField txt_username_create;
     @FXML
-    private TextField txt_email;
+    private TextField txt_email_create;
     @FXML
     private TextField txt_company;
     @FXML
@@ -93,7 +93,7 @@ public class UserCreationController {
 
     // Buttons
     @FXML
-    private Button btn_create;
+    private Button btn_create_create;
 
     @FXML
     private Button btn_cancel;
@@ -125,14 +125,14 @@ public class UserCreationController {
         scene.getStylesheets().add(getClass().getResource("/crudclient/view/styles/inputStyle.css").toExternalForm()); // Imports the CSS file used for errors in some inputs.
 
         // Set validators
-        txt_email.getProperties().put("emailValidator", false);
+        txt_email_create.getProperties().put("emailValidator", false);
         txt_lastname.getProperties().put("minLengthValidator", false);
         txt_firstname.getProperties().put("minLengthValidator", false);
-        txt_username.getProperties().put("minLengthValidator", false);
+        txt_username_create.getProperties().put("minLengthValidator", false);
         txt_password.getProperties().put("passwordRequirements", false);
         txt_repeatPassword.getProperties().put("passwordRequirements", false);
         txt_repeatPassword.getProperties().put("passwordsMatch", false);
-        this.hint_password.setText("The passwords shoud match the requirements:\n" + genericValidations.PASSWORD_CONDITIONS);
+        hint_password.setText("The passwords shoud match the requirements:\n" + genericValidations.PASSWORD_CONDITIONS);
 
         // Set listeners
         this.setListeners();
@@ -181,11 +181,11 @@ public class UserCreationController {
             this.validate(); // Executes the validation.
         });
 
-        this.txt_username.textProperty().addListener((obs, oldText, newText) -> {
-            this.genericValidations.textLimiter(this.txt_username, 200, newText); // Limits the input to 200 characters
-            Boolean minlengthValidator = this.genericValidations.minLength(this.txt_username, 3, newText, "minLengthValidator"); // Adds a min lenght validator
+        this.txt_username_create.textProperty().addListener((obs, oldText, newText) -> {
+            this.genericValidations.textLimiter(this.txt_username_create, 200, newText); // Limits the input to 200 characters
+            Boolean minlengthValidator = this.genericValidations.minLength(this.txt_username_create, 3, newText, "minLengthValidator"); // Adds a min lenght validator
             this.hint_username.setText("3 characters min");
-            setInputError(minlengthValidator, txt_username, hint_username);
+            setInputError(minlengthValidator, txt_username_create, hint_username);
             this.validate(); // Executes the validation.
         });
         this.chb_company.setOnAction(event -> {
@@ -193,13 +193,13 @@ public class UserCreationController {
         });
 
         // Validation for the Email field
-        this.txt_email.textProperty().addListener((obs, oldText, newText) -> {
+        this.txt_email_create.textProperty().addListener((obs, oldText, newText) -> {
             //this.genericValidations.minLength(this.txt_email, 3, newText, "minLengthValidator");
-            this.genericValidations.textLimiter(this.txt_email, 254, newText);
-            boolean emailValidator = this.genericValidations.regexValidator(this.genericValidations.EMAIL_REGEXP, this.txt_email, newText.toLowerCase(), "emailValidator"); // Adds a regex validation to check if the email is correct
+            this.genericValidations.textLimiter(this.txt_email_create, 254, newText);
+            boolean emailValidator = this.genericValidations.regexValidator(this.genericValidations.EMAIL_REGEXP, this.txt_email_create, newText.toLowerCase(), "emailValidator"); // Adds a regex validation to check if the email is correct
             this.hint_email.setText(this.genericValidations.TXT_ENTER_VALID_EMAIL);
 
-            setInputError(emailValidator, txt_email, hint_email);
+            setInputError(emailValidator, txt_email_create, hint_email);
             this.validate();
         });
 
@@ -266,17 +266,17 @@ public class UserCreationController {
      * then create a new user.
      */
     public void validate() {
-        if (Boolean.parseBoolean(this.txt_email.getProperties().get("emailValidator").toString())
+        if (Boolean.parseBoolean(this.txt_email_create.getProperties().get("emailValidator").toString())
                 && Boolean.parseBoolean(this.txt_firstname.getProperties().get("minLengthValidator").toString())
-                && Boolean.parseBoolean(this.txt_username.getProperties().get("minLengthValidator").toString())
+                && Boolean.parseBoolean(this.txt_username_create.getProperties().get("minLengthValidator").toString())
                 && Boolean.parseBoolean(this.txt_lastname.getProperties().get("minLengthValidator").toString())
                 && Boolean.parseBoolean(this.txt_password.getProperties().get("passwordRequirements").toString())
                 && Boolean.parseBoolean(this.txt_repeatPassword.getProperties().get("passwordRequirements").toString())
                 && Boolean.parseBoolean(this.txt_repeatPassword.getProperties().get("passwordsMatch").toString())
                 && this.chb_company.getSelectionModel().getSelectedItem() != null) {
-            this.btn_create.setDisable(false);
+            this.btn_create_create.setDisable(false);
         } else {
-            this.btn_create.setDisable(true);
+            this.btn_create_create.setDisable(true);
         }
     }
 
@@ -284,8 +284,8 @@ public class UserCreationController {
         User user = new User();
         user.setName(txt_firstname.getText());
         user.setSurname(txt_lastname.getText());
-        user.setEmail(txt_email.getText());
-        user.setUsername(txt_username.getText());
+        user.setEmail(txt_email_create.getText());
+        user.setUsername(txt_username_create.getText());
         user.setCompany((Company) chb_company.getSelectionModel().getSelectedItem());
         user.setStatus((UserStatus) chb_status.getSelectionModel().getSelectedItem());
         user.setPrivilege((UserPrivilege) chb_privilege.getSelectionModel().getSelectedItem());
@@ -303,6 +303,8 @@ public class UserCreationController {
             alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get().equals(ButtonType.OK)) {
+                userManagementController.getUsers();
+                userManagementController.createFilteredListAndTableListeners();
                 stage.close();
             } else {
                 alert.close();
@@ -312,11 +314,13 @@ public class UserCreationController {
         } catch (UsernameAlreadyExistsException ex) {
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
             hint_username.setText("The username already exists.");
-            setInputError(false, txt_username, hint_username);
+            btn_create_create.setDisable(true);
+            setInputError(false, txt_username_create, hint_username);
         } catch (EmailAlreadyExistsException ex) {
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
             hint_email.setText("The email already exists.");
-            setInputError(false, txt_email, hint_email);
+            btn_create_create.setDisable(true);
+            setInputError(false, txt_email_create, hint_email);
         }
     }
 
@@ -329,6 +333,7 @@ public class UserCreationController {
         alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get().equals(ButtonType.OK)) {
+
             stage.close();
         } else {
             alert.close();
