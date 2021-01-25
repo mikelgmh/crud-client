@@ -154,7 +154,9 @@ public class OrderManagementController {
         orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
         }));
 
-        tableOrder.setItems(orderData);
+        filteredListAndTableListeners();
+
+
         stage.show();
         logger.log(Level.INFO, "OrderManagement stage loaded.");
     }
@@ -201,6 +203,7 @@ public class OrderManagementController {
             tableOrder.refresh();
             orderImplementation.editOrder(tableOrder.getSelectionModel().getSelectedItem());
         });
+
     }
 
     private void handlerDeleteOrder(ActionEvent event) {
@@ -265,13 +268,13 @@ public class OrderManagementController {
         Integer newId = lastOrder.getId();
 
         order = new Order();
-        order.setId(newId+1);
+        order.setId(newId + 1);
 
         User loggedUser = DashboardController.loggedUser;
         order.setUser(loggedUser);
         Date date = java.util.Calendar.getInstance().getTime();
         order.setDate(date);
-        
+
         order.setStatus(OrderStatus.REQUESTED);
 
         orderProduct = new OrderProduct();
@@ -339,16 +342,38 @@ public class OrderManagementController {
     private void handlerCommitNewOrder(ActionEvent event) {
         Order prueba = new Order();
         Float totalOrderPrice = 0.0f;
-            for (OrderProduct op : order.getOrderProduct()) {
-                totalOrderPrice = totalOrderPrice + op.getTotal_price();
-            }
+        for (OrderProduct op : order.getOrderProduct()) {
+            totalOrderPrice = totalOrderPrice + op.getTotal_price();
+        }
         order.setTotal_price(totalOrderPrice);
         prueba = order;
-        
+
         order.getUser();
-        
-        
+
         this.getOrderImplementation().createOrder(order);
+    }
+
+    private void filteredListAndTableListeners() {
+        FilteredList<Order> filteredData = new FilteredList<>(orderData, p -> true);
+        setSearchFilterListeners(filteredData);
+        SortedList<Order> sortedData = new SortedList<>(filteredData);
+
+        // Bindea de 
+        sortedData.comparatorProperty().bind(tableOrder.comparatorProperty());
+        this.tableOrder.setItems(sortedData);
+    }
+
+    private void setSearchFilterListeners(FilteredList<Order> filteredData) {
+        filteredData.predicateProperty().bind(Bindings.createObjectBinding(()
+                -> order -> order.getId().toString().contains(txt_IDOrder.getText())
+                && order.getUser().getName().toLowerCase().contains(txt_userOrder.getText().toLowerCase().trim())
+                && order.getTotal_price().toString().contains(txt_totalPriceOrder.getText()),
+                //&& order.getStatus().toString().equalsIgnoreCase(combo_statusOrder.getSelectionModel().getSelectedItem().toString()),
+                txt_IDOrder.textProperty(),
+                txt_userOrder.textProperty(),
+                txt_totalPriceOrder.textProperty()
+                //combo_statusOrder.getSelectionModel().getSelectedItem()
+        ));
     }
 
 }
