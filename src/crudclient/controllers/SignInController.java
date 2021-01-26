@@ -6,8 +6,6 @@ import crudclient.interfaces.EmailServiceInterface;
 import crudclient.interfaces.SignInInterface;
 import crudclient.model.User;
 import crudclient.util.security.AsymmetricEncryption;
-import crudclient.util.session.UserSession;
-import java.io.IOException;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
