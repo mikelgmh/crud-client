@@ -67,7 +67,7 @@ import javax.ws.rs.ClientErrorException;
 /**
  * FXML Controller class
  *
- * @author Usuario
+ * @author Imanol
  */
 public class OrderManagementController {
 
@@ -123,8 +123,6 @@ public class OrderManagementController {
     @FXML
     private Button btn_OrderMngmt;
     @FXML
-    private Button btn_deletePro;
-    @FXML
     private Button btn_commitOrder;
 
     private static final Logger LOG = Logger.getLogger(OrderManagementController.class.getName());
@@ -163,6 +161,11 @@ public class OrderManagementController {
         filteredListAndTableListeners();
 
         stage.show();
+        showAlert(Alert.AlertType.WARNING, "Caution!!!", "", "Aviso. Los cambios"
+                + " que hagas en la tabla de ordenes (estado de la orden) "
+                + "se actualizarán en la base de datos automaticamente. Los productos"
+                + "(tabla inferior) requieren de pulsar los botones en product manager"
+                + "que se encuentran a su derecha.");
         logger.log(Level.INFO, "OrderManagement stage loaded.");
     }
 
@@ -200,17 +203,14 @@ public class OrderManagementController {
         btn_modifyOrder.disableProperty().bind(Bindings.isEmpty(tableOrder.getSelectionModel().getSelectedItems()));
         btn_deleteOrder.setOnAction(this::handlerDeleteOrder);
         btn_deleteOrder.disableProperty().bind(Bindings.isEmpty(tableOrder.getSelectionModel().getSelectedItems()));
-        btn_deletePro.setOnAction(this::handlerDeleteProductFromOrder);
-        btn_deletePro.setVisible(false);
         btn_OrderMngmt.setOnAction(this::handlerOrderModification);
+        btn_OrderMngmt.disableProperty().bind(Bindings.isEmpty(tableProducts.getSelectionModel().getSelectedItems()));
         btn_commitOrder.setOnAction(this::handlerCommitNewOrder);
-        btn_deletePro.setVisible(false);
+        btn_commitOrder.disableProperty().bind(Bindings.isEmpty(tableProducts.getSelectionModel().getSelectedItems()));
 
-        setButtons();
         setButtonsWorker();
 
         column_status.setOnEditCommit((TableColumn.CellEditEvent<Order, OrderStatus> data) -> {
-
             tableOrder.getSelectionModel().getSelectedItem().setStatus(data.getNewValue());
             tableOrder.refresh();
 
@@ -220,17 +220,13 @@ public class OrderManagementController {
     }
 
     private void handlerDeleteOrder(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Delete value");
-        String a = "You are going to delete the order. Are you sure?";
-        alert.setContentText(a);
-        Optional<ButtonType> result = alert.showAndWait();
-        if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
-            order = tableOrder.getSelectionModel().getSelectedItem();
-            this.getOrderImplementation().removeOrder(order.getId().toString());
-            tableOrder.getItems().remove(order);
-            showAlert(Alert.AlertType.INFORMATION, "Deleted succesfully", "", "Order deleted from database.");
-        }
+        order = tableOrder.getSelectionModel().getSelectedItem();
+        this.getOrderImplementation().removeOrder(order.getId().toString());
+        orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
+        }));
+        tableOrder.setItems(orderData);
+        tableOrder.refresh();
+        showAlert(Alert.AlertType.INFORMATION, "Deleted succesfully", "", "Order deleted from database.");
     }
 
     private void handlerCreateOrder(ActionEvent event) {
@@ -260,12 +256,6 @@ public class OrderManagementController {
             showAlert(Alert.AlertType.WARNING, "Can´t obtain products.", "", "Can´t obtain products from this order.");
         }
 
-    }
-
-    private void handlerDeleteProductFromOrder(ActionEvent event) {
-        //Poner alerta para confirmar el borrado del producto
-        orderProduct = tableProducts.getSelectionModel().getSelectedItem();
-        tableProducts.getItems().remove(orderProduct);
     }
 
     private void handlerOrderModification(ActionEvent event) {
@@ -368,27 +358,33 @@ public class OrderManagementController {
     }
 
     private void handlerCommitNewOrder(ActionEvent event) {
-        Order prueba = new Order();
-        Float totalOrderPrice = 0.0f;
-        for (OrderProduct op : order.getOrderProduct()) {
-            totalOrderPrice = totalOrderPrice + op.getTotal_price();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Edit value");
+        String a = "Your changes will be edited in the database. Are you sure?";
+        alert.setContentText(a);
+        Optional<ButtonType> result = alert.showAndWait();
+        if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
+            Order prueba = new Order();
+            Float totalOrderPrice = 0.0f;
+            for (OrderProduct op : order.getOrderProduct()) {
+                totalOrderPrice = totalOrderPrice + op.getTotal_price();
+            }
+            order.setTotal_price(totalOrderPrice);
+            prueba = order;
+
+            order.getUser();
+
+            try {
+                this.getOrderImplementation().createOrder(order);
+                orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
+                }));
+                tableOrder.setItems(orderData);
+                tableOrder.refresh();
+                tableProducts.getItems().clear();
+            } catch (Exception e) {
+                showAlert(Alert.AlertType.INFORMATION, "Can´t create ", "", "Order deleted from database.");
+            }
         }
-        order.setTotal_price(totalOrderPrice);
-        prueba = order;
-
-        order.getUser();
-
-        try {
-            this.getOrderImplementation().createOrder(order);
-            orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
-            }));
-            tableOrder.setItems(orderData);
-            tableOrder.refresh();
-            tableProducts.getItems().clear();
-        } catch (Exception e) {
-            showAlert(Alert.AlertType.INFORMATION, "Can´t create ", "", "Order deleted from database.");
-        }
-
     }
 
     private void filteredListAndTableListeners() {
@@ -414,13 +410,6 @@ public class OrderManagementController {
         ));
     }
 
-    private void setButtons() {
-        currentUser = DashboardController.loggedUser;
-        if (currentUser.getPrivilege().toString().equalsIgnoreCase("PROVIDER")) {
-            btn_newOrder.setDisable(true);
-        }
-    }
-
     private void setButtonsWorker() {
         currentUser = DashboardController.loggedUser;
         if (currentUser.getPrivilege().toString().equalsIgnoreCase("WORKER")) {
@@ -428,5 +417,4 @@ public class OrderManagementController {
             btn_deleteOrder.setDisable(true);
         }
     }
-
 }
