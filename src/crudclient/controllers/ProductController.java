@@ -53,6 +53,7 @@ import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.FloatStringConverter;
 import javax.ws.rs.core.GenericType;
 
+
 /**
  * FXML Controller class
  *
@@ -257,6 +258,7 @@ public class ProductController {
 
     @FXML
     private void handleOnClickCreate(ActionEvent event) {
+        try{
         Product newProduct = new Product();
         newProduct.setName("");
         newProduct.setPrice(0);
@@ -284,6 +286,9 @@ public class ProductController {
         // scroll to new row
         productImplementation.create_XML(newProduct);
         tv_Tabla.scrollTo(newProduct);
+        }catch(Exception e){
+            showAlert(Alert.AlertType.WARNING, "Error with database", "", "Can´t refresh the table");
+        }
     }
 
     @FXML
@@ -366,6 +371,15 @@ public class ProductController {
 
     public void setCurrentUser(User user) {
         this.currentUser = user;
+    }
+
+      public void showAlert(Alert.AlertType type, String title, String header, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+
+        alert.showAndWait();
     }
 
 }

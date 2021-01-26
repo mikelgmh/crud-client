@@ -87,14 +87,15 @@ public class ProductTest extends ApplicationTest {
     @Test
     public void test003_createProduct() {
         clickOn("#btn_Create");
-        
+        Node row = lookup(".table-row-cell").nth(10).query();
+        clickOn(row);
         verifyThat("#btn_Delete", isEnabled());
         verifyThat("#btn_Create", isEnabled());
         verifyThat("#btn_OrderCreate", isInvisible());
         verifyThat("#tf_company", isInvisible());
     }
 
-    @Test
+  /*  @Test
     public void test004_goToProductManagmentFromOrderProduct() { // Check that the delete button is disabled
         clickOn("#menuManagement");
         clickOn("#menuOrders");
@@ -112,6 +113,6 @@ public class ProductTest extends ApplicationTest {
         Node row = lookup(".table-row-cell").nth(0).query();
         clickOn(row);
         clickOn("#btn_OrderCreate");
-    }
+    }*/
 
 }

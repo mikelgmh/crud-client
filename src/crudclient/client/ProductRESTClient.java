@@ -5,14 +5,18 @@
  */
 package crudclient.client;
 
+import crudclient.exceptions.ProductAlreadyExistsException;
 import crudclient.interfaces.ProductInterface;
 import crudclient.model.Product;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
 
 /**
  * Jersey REST client generated for REST resource:ProductFacadeREST
@@ -84,6 +88,7 @@ public class ProductRESTClient implements ProductInterface{
 
     public void create_XML(Object requestEntity) throws ClientErrorException {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+
     }
 
     public void create_JSON(Object requestEntity) throws ClientErrorException {
