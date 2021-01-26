@@ -64,16 +64,49 @@ import javax.ws.rs.core.GenericType;
 public class UserManagementController {
 
     // The needed properties and variables to run this.
+    /**
+     * The stage for this window.
+     */
     private Stage stage;
-    private static final Logger logger = Logger.getLogger("signupsignin.controllers.SignUpController");
-    private final GenericValidations genericValidations;
-    private UserInterface userImplementation;
+    /**
+     * The logger instance.
+     */
+    private static final Logger logger = Logger.getLogger("signupsignin.controllers.SignUpController"); // Logger instance
+    /**
+     * The generic validations instance.
+     */
+    private final GenericValidations genericValidations; // Generic validations instance
+    /**
+     * The user implementation for this window.
+     */
+    private UserInterface userImplementation; // The user implementation
+    /**
+     * The list of users.
+     */
     private ObservableList<User> masterData = FXCollections.observableArrayList();
+    /**
+     * The list of companies.
+     */
     private ObservableList<Company> companiesList = FXCollections.observableArrayList();
+    /**
+     * The implementation of company.
+     */
     private CompanyInterface companyImplementation;
+    /**
+     * the formatter for dates.
+     */
     private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+    /**
+     * The current user.
+     */
     private User currentUser;
+    /**
+     * default zone id used for formatting dates.
+     */
     private ZoneId defaultZoneId = ZoneId.systemDefault();
+    /**
+     * Another formatter for dates.
+     */
     DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
     @FXML

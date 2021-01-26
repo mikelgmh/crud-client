@@ -44,12 +44,33 @@ import javax.ws.rs.core.GenericType;
 public class UserCreationController {
 
     // The needed class properties and variables.
+    /**
+     * The stage for this window.
+     */
     private Stage stage;
-    private static final Logger logger = Logger.getLogger("signupsignin.controllers.SignUpController");
+    /**
+     * the logger for this class
+     */
+    private static final Logger logger = Logger.getLogger("crudclient");
+    /**
+     * The user implementation
+     */
     private UserInterface userImplementation;
+    /**
+     * the company implementation
+     */
     private CompanyInterface companyImplementation;
+    /**
+     * The generic validations instance
+     */
     private final GenericValidations genericValidations = new GenericValidations();
+    /**
+     * The list of companies
+     */
     private ObservableList companyList;
+    /**
+     * An instance of the user management controller.
+     */
     private UserManagementController userManagementController;
 
     // Text fields, password fields and choiceboxes.
@@ -108,15 +129,15 @@ public class UserCreationController {
     public void initStage(Parent parent) {
         logger.log(Level.INFO, "Loading user creation window...");
         // Creates a scena and a stage and opens the window.
-        Scene scene = new Scene(parent);
-        Stage stage = new Stage();
+        Scene scene = new Scene(parent); // Sets the scene
+        Stage stage = new Stage(); // Creates a new stage
 
         // Set stage
-        this.setStage(stage);
+        this.setStage(stage); // Sets the stage
 
         // Company implementation
-        CompanyFactory companyFactory = new CompanyFactory();
-        this.companyImplementation = companyFactory.getImplementation();
+        CompanyFactory companyFactory = new CompanyFactory(); // Creates a company factory
+        this.companyImplementation = companyFactory.getImplementation(); // Gets a company implementation
 
         // Sets the default field values.
         setDefaultFieldValues();
@@ -158,7 +179,7 @@ public class UserCreationController {
         try {
             this.companyList = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
             }));
-        } catch (Exception ex) {
+        } catch (Exception ex) { // If the server can't be reached
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
             showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
         }
@@ -208,28 +229,28 @@ public class UserCreationController {
         // Sets a listener for the email field.
         this.txt_email_create.textProperty().addListener((obs, oldText, newText) -> {
             //this.genericValidations.minLength(this.txt_email, 3, newText, "minLengthValidator");
-            this.genericValidations.textLimiter(this.txt_email_create, 254, newText);
+            this.genericValidations.textLimiter(this.txt_email_create, 254, newText); // 254 char text limiter
             boolean emailValidator = this.genericValidations.regexValidator(this.genericValidations.EMAIL_REGEXP, this.txt_email_create, newText.toLowerCase(), "emailValidator"); // Adds a regex validation to check if the email is correct
             this.hint_email.setText(this.genericValidations.TXT_ENTER_VALID_EMAIL);
-            setInputError(emailValidator, txt_email_create, hint_email);
+            setInputError(emailValidator, txt_email_create, hint_email); // Sets the input errors
             this.validate();
         });
 
         // Sets a listener for the password field.
         this.txt_password.textProperty().addListener((obs, oldText, newText) -> {
             Boolean passwordsMatch = this.genericValidations.comparePasswords(this.txt_password, this.txt_repeatPassword, "passwordsMatch");
-            this.genericValidations.textLimiter(this.txt_password, 25, newText);
+            this.genericValidations.textLimiter(this.txt_password, 25, newText); // 25 char text limiter
             this.genericValidations.regexValidator(this.genericValidations.PASS_REGEXP, this.txt_password, newText, "passwordRequirements");
-            this.setPasswordFieldsError(passwordsMatch);
+            this.setPasswordFieldsError(passwordsMatch); // Sets the password fields error
             this.validate();
         });
 
         // Sets a listener for the repeatPassword field.
         this.txt_repeatPassword.textProperty().addListener((obs, oldText, newText) -> {
             Boolean passwordsMatch = this.genericValidations.comparePasswords(this.txt_password, this.txt_repeatPassword, "passwordsMatch");
-            this.genericValidations.textLimiter(this.txt_repeatPassword, 25, newText);
+            this.genericValidations.textLimiter(this.txt_repeatPassword, 25, newText); // 25 char text limiter
             this.genericValidations.regexValidator(this.genericValidations.PASS_REGEXP, this.txt_repeatPassword, newText, "passwordRequirements");
-            this.setPasswordFieldsError(passwordsMatch);
+            this.setPasswordFieldsError(passwordsMatch); // Sets the password fields error
             this.validate();
         });
     }
@@ -243,24 +264,24 @@ public class UserCreationController {
      */
     public void setPasswordFieldsError(Boolean passwordsMatch) {
         if (!passwordsMatch) { // If passwords do noy match sets the input error styles
-            this.hint_password.setTextFill(Color.RED);
-            this.genericValidations.addClass(this.txt_password, "error", Boolean.TRUE);
-            this.hint_password.setText("Passwords don't match");
-            this.hint_repeatPassword.setTextFill(Color.RED);
-            this.genericValidations.addClass(this.txt_repeatPassword, "error", Boolean.TRUE);
+            this.hint_password.setTextFill(Color.RED); // Sets the color of the hint to red
+            this.genericValidations.addClass(this.txt_password, "error", Boolean.TRUE); // adds the class
+            this.hint_password.setText("Passwords don't match"); // Sets the text
+            this.hint_repeatPassword.setTextFill(Color.RED); // Sets the color to red
+            this.genericValidations.addClass(this.txt_repeatPassword, "error", Boolean.TRUE); // Sets the error class
         } else { // Sets the default styles to inputs
             if (!Boolean.parseBoolean(txt_password.getProperties().get("passwordRequirements").toString())) {
-                this.hint_password.setTextFill(Color.RED);
-                this.genericValidations.addClass(this.txt_password, "error", Boolean.TRUE);
-                this.hint_password.setText("The passwords do not fulfill the requirements:\n" + genericValidations.PASSWORD_CONDITIONS);
-                this.hint_repeatPassword.setTextFill(Color.RED);
-                this.genericValidations.addClass(this.txt_repeatPassword, "error", Boolean.TRUE);
+                this.hint_password.setTextFill(Color.RED); // Sets the color to red
+                this.genericValidations.addClass(this.txt_password, "error", Boolean.TRUE); // Changes the css class
+                this.hint_password.setText("The passwords do not fulfill the requirements:\n" + genericValidations.PASSWORD_CONDITIONS); // Sets the text
+                this.hint_repeatPassword.setTextFill(Color.RED);// Prueba para ver si asier lee los comentarios
+                this.genericValidations.addClass(this.txt_repeatPassword, "error", Boolean.TRUE); // Adds the css class
             } else { // If there's not error, set error class to false in the inputs.
-                this.hint_password.setTextFill(genericValidations.greyColor);
-                this.genericValidations.addClass(this.txt_password, "error", Boolean.FALSE);
-                this.hint_password.setText(genericValidations.PASSWORD_CONDITIONS);
-                this.hint_repeatPassword.setTextFill(genericValidations.greyColor);
-                this.genericValidations.addClass(this.txt_repeatPassword, "error", Boolean.FALSE);
+                this.hint_password.setTextFill(genericValidations.greyColor); // Sets the color to grey
+                this.genericValidations.addClass(this.txt_password, "error", Boolean.FALSE); // Adds the class
+                this.hint_password.setText(genericValidations.PASSWORD_CONDITIONS); // Sets the hint text
+                this.hint_repeatPassword.setTextFill(genericValidations.greyColor); // Sets the color to grey
+                this.genericValidations.addClass(this.txt_repeatPassword, "error", Boolean.FALSE); // Adds the error class to false
             }
 
         }
@@ -274,11 +295,11 @@ public class UserCreationController {
      * @param hint
      */
     public void setInputError(boolean validatorStatus, TextField tf, Label hint) {
-        if (!validatorStatus) { // Si Hay error
-            this.genericValidations.addClass(tf, "error", Boolean.TRUE);
-            hint.setTextFill(Color.RED);
+        if (!validatorStatus) { // if theres an error
+            this.genericValidations.addClass(tf, "error", Boolean.TRUE); // Set the error class to true
+            hint.setTextFill(Color.RED); // Set the color to red
         } else { // si no hay error
-            hint.setTextFill(this.genericValidations.greyColor);
+            hint.setTextFill(this.genericValidations.greyColor); // set the color to grey
             this.genericValidations.addClass(tf, "error", Boolean.FALSE);
         }
     }
@@ -319,8 +340,8 @@ public class UserCreationController {
 
         try {
             // Encrypts the password before setting the password to the user.
-            AsymmetricEncryption asymmetricEncryption = new AsymmetricEncryption(getUserImplementation().getPublicKey());
-            String encryptedPassword = asymmetricEncryption.encryptString(txt_password.getText());
+            AsymmetricEncryption asymmetricEncryption = new AsymmetricEncryption(getUserImplementation().getPublicKey()); // Get the public key and create a new instance of asymmetricEncryption
+            String encryptedPassword = asymmetricEncryption.encryptString(txt_password.getText()); // encrypt the password
             user.setPassword(encryptedPassword);
             this.userImplementation.createUser(user); // Sends the request
             userManagementController.getUsers();
