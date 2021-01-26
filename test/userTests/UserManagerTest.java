@@ -394,29 +394,52 @@ public class UserManagerTest extends ApplicationTest {
     }
 
     @Test
-    public void test020_deleteLastItem() {
-        table = lookup("#table").queryTableView();
-        int rowCount = table.getItems().size();
-        assertNotEquals("Table has no data: Cannot test.",
-                rowCount, 0);
-        Node row = lookup(".table-row-cell").nth(rowCount - 1).query();
-        assertNotNull("Row is null: table has not that row. ", row);
-        clickOn(row);
-        clickOn("#btn_delete");
-        verifyThat("If you are sure you want to delete this user, click OK. This will delete every single data related to this user. Be sure if you really want to delete it!.",
-                isVisible());
-        clickOn(isCancelButton());
-        clickOn("#btn_delete");
-        clickOn(isDefaultButton());
-
+    public void test021_testTableCellsMaxLength() {
+        if (VALDIATE_MAX_LENGTH) {
+            testColumnLength("tc_name");
+            testColumnLength("tc_surname");
+            testColumnLength("tc_email");
+            testColumnLength("tc_username");
+        }
     }
 
     @Test
-    public void test021_testTableCellsMaxLength() {
-        testColumnLength("tc_name");
-        testColumnLength("tc_surname");
-        testColumnLength("tc_email");
-        testColumnLength("tc_username");
+    public void test022_testClickableChoiceboxes() {
+        if (VALDIATE_MAX_LENGTH) {
+            choiceboxColumnTest("tc_company");
+            choiceboxColumnTest("tc_status");
+            choiceboxColumnTest("tc_company");
+        }
+    }
+
+    @Test
+    public void test023_testRepeatedEmail() {
+        table = lookup("#table").queryTableView();
+        int rowCount = table.getItems().size();
+        Node node = lookup("#tc_email").nth(rowCount).query();
+        clickOn(node);
+        node = lookup("#tc_email").nth(rowCount).query();
+        clickOn(node);
+        eraseText(30);
+        write("mikelgmh@gmail.com");
+        type(KeyCode.ENTER);
+        verifyThat("The email already exists, pick another email.", isVisible());
+        clickOn(isDefaultButton());
+    }
+
+    @Test
+    public void test024_testRepeatedUsername() {
+        table = lookup("#table").queryTableView();
+        int rowCount = table.getItems().size();
+        Node node = lookup("#tc_username").nth(rowCount).query();
+        clickOn(node);
+        node = lookup("#tc_username").nth(rowCount).query();
+        clickOn(node);
+        eraseText(30);
+        write("mikel");
+        type(KeyCode.ENTER);
+        verifyThat("The username already exists, pick another username.", isVisible());
+        clickOn(isDefaultButton());
     }
 
     public void writeColumnText() {
@@ -434,5 +457,44 @@ public class UserManagerTest extends ApplicationTest {
         node = lookup("#" + column).nth(rowCount).query();
         clickOn(node);
         writeColumnText();
+    }
+
+     public void updateColumnTest(String column) {
+        table = lookup("#table").queryTableView();
+        int rowCount = table.getItems().size();
+        Node node = lookup("#" + column).nth(rowCount).query();
+        clickOn(node);
+        node = lookup("#" + column).nth(rowCount).query();
+        clickOn(node);
+         eraseText(25);
+         write("NewValue");
+    }
+    public void choiceboxColumnTest(String column) {
+        table = lookup("#table").queryTableView();
+        int rowCount = table.getItems().size();
+        Node node = lookup("#" + column).nth(rowCount).query();
+        clickOn(node);
+        node = lookup("#" + column).nth(rowCount).query();
+        clickOn(node);
+        type(KeyCode.DOWN);
+        type(KeyCode.ENTER);
+    }
+
+    @Test
+    public void test099_deleteLastItem() {
+        table = lookup("#table").queryTableView();
+        int rowCount = table.getItems().size();
+        assertNotEquals("Table has no data: Cannot test.",
+                rowCount, 0);
+        Node row = lookup(".table-row-cell").nth(rowCount - 1).query();
+        assertNotNull("Row is null: table has not that row. ", row);
+        clickOn(row);
+        clickOn("#btn_delete");
+        verifyThat("If you are sure you want to delete this user, click OK. This will delete every single data related to this user. Be sure if you really want to delete it!.",
+                isVisible());
+        clickOn(isCancelButton());
+        clickOn("#btn_delete");
+        clickOn(isDefaultButton());
+
     }
 }

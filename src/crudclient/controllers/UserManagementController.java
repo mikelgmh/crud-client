@@ -7,6 +7,7 @@ package crudclient.controllers;
 
 import crudclient.exceptions.CellMaxLengthException;
 import crudclient.exceptions.EmailAlreadyExistsException;
+import crudclient.exceptions.InvalidEmailException;
 import crudclient.exceptions.UsernameAlreadyExistsException;
 import crudclient.factories.CompanyFactory;
 import crudclient.interfaces.CompanyInterface;
@@ -227,6 +228,10 @@ public class UserManagementController {
             try {
                 checkCellMaxLength(254, data.getNewValue().length());
                 searchEmailAlreadyExists(table.getSelectionModel().getSelectedItem(), data.getNewValue());
+                boolean validEmail = genericValidations.simpleStringRegexValidator(GenericValidations.EMAIL_REGEXP, data.getNewValue());
+                if (!validEmail) {
+                    throw new InvalidEmailException();
+                }
                 table.getSelectionModel().getSelectedItem().setEmail(data.getNewValue());
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
             } catch (CellMaxLengthException ex) {
@@ -234,6 +239,10 @@ public class UserManagementController {
             } catch (EmailAlreadyExistsException ex) {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
                 showAlert(Alert.AlertType.ERROR, "Can't update this user", "Email already exists", "The email already exists, pick another email.");
+                table.refresh();
+            } catch (InvalidEmailException ex) {
+                Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+                showAlert(Alert.AlertType.ERROR, "Invalid email", "Email is invalid", "The email format is invalid.");
                 table.refresh();
             }
         });

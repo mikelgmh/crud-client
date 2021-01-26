@@ -64,6 +64,10 @@ public class GenericValidations {
         }
     }
 
+    public boolean simpleStringRegexValidator(Pattern regexp, String value) {
+        return regexp.matcher(value).matches();
+    }
+
     /**
      * Validates a TextField checking if the text has a minimum of characters.
      * Sets the property passed in the method to true or false.
