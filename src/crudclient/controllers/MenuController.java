@@ -5,8 +5,10 @@
  */
 package crudclient.controllers;
 
+import crudclient.factories.CompanyFactory;
 import crudclient.factories.SignInFactory;
 import crudclient.factories.UserFactory;
+import crudclient.interfaces.CompanyInterface;
 import crudclient.interfaces.SignInInterface;
 import crudclient.interfaces.UserInterface;
 import crudclient.model.User;
@@ -57,11 +59,10 @@ public class MenuController implements Initializable {
     private MenuItem menuOrders;
     @FXML
     private MenuItem menuProducts;
-    
+
     private Stage stage;
 
     private User user;
-
 
     public User getUser() {
         return user;
@@ -70,6 +71,7 @@ public class MenuController implements Initializable {
     public void setUser(User user) {
         this.user = user;
     }
+
     /**
      * Initializes the controller class.
      */
@@ -99,22 +101,39 @@ public class MenuController implements Initializable {
                 }
             }
         });
-        
+
         menuUsers.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent t) {
-                    try {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/UserManagement.fxml"));
-                        Parent root = (Parent) loader.load();
-                        UserManagementController controller = ((UserManagementController) loader.getController());
-                        UserFactory userFactory = new UserFactory();
-                        UserInterface userImplementation = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
-                        controller.setUserImplementation(userImplementation);
-                        controller.setStage(new Stage());
-                        controller.initStage(root);
-                        stage.close();
-                    } catch (IOException ex) {
-                        Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/UserManagement.fxml"));
+                    Parent root = (Parent) loader.load();
+                    UserManagementController controller = ((UserManagementController) loader.getController());
+                    UserFactory userFactory = new UserFactory();
+                    UserInterface userImplementation = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
+                    controller.setUserImplementation(userImplementation);
+                    controller.setStage(new Stage());
+                    controller.initStage(root);
+                    stage.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+        menuCompanies.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/companies.fxml"));
+                    Parent root = (Parent) loader.load();
+                    CompanyController controller = ((CompanyController) loader.getController());
+                    CompanyFactory companyFactory = new CompanyFactory();
+                    CompanyInterface companyImplementation = companyFactory.getImplementation();
+                    controller.setImplementation(companyImplementation);
+                    controller.setStage(new Stage());
+                    controller.initStage(root);
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
