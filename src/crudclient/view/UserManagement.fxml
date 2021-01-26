@@ -14,7 +14,7 @@
 
 <VBox fx:id="vbox" prefHeight="818.0" prefWidth="1004.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="crudclient.controllers.UserManagementController">
     <children>
-        <fx:include source="menubar.fxml" />
+        <fx:include fx:id="menuBaruser" prefWidth="1008.0" source="menubar.fxml" />
         <AnchorPane fx:id="anchorpane" maxHeight="-1.0" maxWidth="-1.0" prefHeight="665.0" prefWidth="1041.0" VBox.vgrow="ALWAYS">
             <children>
                 <TableView fx:id="table" layoutY="265.0" prefHeight="418.0" prefWidth="1009.0">
@@ -26,7 +26,7 @@
                         <TableColumn fx:id="tc_company" minWidth="0.0" prefWidth="118.0" text="Company" />
                         <TableColumn fx:id="tc_status" prefWidth="86.0" text="Status" />
                         <TableColumn fx:id="tc_privilege" prefWidth="105.0" text="Privilege" />
-                        <TableColumn fx:id="tc_lastAccess" prefWidth="128.0" text="Last Connection" />
+                        <TableColumn fx:id="tc_lastAccess" prefWidth="127.0" text="Last Connection" />
                     </columns>
                 </TableView>
                 <TextField fx:id="txt_name" layoutX="45.0" layoutY="108.0" prefHeight="25.0" prefWidth="185.0" />

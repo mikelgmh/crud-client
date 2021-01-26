@@ -124,4 +124,12 @@ public class MenuController implements Initializable {
         });
     }
 
+    public MenuBar getMenuBar() {
+        return menuBar;
+    }
+
+    public void setMenuBar(MenuBar menuBar) {
+        this.menuBar = menuBar;
+    }
+
 }

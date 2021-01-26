@@ -53,7 +53,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.cell.ComboBoxTableCell;
+import javafx.scene.layout.HBox;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -119,6 +121,8 @@ public class UserManagementController {
     private TableColumn<User, String> tc_lastAccess;
 
     @FXML
+    private HBox menuBaruser;
+    @FXML
     private MenuController menuController;
 
     public UserManagementController() {
@@ -141,6 +145,8 @@ public class UserManagementController {
         // Set factories
         this.setCellValueFactories();
 
+        
+        
         this.configTableView();
 
         // Set stage
@@ -156,6 +162,7 @@ public class UserManagementController {
         stage.setResizable(false); // Prevents the user to resize the window.
         scene.getStylesheets().add(getClass().getResource("/crudclient/view/styles/inputStyle.css").toExternalForm()); // Imports the CSS file used for errors in some inputs.
 
+        
         // Set the default values for some cells
         this.setDefaultFieldValues();
         this.btn_delete.setDisable(true);
