@@ -13,11 +13,11 @@ import javax.ws.rs.core.GenericType;
  */
 public interface OrderInterface {
     
-    public List<Order> findAllOrders(GenericType responseType) throws ClientErrorException, ServerConnectionException;
+    public List<Order> findAllOrders(GenericType responseType) throws ClientErrorException;
     
-    public void createOrder(Object requestEntity) throws ClientErrorException, ServerConnectionException;
+    public void createOrder(Object requestEntity) throws ClientErrorException;
     
-    public void removeOrder(String id) throws ClientErrorException, ServerConnectionException;
+    public void removeOrder(String id) throws ClientErrorException;
     
-    public void editOrder(Object requestEntity) throws ClientErrorException, ServerConnectionException;
+    public void editOrder(Object requestEntity) throws ClientErrorException;
 }

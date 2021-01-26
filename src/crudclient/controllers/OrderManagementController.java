@@ -143,7 +143,7 @@ public class OrderManagementController {
         stage.setOnShowing(this::handleWindowsShowing);
 
         setTableOrderProductEditable();
-        
+
         column_date.setSortType(TableColumn.SortType.DESCENDING);
         combo_statusOrder.setItems(FXCollections.observableArrayList(OrderStatus.values()));
         column_ID.setCellValueFactory(new PropertyValueFactory("id"));
@@ -153,16 +153,14 @@ public class OrderManagementController {
         ObservableList statusOrders = FXCollections.observableArrayList(OrderStatus.values());
         column_status.setCellFactory(ComboBoxTableCell.forTableColumn(statusOrders));
         column_user.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUser().getName().concat(" " + cellData.getValue().getUser().getSurname())));
-        try{
+        try {
             orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
-        }));
-        }catch(ServerConnectionException e){
-            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, e);
-            showAlert(Alert.AlertType.WARNING, "Server ERROR", "", "Can´t connect to server!");
+            }));
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.WARNING, "Server ERROR", "", "Can´t get data!");
         }
 
         filteredListAndTableListeners();
-
 
         stage.show();
         logger.log(Level.INFO, "OrderManagement stage loaded.");
@@ -176,18 +174,21 @@ public class OrderManagementController {
         column_totalPriceProduct.setCellValueFactory(new PropertyValueFactory("total_price"));
 
         column_QuantityProduct.setCellFactory(TextFieldTableCell.<OrderProduct, Integer>forTableColumn(quantity));
-        column_QuantityProduct.setOnEditCommit(data -> {
-            tableProducts.getSelectionModel().getSelectedItem().setTotal_quantity(data.getNewValue());
-            Float unitPrice = tableProducts.getSelectionModel().getSelectedItem().getProduct().getPrice();
-            tableProducts.getSelectionModel().getSelectedItem().setTotal_price(unitPrice * tableProducts.getSelectionModel().getSelectedItem().getTotal_quantity());//ERROR
-            order.setOrderProduct(productsData);
-            Float totalOrderPrice = 0.0f;
-            for (OrderProduct op : order.getOrderProduct()) {
-                totalOrderPrice = totalOrderPrice + op.getTotal_price();
-            }
-            order.setTotal_price(totalOrderPrice);
-
-        });
+        try {
+            column_QuantityProduct.setOnEditCommit(data -> {
+                tableProducts.getSelectionModel().getSelectedItem().setTotal_quantity(data.getNewValue());
+                Float unitPrice = tableProducts.getSelectionModel().getSelectedItem().getProduct().getPrice();
+                tableProducts.getSelectionModel().getSelectedItem().setTotal_price(unitPrice * tableProducts.getSelectionModel().getSelectedItem().getTotal_quantity());//ERROR
+                order.setOrderProduct(productsData);
+                Float totalOrderPrice = 0.0f;
+                for (OrderProduct op : order.getOrderProduct()) {
+                    totalOrderPrice = totalOrderPrice + op.getTotal_price();
+                }
+                order.setTotal_price(totalOrderPrice);
+            });
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.WARNING, "It´s not a number", "", "You must type a number!");
+        }
 
     }
 
@@ -204,32 +205,31 @@ public class OrderManagementController {
         btn_OrderMngmt.setOnAction(this::handlerOrderModification);
         btn_commitOrder.setOnAction(this::handlerCommitNewOrder);
         btn_deletePro.setVisible(false);
-        
+
         setButtons();
-        
+        setButtonsWorker();
+
         column_status.setOnEditCommit((TableColumn.CellEditEvent<Order, OrderStatus> data) -> {
+
             tableOrder.getSelectionModel().getSelectedItem().setStatus(data.getNewValue());
             tableOrder.refresh();
-            try {
-                orderImplementation.editOrder(tableOrder.getSelectionModel().getSelectedItem());
-            } catch (ClientErrorException ex) {
-                Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ServerConnectionException ex) {
-                Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+
+            orderImplementation.editOrder(tableOrder.getSelectionModel().getSelectedItem());
         });
 
     }
 
     private void handlerDeleteOrder(ActionEvent event) {
-        try {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete value");
+        String a = "You are going to delete the order. Are you sure?";
+        alert.setContentText(a);
+        Optional<ButtonType> result = alert.showAndWait();
+        if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
             order = tableOrder.getSelectionModel().getSelectedItem();
             this.getOrderImplementation().removeOrder(order.getId().toString());
             tableOrder.getItems().remove(order);
-        } catch (ClientErrorException ex) {
-            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ServerConnectionException ex) {
-            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            showAlert(Alert.AlertType.INFORMATION, "Deleted succesfully", "", "Order deleted from database.");
         }
     }
 
@@ -247,14 +247,18 @@ public class OrderManagementController {
             LOG.log(Level.INFO, "Regresa a Order ");
             createOrder(products);
         } catch (IOException ex) {
-            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            showAlert(Alert.AlertType.WARNING, "Can´t change to product window.", "", "Can´t open the product manager.");
         }
     }
 
     private void handlerModifyOrder(ActionEvent event) {
-        order = tableOrder.getSelectionModel().getSelectedItem();
-        productsData = FXCollections.observableList(order.getOrderProduct());
-        tableProducts.setItems((ObservableList<OrderProduct>) productsData);
+        try {
+            order = tableOrder.getSelectionModel().getSelectedItem();
+            productsData = FXCollections.observableList(order.getOrderProduct());
+            tableProducts.setItems((ObservableList<OrderProduct>) productsData);
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.WARNING, "Can´t obtain products.", "", "Can´t obtain products from this order.");
+        }
 
     }
 
@@ -271,8 +275,8 @@ public class OrderManagementController {
         alert.setContentText(a);
         Optional<ButtonType> result = alert.showAndWait();
         if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
+            getOrderImplementation().editOrder(order);
             try {
-                getOrderImplementation().editOrder(order);
                 orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
                 }));
                 tableOrder.setItems(orderData);
@@ -281,10 +285,8 @@ public class OrderManagementController {
                 productsData = FXCollections.observableList(order.getOrderProduct());
                 tableProducts.setItems((ObservableList<OrderProduct>) productsData);
                 tableOrder.refresh();
-            } catch (ClientErrorException ex) {
-                Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ServerConnectionException ex) {
-                Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception e) {
+                showAlert(Alert.AlertType.WARNING, "Error with database", "", "Can´t refresh table with orders value.");
             }
         }
     }
@@ -378,11 +380,15 @@ public class OrderManagementController {
 
         try {
             this.getOrderImplementation().createOrder(order);
-        } catch (ClientErrorException ex) {
-            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ServerConnectionException ex) {
-            Logger.getLogger(OrderManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            orderData = FXCollections.observableArrayList(getOrderImplementation().findAllOrders(new GenericType<List<Order>>() {
+            }));
+            tableOrder.setItems(orderData);
+            tableOrder.refresh();
+            tableProducts.getItems().clear();
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.INFORMATION, "Can´t create ", "", "Order deleted from database.");
         }
+
     }
 
     private void filteredListAndTableListeners() {
@@ -404,17 +410,23 @@ public class OrderManagementController {
                 txt_IDOrder.textProperty(),
                 txt_userOrder.textProperty(),
                 txt_totalPriceOrder.textProperty()
-                //combo_statusOrder.getSelectionModel().getSelectedItem()
+        //combo_statusOrder.getSelectionModel().getSelectedItem()
         ));
     }
 
     private void setButtons() {
         currentUser = DashboardController.loggedUser;
-        if(currentUser.getPrivilege().toString().equalsIgnoreCase("WORKER")){
+        if (currentUser.getPrivilege().toString().equalsIgnoreCase("PROVIDER")) {
+            btn_newOrder.setDisable(true);
+        }
+    }
+
+    private void setButtonsWorker() {
+        currentUser = DashboardController.loggedUser;
+        if (currentUser.getPrivilege().toString().equalsIgnoreCase("WORKER")) {
             btn_modifyOrder.setDisable(true);
             btn_deleteOrder.setDisable(true);
         }
     }
 
-    
 }

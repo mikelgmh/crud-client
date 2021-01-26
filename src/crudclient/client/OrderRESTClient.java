@@ -40,7 +40,7 @@ public class OrderRESTClient implements OrderInterface {
     }
 
     public void editOrder(Object requestEntity) throws ClientErrorException {
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
     public void edit_JSON(Object requestEntity) throws ClientErrorException {
@@ -59,7 +59,7 @@ public class OrderRESTClient implements OrderInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public List<Order> findAllOrders(GenericType responseType) throws ClientErrorException, ServerConnectionException {
+    public List<Order> findAllOrders(GenericType responseType) throws ClientErrorException{
         WebTarget resource = webTarget;
         resource = resource.path("order");
         List<Order> allOrders = (List<Order>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
@@ -72,11 +72,8 @@ public class OrderRESTClient implements OrderInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public void createOrder(Object requestEntity) throws ClientErrorException, ServerConnectionException {
+    public void createOrder(Object requestEntity) throws ClientErrorException {
         Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
-        if (response.getStatus() == 500) {
-            throw new ServerConnectionException();
-        }
     }
 
     public void create_JSON(Object requestEntity) throws ClientErrorException {
