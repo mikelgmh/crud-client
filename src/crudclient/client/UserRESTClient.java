@@ -6,6 +6,7 @@
 package crudclient.client;
 
 import crudclient.exceptions.EmailAlreadyExistsException;
+import crudclient.exceptions.EmailAndUsernameAlreadyExistException;
 import crudclient.exceptions.UsernameAlreadyExistsException;
 import crudclient.interfaces.EmailServiceInterface;
 import crudclient.interfaces.SignInInterface;
@@ -205,9 +206,10 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
      * @throws ClientErrorException
      * @throws UsernameAlreadyExistsException
      * @throws EmailAlreadyExistsException
+     * @throws crudclient.exceptions.EmailAndUsernameAlreadyExistException
      */
     @Override
-    public void createUser(Object requestEntity) throws ClientErrorException, UsernameAlreadyExistsException, EmailAlreadyExistsException {
+    public void createUser(Object requestEntity) throws ClientErrorException, UsernameAlreadyExistsException, EmailAlreadyExistsException,EmailAndUsernameAlreadyExistException {
         Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
         if (response.getStatus() == 401) {
 
@@ -215,6 +217,9 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
         }
         if (response.getStatus() == 403) {
             throw new EmailAlreadyExistsException();
+        }
+               if (response.getStatus() == 405) {
+            throw new EmailAndUsernameAlreadyExistException();
         }
 
     }

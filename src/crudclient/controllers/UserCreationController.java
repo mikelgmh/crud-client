@@ -6,6 +6,7 @@
 package crudclient.controllers;
 
 import crudclient.exceptions.EmailAlreadyExistsException;
+import crudclient.exceptions.EmailAndUsernameAlreadyExistException;
 import crudclient.exceptions.UsernameAlreadyExistsException;
 import crudclient.factories.CompanyFactory;
 import crudclient.interfaces.CompanyInterface;
@@ -369,6 +370,16 @@ public class UserCreationController {
             setInputError(false, txt_username_create, hint_username);
         } catch (EmailAlreadyExistsException ex) { // Thrown when the email already exists in the database.
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+            hint_email.setText("The email already exists.");
+            btn_create_create.setDisable(true);
+            setInputError(false, txt_email_create, hint_email);
+        } catch (EmailAndUsernameAlreadyExistException e) {
+            Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, e);
+            hint_username.setText("The username already exists.");
+            btn_create_create.setDisable(true);
+            setInputError(false, txt_username_create, hint_username);
+
+            Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, e);
             hint_email.setText("The email already exists.");
             btn_create_create.setDisable(true);
             setInputError(false, txt_email_create, hint_email);
