@@ -442,6 +442,33 @@ public class UserManagerTest extends ApplicationTest {
         clickOn(isDefaultButton());
     }
 
+    @Test
+    public void test025_testColumnUpdate() {
+        updateColumnTest("tc_name");
+        updateColumnTest("tc_surname");
+        updateColumnTest("tc_username");
+        updateColumnTest("tc_email");
+        //verifyThat("The email format is invalid.", isVisible());
+    }
+
+    @Test
+    public void test026_testEmailFormatError() {
+        table = lookup("#table").queryTableView();
+        int rowCount = table.getItems().size();
+        Node node = lookup("#tc_email").nth(rowCount).query();
+        clickOn(node);
+        node = lookup("#tc_email").nth(rowCount).query();
+        clickOn(node);
+        eraseText(50);
+        for (int i = 0; i < 30; i++) {
+            type(KeyCode.DELETE);
+        }
+        write("wrongEmail");
+        type(KeyCode.ENTER);
+        verifyThat("The email format is invalid.", isVisible());
+        clickOn(isDefaultButton());
+    }
+
     public void writeColumnText() {
         write(OVERSIZED_TEXT);
         type(KeyCode.ENTER);
@@ -459,16 +486,18 @@ public class UserManagerTest extends ApplicationTest {
         writeColumnText();
     }
 
-     public void updateColumnTest(String column) {
+    public void updateColumnTest(String column) {
         table = lookup("#table").queryTableView();
         int rowCount = table.getItems().size();
         Node node = lookup("#" + column).nth(rowCount).query();
         clickOn(node);
         node = lookup("#" + column).nth(rowCount).query();
         clickOn(node);
-         eraseText(25);
-         write("NewValue");
+        eraseText(25);
+        write("NewValue");
+        type(KeyCode.ENTER);
     }
+
     public void choiceboxColumnTest(String column) {
         table = lookup("#table").queryTableView();
         int rowCount = table.getItems().size();
