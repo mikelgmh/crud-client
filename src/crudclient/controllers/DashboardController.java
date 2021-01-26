@@ -82,6 +82,8 @@ public class DashboardController {
         menuController = new MenuController();
         menuController.setUser(user);
         loggedUser = user;
+        lbl_Welcome.setText("Welcome "+user.getName());
+        lbl_Connection.setText(user.getLastAccessAsString());
         //setButtons();
     }
 
