@@ -195,7 +195,7 @@ public class SignInController {
     /**
      * Method to set the Company implementation getting the Company interface.
      *
-     * @param companyInterface
+     * @param signInInterface
      */
     public void setImplementation(SignInInterface signInInterface) {
         this.signInImplementation = signInInterface;

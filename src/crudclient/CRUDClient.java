@@ -1,10 +1,7 @@
 package crudclient;
 
-import crudclient.controllers.CompanyController;
 import crudclient.controllers.SignInController;
-import crudclient.factories.CompanyFactory;
 import crudclient.factories.SignInFactory;
-import crudclient.interfaces.CompanyInterface;
 import crudclient.interfaces.SignInInterface;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
