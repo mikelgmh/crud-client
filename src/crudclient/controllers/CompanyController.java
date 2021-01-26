@@ -14,10 +14,14 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import crudclient.model.CompanyType;
 import java.util.List;
+import java.util.Optional;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -76,6 +80,7 @@ public class CompanyController {
         stage.setTitle("Companies");
         stage.setResizable(true);
         stage.setOnShowing(this::handleWindowShowing);
+        stage.onCloseRequestProperty().set(this::handleCloseRequest);
         tableViewCompanies.getSelectionModel().selectedItemProperty()
                 .addListener(this::handleCompaniesTableSelectionChanged);
         // setOnEditCommit handlers for the columns
@@ -181,13 +186,24 @@ public class CompanyController {
      */
     @FXML
     private void deleteCompanyAction(ActionEvent event) {
-        // Delete selected Company in the database.
-        Company delCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
-        getCompanyImplementation().remove(delCompany.getId().toString());
-        // Delete selected Company in the TableView
-        tableViewCompanies.getItems().remove(tableViewCompanies.getSelectionModel().getSelectedItem());
-        // Load again the table to load the Company's ids correctly
-        loadTableView();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete company");
+        alert.setHeaderText("Company will be deleted");
+        alert.setContentText("You will delete the selected company, are you sure?");
+        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get().equals(ButtonType.OK)) {
+            // Delete selected Company in the database.
+            Company delCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
+            getCompanyImplementation().remove(delCompany.getId().toString());
+            // Delete selected Company in the TableView
+            tableViewCompanies.getItems().remove(tableViewCompanies.getSelectionModel().getSelectedItem());
+            // Load again the table to load the Company's ids correctly
+            loadTableView();
+        } else {
+            event.consume();
+            alert.close();
+        }
     }
 
     /**
@@ -217,6 +233,27 @@ public class CompanyController {
             tableViewCompanies.setPlaceholder(new Label(ex.getMessage()));
         }
         tableViewCompanies.setItems(companyData);
+    }
+
+    /**
+     * Handler to the close button of the window.
+     *
+     * @param event
+     */
+    private void handleCloseRequest(WindowEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Close confirmation");
+        alert.setHeaderText("Application will be closed");
+        alert.setContentText("You will close the application");
+        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get().equals(ButtonType.OK)) {
+            stage.close();
+            Platform.exit();
+        } else {
+            event.consume();
+            alert.close();
+        }
     }
 
     /**
