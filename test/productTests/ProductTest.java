@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -41,9 +42,9 @@ public class ProductTest extends ApplicationTest {
     @FXML
     private TableColumn<Product, Float> tc_Price;
     @FXML
-    private Button btn_Create;
+    private Button btn_CreateProduct;
     @FXML
-    private Button btn_Delete;
+    private Button btn_DeleteProduct;
     @FXML
     private Button btn_OrderCreate;
     @FXML
@@ -78,24 +79,66 @@ public class ProductTest extends ApplicationTest {
     public void test002_goToProductManagment() {
         clickOn("#menuManagement");
         clickOn("#menuProducts");
-        verifyThat("#btn_Delete", isEnabled());
-        verifyThat("#btn_Create", isEnabled());
-        verifyThat("#btn_OrderCreate", isInvisible());
-        verifyThat("#tf_company", isInvisible());
-    }
-    
-    @Test
-    public void test003_createProduct() {
-        clickOn("#btn_Create");
-        Node row = lookup(".table-row-cell").nth(10).query();
-        clickOn(row);
-        verifyThat("#btn_Delete", isEnabled());
-        verifyThat("#btn_Create", isEnabled());
+        verifyThat("#btn_DeleteProduct", isEnabled());
+        verifyThat("#btn_CreateProduct", isEnabled());
         verifyThat("#btn_OrderCreate", isInvisible());
         verifyThat("#tf_company", isInvisible());
     }
 
-  /*  @Test
+    @Test
+    public void test003_createProduct() {
+        clickOn("#btn_CreateProduct");
+        Node rowName = lookup("#tc_Name").nth(1).query();
+        doubleClickOn(rowName);
+        write("Manzana");
+        this.press(KeyCode.ENTER);
+        Node rowWeight = lookup("#tc_Weight").nth(1).query();
+        doubleClickOn(rowWeight);
+        write("13");
+        this.press(KeyCode.ENTER);
+        Node rowPrice = lookup("#tc_Price").nth(1).query();
+        doubleClickOn(rowPrice);
+        write("50");
+        this.press(KeyCode.ENTER);
+    }
+
+    @Test
+    public void test004_editProduct() {
+        Node rowName = lookup("#tc_Name").nth(2).query();
+        doubleClickOn(rowName);
+        write("Prueba");
+        this.press(KeyCode.ENTER);
+        Node rowWeight = lookup("#tc_Weight").nth(2).query();
+        doubleClickOn(rowWeight);
+        write("5");
+        this.press(KeyCode.ENTER);
+        Node rowPrice = lookup("#tc_Price").nth(2).query();
+        doubleClickOn(rowPrice);
+        write("8");
+        this.press(KeyCode.ENTER);
+    }
+
+    @Test
+    public void test005_deleteProduct() {
+        Node rowName = lookup("#tc_Name").nth(4).query();
+        clickOn(rowName);
+        clickOn("#btn_DeleteProduct");
+    }
+
+    @Test
+    public void test006_goToProductManagmentFromOrderManagment() {
+        clickOn("#menuManagement");
+        clickOn("#menuOrders");
+        clickOn("#btn_newOrder");
+        verifyThat("#btn_DeleteProduct", isInvisible());
+        verifyThat("#btn_CreateProduct", isInvisible());
+        verifyThat("#btn_OrderCreate", isEnabled());
+        verifyThat("#tf_company", isEnabled());
+    }
+    
+    
+
+    /*  @Test
     public void test004_goToProductManagmentFromOrderProduct() { // Check that the delete button is disabled
         clickOn("#menuManagement");
         clickOn("#menuOrders");
@@ -114,5 +157,4 @@ public class ProductTest extends ApplicationTest {
         clickOn(row);
         clickOn("#btn_OrderCreate");
     }*/
-
 }

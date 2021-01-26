@@ -11,7 +11,7 @@
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="622.0" prefWidth="764.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="crudclient.controllers.ProductController">
     <children>
         <fx:include prefWidth="763.0" source="menubar.fxml" />
-        <StackPane layoutX="22.0" layoutY="63.0" prefHeight="531.0" prefWidth="642.0"></StackPane>
+        <StackPane layoutX="22.0" layoutY="63.0" prefHeight="531.0" prefWidth="642.0" />
     </children>
     <children>
       <StackPane layoutX="30.0" layoutY="198.0" prefHeight="396.0" prefWidth="693.0">
@@ -27,8 +27,8 @@
       </StackPane>
       <Pane layoutY="27.0" prefHeight="158.0" prefWidth="764.0">
          <children>
-            <Button fx:id="btn_Create" layoutX="194.0" layoutY="109.0" mnemonicParsing="false" onAction="#handleOnClickCreate" prefHeight="21.0" prefWidth="123.0" text="Create product" />
-            <Button fx:id="btn_Delete" layoutX="447.0" layoutY="106.0" mnemonicParsing="false" onAction="#handleOnClickDelete" prefHeight="31.0" prefWidth="123.0" text="Delete product" />
+            <Button fx:id="btn_CreateProduct" layoutX="194.0" layoutY="109.0" mnemonicParsing="false" onAction="#handleOnClickCreate" prefHeight="21.0" prefWidth="123.0" text="Create product" />
+            <Button fx:id="btn_DeleteProduct" layoutX="447.0" layoutY="106.0" mnemonicParsing="false" onAction="#handleOnClickDelete" prefHeight="31.0" prefWidth="123.0" text="Delete product" />
             <Label fx:id="lbl_Choose" layoutX="64.0" layoutY="32.0" text="Choose company:" />
             <Button fx:id="btn_OrderCreate" layoutX="508.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleOnClickCreateOrder" prefHeight="31.0" prefWidth="207.0" text="Create Order" />
             <TextField fx:id="tf_company" layoutX="181.0" layoutY="28.0" />
