@@ -16,14 +16,11 @@ import crudclient.model.UserPrivilege;
 import crudclient.model.UserStatus;
 import crudclient.util.security.AsymmetricEncryption;
 import crudclient.util.validation.GenericValidations;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -35,7 +32,6 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Background;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javax.ws.rs.ClientErrorException;
@@ -47,6 +43,7 @@ import javax.ws.rs.core.GenericType;
  */
 public class UserCreationController {
 
+    // The needed class properties and variables.
     private Stage stage;
     private static final Logger logger = Logger.getLogger("signupsignin.controllers.SignUpController");
     private UserInterface userImplementation;
@@ -55,6 +52,7 @@ public class UserCreationController {
     private ObservableList companyList;
     private UserManagementController userManagementController;
 
+    // Text fields, password fields and choiceboxes.
     @FXML
     private TextField txt_firstname;
     @FXML
@@ -93,16 +91,21 @@ public class UserCreationController {
     // Buttons
     @FXML
     private Button btn_create_create;
-
     @FXML
     private Button btn_cancel;
 
+    /**
+     * Empty constructor for this class.
+     */
     public UserCreationController() {
     }
 
+    /**
+     * The method that is run when this window opens.
+     *
+     * @param parent
+     */
     public void initStage(Parent parent) {
-
-        // Sets the default hint behavior
         logger.log(Level.INFO, "Loading user creation window...");
         // Creates a scena and a stage and opens the window.
         Scene scene = new Scene(parent);
@@ -115,6 +118,7 @@ public class UserCreationController {
         CompanyFactory companyFactory = new CompanyFactory();
         this.companyImplementation = companyFactory.getImplementation();
 
+        // Sets the default field values.
         setDefaultFieldValues();
 
         // Set some properties of the stage
@@ -144,9 +148,13 @@ public class UserCreationController {
      * retrieves some data from the server.
      */
     public void setDefaultFieldValues() {
+        logger.log(Level.INFO, "Setting the default field values.");
+
+        // Sets the items in the choiceboxes.
         this.chb_privilege.setItems(FXCollections.observableArrayList(UserPrivilege.values()));
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
 
+        // Gets the list of companies and sets the values into the Company choicebox.
         try {
             this.companyList = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
             }));
@@ -166,6 +174,8 @@ public class UserCreationController {
      */
     public void setListeners() {
         logger.log(Level.INFO, "Setting listeners for the components of the window.");
+
+        // Sets a listener for the firstname field.
         this.txt_firstname.textProperty().addListener((obs, oldText, newText) -> {
             Boolean minlengthValidator = this.genericValidations.minLength(this.txt_firstname, 3, newText, "minLengthValidator"); // Adds a min lenght validator
             this.genericValidations.textLimiter(this.txt_firstname, 200, newText); // Limits the input to 200 characters
@@ -173,13 +183,15 @@ public class UserCreationController {
             this.validate(); // Executes the validation.
         });
 
+        // Sets a listener for the lastname field.
         this.txt_lastname.textProperty().addListener((obs, oldText, newText) -> {
             Boolean minlengthValidator = this.genericValidations.minLength(this.txt_lastname, 3, newText, "minLengthValidator"); // Adds a min lenght validator
-            setInputError(minlengthValidator, txt_lastname, hint_lastname);
+            setInputError(minlengthValidator, txt_lastname, hint_lastname); // Sets the input to error mode if the validation is true
             this.genericValidations.textLimiter(this.txt_lastname, 200, newText); // Limits the input to 200 characters
             this.validate(); // Executes the validation.
         });
 
+        // Sets a listener for the username field.
         this.txt_username_create.textProperty().addListener((obs, oldText, newText) -> {
             this.genericValidations.textLimiter(this.txt_username_create, 200, newText); // Limits the input to 200 characters
             Boolean minlengthValidator = this.genericValidations.minLength(this.txt_username_create, 3, newText, "minLengthValidator"); // Adds a min lenght validator
@@ -187,21 +199,23 @@ public class UserCreationController {
             setInputError(minlengthValidator, txt_username_create, hint_username);
             this.validate(); // Executes the validation.
         });
+
+        // Sets a listener for the company choicebox.
         this.chb_company.setOnAction(event -> {
             this.validate();
         });
 
-        // Validation for the Email field
+        // Sets a listener for the email field.
         this.txt_email_create.textProperty().addListener((obs, oldText, newText) -> {
             //this.genericValidations.minLength(this.txt_email, 3, newText, "minLengthValidator");
             this.genericValidations.textLimiter(this.txt_email_create, 254, newText);
             boolean emailValidator = this.genericValidations.regexValidator(this.genericValidations.EMAIL_REGEXP, this.txt_email_create, newText.toLowerCase(), "emailValidator"); // Adds a regex validation to check if the email is correct
             this.hint_email.setText(this.genericValidations.TXT_ENTER_VALID_EMAIL);
-
             setInputError(emailValidator, txt_email_create, hint_email);
             this.validate();
         });
 
+        // Sets a listener for the password field.
         this.txt_password.textProperty().addListener((obs, oldText, newText) -> {
             Boolean passwordsMatch = this.genericValidations.comparePasswords(this.txt_password, this.txt_repeatPassword, "passwordsMatch");
             this.genericValidations.textLimiter(this.txt_password, 25, newText);
@@ -209,6 +223,8 @@ public class UserCreationController {
             this.setPasswordFieldsError(passwordsMatch);
             this.validate();
         });
+
+        // Sets a listener for the repeatPassword field.
         this.txt_repeatPassword.textProperty().addListener((obs, oldText, newText) -> {
             Boolean passwordsMatch = this.genericValidations.comparePasswords(this.txt_password, this.txt_repeatPassword, "passwordsMatch");
             this.genericValidations.textLimiter(this.txt_repeatPassword, 25, newText);
@@ -239,7 +255,7 @@ public class UserCreationController {
                 this.hint_password.setText("The passwords do not fulfill the requirements:\n" + genericValidations.PASSWORD_CONDITIONS);
                 this.hint_repeatPassword.setTextFill(Color.RED);
                 this.genericValidations.addClass(this.txt_repeatPassword, "error", Boolean.TRUE);
-            } else {
+            } else { // If there's not error, set error class to false in the inputs.
                 this.hint_password.setTextFill(genericValidations.greyColor);
                 this.genericValidations.addClass(this.txt_password, "error", Boolean.FALSE);
                 this.hint_password.setText(genericValidations.PASSWORD_CONDITIONS);
@@ -250,6 +266,13 @@ public class UserCreationController {
         }
     }
 
+    /**
+     * Sets the error style for the received TextField.
+     *
+     * @param validatorStatus
+     * @param tf
+     * @param hint
+     */
     public void setInputError(boolean validatorStatus, TextField tf, Label hint) {
         if (!validatorStatus) { // Si Hay error
             this.genericValidations.addClass(tf, "error", Boolean.TRUE);
@@ -262,10 +285,11 @@ public class UserCreationController {
 
     /**
      * Executes the validation task for each component in the form. If all true,
-     * then create a new user.
+     * then create a new user. The create button is disabled if the validations
+     * fail.
      */
     public void validate() {
-        if (Boolean.parseBoolean(this.txt_email_create.getProperties().get("emailValidator").toString())
+        if (Boolean.parseBoolean(this.txt_email_create.getProperties().get("emailValidator").toString()) // If validations pass
                 && Boolean.parseBoolean(this.txt_firstname.getProperties().get("minLengthValidator").toString())
                 && Boolean.parseBoolean(this.txt_username_create.getProperties().get("minLengthValidator").toString())
                 && Boolean.parseBoolean(this.txt_lastname.getProperties().get("minLengthValidator").toString())
@@ -273,13 +297,17 @@ public class UserCreationController {
                 && Boolean.parseBoolean(this.txt_repeatPassword.getProperties().get("passwordRequirements").toString())
                 && Boolean.parseBoolean(this.txt_repeatPassword.getProperties().get("passwordsMatch").toString())
                 && this.chb_company.getSelectionModel().getSelectedItem() != null) {
-            this.btn_create_create.setDisable(false);
-        } else {
+            this.btn_create_create.setDisable(false); // disable create button
+        } else { // Else enable create button
             this.btn_create_create.setDisable(true);
         }
     }
 
+    /**
+     * The creation button handler. Creates the user object and send a request.
+     */
     public void onCreateButtonClickHandler() {
+        // Create user.
         User user = new User();
         user.setName(txt_firstname.getText());
         user.setSurname(txt_lastname.getText());
@@ -290,13 +318,14 @@ public class UserCreationController {
         user.setPrivilege((UserPrivilege) chb_privilege.getSelectionModel().getSelectedItem());
 
         try {
+            // Encrypts the password before setting the password to the user.
             AsymmetricEncryption asymmetricEncryption = new AsymmetricEncryption(getUserImplementation().getPublicKey());
             String encryptedPassword = asymmetricEncryption.encryptString(txt_password.getText());
             user.setPassword(encryptedPassword);
-            this.userImplementation.createUser(user);
+            this.userImplementation.createUser(user); // Sends the request
             userManagementController.getUsers();
             // Show an alert if the user has been created
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION); // If the request is successful, ask the user to close the window or remain in the same one.
             alert.setTitle("Go back to the user management screen?");
             alert.setHeaderText("User successfully created");
             alert.setContentText("You will go back to the management window if you press OK");
@@ -309,27 +338,30 @@ public class UserCreationController {
             } else {
                 alert.close();
             }
-        } catch (ClientErrorException ex) {
+        } catch (ClientErrorException ex) { // If there's a client error
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
             showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
-        } catch (UsernameAlreadyExistsException ex) {
+        } catch (UsernameAlreadyExistsException ex) { // Thrown when the username already exists in the database.
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
             hint_username.setText("The username already exists.");
             btn_create_create.setDisable(true);
             setInputError(false, txt_username_create, hint_username);
-        } catch (EmailAlreadyExistsException ex) {
+        } catch (EmailAlreadyExistsException ex) { // Thrown when the email already exists in the database.
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
             hint_email.setText("The email already exists.");
             btn_create_create.setDisable(true);
             setInputError(false, txt_email_create, hint_email);
-        } catch (Exception ex) {
+        } catch (Exception ex) { // If the server disconnects this exception is thrown.
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
             showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
         }
     }
 
+    /**
+     * Closes the current window.
+     */
     public void closeWindow() {
-
+        // Asks the user if really want to close the window.
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Close confirmation");
         alert.setHeaderText("Application will be closed");
@@ -337,13 +369,20 @@ public class UserCreationController {
         alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get().equals(ButtonType.OK)) {
-
             stage.close();
         } else {
             alert.close();
         }
     }
 
+    /**
+     * A method to show an alert so we don't repeat some code.
+     *
+     * @param type
+     * @param title
+     * @param header
+     * @param content
+     */
     public void showAlert(Alert.AlertType type, String title, String header, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -353,26 +392,54 @@ public class UserCreationController {
         alert.showAndWait();
     }
 
+    /**
+     * Gets the stage.
+     *
+     * @return
+     */
     public Stage getStage() {
         return stage;
     }
 
+    /**
+     * Sets the stage.
+     *
+     * @param stage
+     */
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
+    /**
+     * Gets the user implementation.
+     *
+     * @return
+     */
     public UserInterface getUserImplementation() {
         return userImplementation;
     }
 
+    /**
+     * Sets the user implementation.
+     *
+     * @param userImplementation
+     */
     public void setUserImplementation(UserInterface userImplementation) {
         this.userImplementation = userImplementation;
     }
 
+    /**
+     * Gets the user management controller.
+     *
+     * @return
+     */
     public UserManagementController getUserManagementController() {
         return userManagementController;
     }
 
+    /**
+     * Sets the user management controller.
+     */
     public void setUserManagementController(UserManagementController userManagementController) {
         this.userManagementController = userManagementController;
     }
