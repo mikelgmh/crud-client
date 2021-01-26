@@ -40,12 +40,14 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableArray;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXMLLoader;
@@ -56,6 +58,9 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -94,6 +99,8 @@ public class UserManagementController {
     private ChoiceBox chb_privilege;
     @FXML
     private Label hint_email;
+    @FXML
+    private Text text_lastUpdate;
 
     @FXML
     private Button btn_delete;
@@ -145,8 +152,6 @@ public class UserManagementController {
         // Set factories
         this.setCellValueFactories();
 
-        
-        
         this.configTableView();
 
         // Set stage
@@ -162,7 +167,6 @@ public class UserManagementController {
         stage.setResizable(false); // Prevents the user to resize the window.
         scene.getStylesheets().add(getClass().getResource("/crudclient/view/styles/inputStyle.css").toExternalForm()); // Imports the CSS file used for errors in some inputs.
 
-        
         // Set the default values for some cells
         this.setDefaultFieldValues();
         this.btn_delete.setDisable(true);
@@ -190,9 +194,13 @@ public class UserManagementController {
                 checkCellMaxLength(254, data.getNewValue().length());
                 table.getSelectionModel().getSelectedItem().setName(data.getNewValue());
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+                updateLastModification();
             } catch (CellMaxLengthException ex) {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
                 table.refresh();
+            } catch (Exception ex) {
+                Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+                showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
             }
 
         });
@@ -204,9 +212,13 @@ public class UserManagementController {
                 checkCellMaxLength(254, data.getNewValue().length());
                 table.getSelectionModel().getSelectedItem().setSurname(data.getNewValue());
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+                updateLastModification();
             } catch (CellMaxLengthException ex) {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.WARNING, null, ex);
                 table.refresh();
+            } catch (ProcessingException ex) {
+                Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+                showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
             }
 
         });
@@ -219,12 +231,16 @@ public class UserManagementController {
                 searchUsernameAlreadyExists(table.getSelectionModel().getSelectedItem(), data.getNewValue());
                 table.getSelectionModel().getSelectedItem().setUsername(data.getNewValue());
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+                updateLastModification();
             } catch (CellMaxLengthException ex) {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (UsernameAlreadyExistsException ex) {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
                 showAlert(Alert.AlertType.ERROR, "Can't update this user", "Username already exists", "The username already exists, pick another username.");
                 table.refresh();
+            } catch (Exception ex) {
+                Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+                showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
             }
 
         });
@@ -241,6 +257,7 @@ public class UserManagementController {
                 }
                 table.getSelectionModel().getSelectedItem().setEmail(data.getNewValue());
                 userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+                updateLastModification();
             } catch (CellMaxLengthException ex) {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (EmailAlreadyExistsException ex) {
@@ -251,6 +268,9 @@ public class UserManagementController {
                 Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
                 showAlert(Alert.AlertType.ERROR, "Invalid email", "Email is invalid", "The email format is invalid.");
                 table.refresh();
+            } catch (Exception ex) {
+                Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+                showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
             }
         });
 
@@ -260,7 +280,15 @@ public class UserManagementController {
         tc_status.setOnEditCommit((TableColumn.CellEditEvent<User, UserStatus> data) -> {
             table.getSelectionModel().getSelectedItem().setStatus(data.getNewValue());
             table.refresh();
-            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            try {
+                userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+
+                updateLastModification();
+            } catch (Exception ex) {
+                Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+                showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
+            }
+
         });
 
         // User Privilege column
@@ -269,25 +297,49 @@ public class UserManagementController {
         tc_privilege.setOnEditCommit((TableColumn.CellEditEvent<User, UserPrivilege> data) -> {
             table.getSelectionModel().getSelectedItem().setPrivilege(data.getNewValue());
             table.refresh();
-            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            try {
+                userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+                updateLastModification();
+            } catch (Exception ex) {
+                Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+                showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
+            }
+
         });
 
         // Company column
         CompanyFactory companyFactory = new CompanyFactory();
         this.companyImplementation = companyFactory.getImplementation();
-        ObservableList<Company> companies = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
-        }));
+        ObservableList<Company> companies = null;
+        try {
+            companies = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
+            }));
+        } catch (Exception ex) {
+            Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+            showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
+        }
         tc_company.setCellFactory(ComboBoxTableCell.forTableColumn(companies));
         tc_company.setOnEditCommit((TableColumn.CellEditEvent<User, Company> data) -> {
             table.getSelectionModel().getSelectedItem().setCompany(data.getNewValue());
             table.refresh();
-            userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            updateLastModification();
+            try {
+                userImplementation.editUser(table.getSelectionModel().getSelectedItem());
+            } catch (Exception ex) {
+                Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+                showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
+            }
         });
     }
 
     public void getCompanies() {
-        companiesList = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
-        }));
+        try {
+            companiesList = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
+            }));
+        } catch (Exception ex) {
+            Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+            showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
+        }
     }
 
     public void searchEmailAlreadyExists(User user, String email) throws EmailAlreadyExistsException {
@@ -296,6 +348,12 @@ public class UserManagementController {
                 throw new EmailAlreadyExistsException();
             }
         }
+    }
+
+    public void updateLastModification() {
+        SimpleDateFormat lastUpdateTime = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
+        text_lastUpdate.setText("Last update: " + lastUpdateTime.format(date));
     }
 
     public void searchUsernameAlreadyExists(User user, String username) throws UsernameAlreadyExistsException {
@@ -404,8 +462,12 @@ public class UserManagementController {
     }
 
     public void getUsers() {
-        this.masterData = FXCollections.observableArrayList(getUserImplementation().getUsers(new GenericType<List<User>>() {
-        }));
+        try {
+            this.masterData = FXCollections.observableArrayList(getUserImplementation().getUsers(new GenericType<List<User>>() {
+            }));
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
+        }
     }
 
     public void createFilteredListAndTableListeners() {
@@ -472,7 +534,11 @@ public class UserManagementController {
         alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get().equals(ButtonType.OK)) {
-            this.getUserImplementation().deleteUser(u.getId().toString());
+            try {
+                this.getUserImplementation().deleteUser(u.getId().toString());
+            } catch (Exception e) {
+                showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
+            }
             masterData.remove(u);
         } else {
             alert.close();

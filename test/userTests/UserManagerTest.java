@@ -11,7 +11,7 @@ package userTests;
  * and open the template in the editor.
  */
 import static org.testfx.matcher.base.NodeMatchers.isVisible;
-
+import static org.testfx.matcher.base.NodeMatchers.isInvisible;
 import crudclient.CRUDClient;
 import crudclient.model.User;
 import java.util.concurrent.TimeoutException;
@@ -448,7 +448,6 @@ public class UserManagerTest extends ApplicationTest {
         updateColumnTest("tc_surname");
         updateColumnTest("tc_username");
         updateColumnTest("tc_email");
-        //verifyThat("The email format is invalid.", isVisible());
     }
 
     @Test
@@ -496,6 +495,7 @@ public class UserManagerTest extends ApplicationTest {
         eraseText(25);
         write("NewValue");
         type(KeyCode.ENTER);
+        verifyThat("#btn_delete", isEnabled());
     }
 
     public void choiceboxColumnTest(String column) {
@@ -507,6 +507,7 @@ public class UserManagerTest extends ApplicationTest {
         clickOn(node);
         type(KeyCode.DOWN);
         type(KeyCode.ENTER);
+        verifyThat("#btn_delete", isEnabled());
     }
 
     @Test

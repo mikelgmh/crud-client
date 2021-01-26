@@ -52,7 +52,6 @@ public class UserCreationController {
     private UserInterface userImplementation;
     private CompanyInterface companyImplementation;
     private final GenericValidations genericValidations = new GenericValidations();
-    private AsymmetricEncryption enc;
     private ObservableList companyList;
     private UserManagementController userManagementController;
 
@@ -138,11 +137,6 @@ public class UserCreationController {
         this.setListeners();
 
         stage.show(); // Show the stage
-
-        // PRUEBAS DE ENCRIPTAR Y RECIBIR LA CLAVE PÚBLICA DEL SERVIDOR
-        String publicKeyAsHex = this.userImplementation.getPublicKey();
-        enc = new AsymmetricEncryption(publicKeyAsHex);
-
     }
 
     /**
@@ -153,8 +147,13 @@ public class UserCreationController {
         this.chb_privilege.setItems(FXCollections.observableArrayList(UserPrivilege.values()));
         this.chb_status.setItems(FXCollections.observableArrayList(UserStatus.values()));
 
-        this.companyList = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
-        }));
+        try {
+            this.companyList = FXCollections.observableArrayList(companyImplementation.findAllCompanies_XML(new GenericType<List<Company>>() {
+            }));
+        } catch (Exception ex) {
+            Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+            showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
+        }
 
         this.chb_company.getItems().setAll(companyList);
         // Sets the first values so we don't get an exception when loading the screen.
@@ -289,10 +288,11 @@ public class UserCreationController {
         user.setCompany((Company) chb_company.getSelectionModel().getSelectedItem());
         user.setStatus((UserStatus) chb_status.getSelectionModel().getSelectedItem());
         user.setPrivilege((UserPrivilege) chb_privilege.getSelectionModel().getSelectedItem());
-        AsymmetricEncryption asymmetricEncryption = new AsymmetricEncryption(getUserImplementation().getPublicKey());
-        String encryptedPassword = asymmetricEncryption.encryptString(txt_password.getText());
-        user.setPassword(encryptedPassword);
+
         try {
+            AsymmetricEncryption asymmetricEncryption = new AsymmetricEncryption(getUserImplementation().getPublicKey());
+            String encryptedPassword = asymmetricEncryption.encryptString(txt_password.getText());
+            user.setPassword(encryptedPassword);
             this.userImplementation.createUser(user);
             userManagementController.getUsers();
             // Show an alert if the user has been created
@@ -311,6 +311,7 @@ public class UserCreationController {
             }
         } catch (ClientErrorException ex) {
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+            showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
         } catch (UsernameAlreadyExistsException ex) {
             Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
             hint_username.setText("The username already exists.");
@@ -321,6 +322,9 @@ public class UserCreationController {
             hint_email.setText("The email already exists.");
             btn_create_create.setDisable(true);
             setInputError(false, txt_email_create, hint_email);
+        } catch (Exception ex) {
+            Logger.getLogger(UserCreationController.class.getName()).log(Level.SEVERE, null, ex);
+            showAlert(Alert.AlertType.ERROR, "Can't connect to server", "Connection error", "The server couldn't be reached.");
         }
     }
 
