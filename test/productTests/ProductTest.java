@@ -134,26 +134,4 @@ public class ProductTest extends ApplicationTest {
         verifyThat("#btn_OrderCreate", isEnabled());
         verifyThat("#tf_company", isEnabled());
     }
-    
-    
-
-    /*  @Test
-    public void test004_goToProductManagmentFromOrderProduct() { // Check that the delete button is disabled
-        clickOn("#menuManagement");
-        clickOn("#menuOrders");
-        clickOn("#btn_newOrder");
-        verifyThat("#btn_Delete", isInvisible());
-        verifyThat("#btn_Create", isInvisible());
-        verifyThat("#btn_OrderCreate", isEnabled());
-        verifyThat("#tf_company", isEnabled());
-    }
-
-    @Test
-    public void test005_createNewOrder() { // Check that the delete button is disabled
-        clickOn("#tf_company");
-        write("Aketza");
-        Node row = lookup(".table-row-cell").nth(0).query();
-        clickOn(row);
-        clickOn("#btn_OrderCreate");
-    }*/
 }
