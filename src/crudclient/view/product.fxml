@@ -30,8 +30,9 @@
             <Button fx:id="btn_CreateProduct" layoutX="194.0" layoutY="109.0" mnemonicParsing="false" onAction="#handleOnClickCreate" prefHeight="21.0" prefWidth="123.0" text="Create product" />
             <Button fx:id="btn_DeleteProduct" layoutX="447.0" layoutY="106.0" mnemonicParsing="false" onAction="#handleOnClickDelete" prefHeight="31.0" prefWidth="123.0" text="Delete product" />
             <Label fx:id="lbl_Choose" layoutX="64.0" layoutY="32.0" text="Choose company:" />
-            <Button fx:id="btn_OrderCreate" layoutX="508.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleOnClickCreateOrder" prefHeight="31.0" prefWidth="207.0" text="Create Order" />
+            <Button fx:id="btn_OrderCreate" layoutX="508.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleOnClickCreateOrder" prefHeight="31.0" prefWidth="207.0" text="Send Products to Order" />
             <TextField fx:id="tf_company" layoutX="181.0" layoutY="28.0" />
+            <Label fx:id="lbl_type" layoutX="190.0" layoutY="62.0" text="Type the company name" />
          </children>
       </Pane>
    </children>

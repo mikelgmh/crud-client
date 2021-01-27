@@ -136,6 +136,8 @@ public class ProductController {
      * The declaration of the current user.
      */
     private User currentUser;
+    @FXML
+    private Label lbl_type;
 
     /**
      * The getter of the order managment controller.
@@ -212,6 +214,7 @@ public class ProductController {
          * Set the label invisible.
          */
         lbl_Choose.setVisible(false);
+        lbl_type.setVisible(false);
         /**
          * Set the tooltip of the create button.
          */
