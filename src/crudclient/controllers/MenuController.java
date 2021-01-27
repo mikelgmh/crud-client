@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -109,6 +110,23 @@ public class MenuController implements Initializable {
             }
         });
 
+        menuClose.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Close confirmation");
+                alert.setHeaderText("Application will be closed");
+                alert.setContentText("You will close the application");
+                alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get().equals(ButtonType.OK)) {
+                    Platform.exit();
+                } else {
+                    t.consume();
+                    alert.close();
+                }
+            }
+        });
+        
         menuUsers.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent t) {
                 try {
@@ -166,6 +184,24 @@ public class MenuController implements Initializable {
             }
         });
 
+        menuCompanies.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/companies.fxml"));
+                    Parent root = (Parent) loader.load();
+                    CompanyController controller = ((CompanyController) loader.getController());
+                    CompanyFactory companyFactory = new CompanyFactory();
+                    CompanyInterface companyImplementation = companyFactory.getImplementation();
+                    controller.setImplementation(companyImplementation);
+                    controller.setStage(new Stage());
+                    controller.setCurrentUser(user);
+                    controller.initStage(root);
+
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
     }
 
     

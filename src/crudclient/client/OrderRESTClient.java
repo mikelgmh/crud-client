@@ -5,6 +5,7 @@
  */
 package crudclient.client;
 
+import crudclient.exceptions.ServerConnectionException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -13,6 +14,7 @@ import crudclient.model.Order;
 import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
 
 /**
  * Jersey REST client generated for REST resource:OrderFacadeREST [order]<br>
@@ -38,7 +40,7 @@ public class OrderRESTClient implements OrderInterface {
     }
 
     public void editOrder(Object requestEntity) throws ClientErrorException {
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
     public void edit_JSON(Object requestEntity) throws ClientErrorException {
@@ -57,7 +59,7 @@ public class OrderRESTClient implements OrderInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public List<Order> findAllOrders(GenericType responseType) throws ClientErrorException {
+    public List<Order> findAllOrders(GenericType responseType) throws ClientErrorException{
         WebTarget resource = webTarget;
         resource = resource.path("order");
         List<Order> allOrders = (List<Order>) resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
@@ -71,7 +73,7 @@ public class OrderRESTClient implements OrderInterface {
     }
 
     public void createOrder(Object requestEntity) throws ClientErrorException {
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
     public void create_JSON(Object requestEntity) throws ClientErrorException {

@@ -1,5 +1,6 @@
 package crudclient.interfaces;
 
+import crudclient.exceptions.ServerConnectionException;
 import crudclient.model.Order;
 import java.util.List;
 import java.util.Set;

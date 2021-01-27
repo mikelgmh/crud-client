@@ -172,6 +172,14 @@ public class ProductController {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
+    
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+    }
 
     /**
      * The initial stage of the window.
@@ -711,20 +719,7 @@ public class ProductController {
         tv_Tabla.setItems(productList);
 
     }
-    /**
-     * Getter of the current user
-     * @return current user.
-     */
-    public User getCurrentUser() {
-        return currentUser;
-    }
-    /**
-     * Setter of the current user.
-     * @param user 
-     */
-    public void setCurrentUser(User user) {
-        this.currentUser = user;
-    }
+
     /**
      * The method to show the alerts.
      * @param type
