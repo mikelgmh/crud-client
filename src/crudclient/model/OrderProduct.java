@@ -36,7 +36,6 @@ public class OrderProduct implements Serializable {
         this.id = id;
     }
     
-    @XmlElement(name="product")
     public Product getProduct() {
         return product;
     }

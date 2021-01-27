@@ -531,7 +531,6 @@ public class OrderManagementController {
             }
             order.setTotal_price(totalOrderPrice);
 
-            order.getUser();
 
             try {
                 //Sends the order to database and refresh the table.
