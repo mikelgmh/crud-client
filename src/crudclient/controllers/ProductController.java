@@ -12,6 +12,7 @@ import crudclient.interfaces.CompanyInterface;
 import crudclient.interfaces.ProductInterface;
 import crudclient.model.Company;
 import crudclient.model.Product;
+import crudclient.model.User;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -80,7 +81,8 @@ public class ProductController {
     private ObservableList<Product> pr;
     private ObservableList<Company> co;
     private ProductInterface productImplementation;
-    private OrderManagementController orderManagementController ;
+    private OrderManagementController orderManagementController;
+    private User currentUser;
 
 
     public OrderManagementController getOrdermanagementController() {
@@ -100,6 +102,14 @@ public class ProductController {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+    
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
     }
 
     public void initStage(Parent root) {
