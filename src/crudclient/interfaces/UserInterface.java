@@ -6,6 +6,7 @@
 package crudclient.interfaces;
 
 import crudclient.exceptions.EmailAlreadyExistsException;
+import crudclient.exceptions.EmailAndUsernameAlreadyExistException;
 import crudclient.exceptions.UsernameAlreadyExistsException;
 import java.util.List;
 import java.util.Set;
@@ -47,8 +48,8 @@ public interface UserInterface {
      *
      * @param user The entity to insert. User in this case.
      */
-    public void createUser(Object user) throws ClientErrorException,UsernameAlreadyExistsException,EmailAlreadyExistsException;
-    
+    public void createUser(Object user) throws ClientErrorException, UsernameAlreadyExistsException, EmailAlreadyExistsException, EmailAndUsernameAlreadyExistException;
+
     /**
      * Gets the public encryption key.
      *

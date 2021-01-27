@@ -21,8 +21,8 @@ public class GenericValidations {
     public static final Color greyColor = Color.web("#686464");
     public static final Pattern EMAIL_REGEXP = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     public static final String TXT_ENTER_VALID_EMAIL = "Type a valid email.";
-    public final Pattern PASS_REGEXP = Pattern.compile("^(?=.*[0-9])" + "(?=.*[a-z])(?=.*[A-Z])" + "(?=.*[@#*$%^&+=])" + "(?=\\S+$).{8,25}$");
-    public static final String PASSWORD_CONDITIONS = "- Between 8 and 25 characters\n- Uppercase and Lowercase letters\n- One number and special character at least";
+    public final Pattern PASS_REGEXP = Pattern.compile("^(?=.*[0-9])" + "(?=.*[a-z])(?=.*[A-Z])" + "(?=.*[@#*$%^&+-_.,?=])" + "(?=\\S+$).{8,25}$");
+    public static final String PASSWORD_CONDITIONS = "- Between 8 and 25 characters\n- Uppercase and Lowercase letters\n- One number and special character at least (*+-_$%¿?%.,)";
 
     public GenericValidations() {
     }
@@ -62,6 +62,10 @@ public class GenericValidations {
             tf.getProperties().put(property, false);
             return false;
         }
+    }
+
+    public boolean simpleStringRegexValidator(Pattern regexp, String value) {
+        return regexp.matcher(value).matches();
     }
 
     /**

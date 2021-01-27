@@ -11,16 +11,13 @@ package userTests;
  * and open the template in the editor.
  */
 import static org.testfx.matcher.base.NodeMatchers.isVisible;
-
+import static org.testfx.matcher.base.NodeMatchers.isInvisible;
 import crudclient.CRUDClient;
 import crudclient.model.User;
-import java.nio.charset.Charset;
-import java.util.Random;
 import java.util.concurrent.TimeoutException;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import static org.testfx.matcher.control.ButtonMatchers.isCancelButton;
-
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.PasswordField;
@@ -35,10 +32,8 @@ import static org.testfx.matcher.control.ButtonMatchers.isDefaultButton;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import static org.testfx.api.FxAssert.verifyThat;
-import static org.testfx.matcher.control.TextInputControlMatchers.hasText;
 
 import org.testfx.framework.junit.ApplicationTest;
-import org.testfx.matcher.base.NodeMatchers;
 import static org.testfx.matcher.base.NodeMatchers.isEnabled;
 
 import static org.testfx.matcher.base.NodeMatchers.isDisabled;
@@ -50,12 +45,7 @@ import static org.testfx.matcher.base.NodeMatchers.isDisabled;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserManagerTest extends ApplicationTest {
 
-    private static final String OVERSIZED_TEXT = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-            + "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-            + "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-            + "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-            + "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-            + "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+    private static final String OVERSIZED_TEXT = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX ";
     private static final String VALID_EMAIL = "validEmail@gmail.com";
     private static final boolean VALDIATE_MAX_LENGTH = false;
 
@@ -404,7 +394,124 @@ public class UserManagerTest extends ApplicationTest {
     }
 
     @Test
-    public void test020_deleteLastItem() {
+    public void test021_testTableCellsMaxLength() {
+        if (VALDIATE_MAX_LENGTH) {
+            testColumnLength("tc_name");
+            testColumnLength("tc_surname");
+            testColumnLength("tc_email");
+            testColumnLength("tc_username");
+        }
+    }
+
+    @Test
+    public void test022_testClickableChoiceboxes() {
+        if (VALDIATE_MAX_LENGTH) {
+            choiceboxColumnTest("tc_company");
+            choiceboxColumnTest("tc_status");
+            choiceboxColumnTest("tc_company");
+        }
+    }
+
+    @Test
+    public void test023_testRepeatedEmail() {
+        table = lookup("#table").queryTableView();
+        int rowCount = table.getItems().size();
+        Node node = lookup("#tc_email").nth(rowCount).query();
+        clickOn(node);
+        node = lookup("#tc_email").nth(rowCount).query();
+        clickOn(node);
+        eraseText(30);
+        write("mikelgmh@gmail.com");
+        type(KeyCode.ENTER);
+        verifyThat("The email already exists, pick another email.", isVisible());
+        clickOn(isDefaultButton());
+    }
+
+    @Test
+    public void test024_testRepeatedUsername() {
+        table = lookup("#table").queryTableView();
+        int rowCount = table.getItems().size();
+        Node node = lookup("#tc_username").nth(rowCount).query();
+        clickOn(node);
+        node = lookup("#tc_username").nth(rowCount).query();
+        clickOn(node);
+        eraseText(30);
+        write("mikel");
+        type(KeyCode.ENTER);
+        verifyThat("The username already exists, pick another username.", isVisible());
+        clickOn(isDefaultButton());
+    }
+
+    @Test
+    public void test025_testColumnUpdate() {
+        updateColumnTest("tc_name");
+        updateColumnTest("tc_surname");
+        updateColumnTest("tc_username");
+        updateColumnTest("tc_email");
+    }
+
+    @Test
+    public void test026_testEmailFormatError() {
+        table = lookup("#table").queryTableView();
+        int rowCount = table.getItems().size();
+        Node node = lookup("#tc_email").nth(rowCount).query();
+        clickOn(node);
+        node = lookup("#tc_email").nth(rowCount).query();
+        clickOn(node);
+        eraseText(50);
+        for (int i = 0; i < 30; i++) {
+            type(KeyCode.DELETE);
+        }
+        write("wrongEmail");
+        type(KeyCode.ENTER);
+        verifyThat("The email format is invalid.", isVisible());
+        clickOn(isDefaultButton());
+    }
+
+    public void writeColumnText() {
+        write(OVERSIZED_TEXT);
+        type(KeyCode.ENTER);
+        verifyThat("The max length allowed for this field is 254", isVisible());
+        clickOn(isDefaultButton());
+    }
+
+    public void testColumnLength(String column) {
+        table = lookup("#table").queryTableView();
+        int rowCount = table.getItems().size();
+        Node node = lookup("#" + column).nth(rowCount).query();
+        clickOn(node);
+        node = lookup("#" + column).nth(rowCount).query();
+        clickOn(node);
+        writeColumnText();
+    }
+
+    public void updateColumnTest(String column) {
+        table = lookup("#table").queryTableView();
+        int rowCount = table.getItems().size();
+        Node node = lookup("#" + column).nth(rowCount).query();
+        clickOn(node);
+        node = lookup("#" + column).nth(rowCount).query();
+        clickOn(node);
+        eraseText(25);
+        write("NewValue");
+        type(KeyCode.ENTER);
+        verifyThat("#btn_delete", isEnabled());
+    }
+
+    public void choiceboxColumnTest(String column) {
+        table = lookup("#table").queryTableView();
+        int rowCount = table.getItems().size();
+        Node node = lookup("#" + column).nth(rowCount).query();
+        clickOn(node);
+        node = lookup("#" + column).nth(rowCount).query();
+        clickOn(node);
+        type(KeyCode.DOWN);
+        type(KeyCode.ENTER);
+        verifyThat("#btn_delete", isEnabled());
+    }
+
+    @Test
+    public void test099_deleteLastItem() {
         table = lookup("#table").queryTableView();
         int rowCount = table.getItems().size();
         assertNotEquals("Table has no data: Cannot test.",
@@ -418,6 +525,6 @@ public class UserManagerTest extends ApplicationTest {
         clickOn(isCancelButton());
         clickOn("#btn_delete");
         clickOn(isDefaultButton());
-    }
 
+    }
 }
