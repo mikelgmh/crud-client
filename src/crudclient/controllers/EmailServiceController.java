@@ -72,8 +72,9 @@ public class EmailServiceController {
         // Create an User to send via XML the email to the server
         User user = new User();
         user.setEmail(tfRecoverPassword.getText());
-        getEmailServiceImplementation().sendNewPassword_XML(user, user.getEmail());
-        getEmailServiceImplementation().recoverUserPassword_XML(user, user.getEmail());
+        // Create new Thread to send the email
+        EmailServiceThread emailThread = new EmailServiceThread(user);
+        emailThread.start();
         stage.close();
     }
 

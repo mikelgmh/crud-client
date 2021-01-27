@@ -80,6 +80,7 @@ public class MenuController implements Initializable {
     public void setUser(User user) {
         this.user = user;
     }
+
     /**
      * Initializes the controller class.
      */
@@ -102,7 +103,7 @@ public class MenuController implements Initializable {
                         controller.setImplementation(signInImplementation);
                         controller.setStage(new Stage());
                         controller.initStage(root);
-
+                        stage.close();
                     } catch (IOException ex) {
                         Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -137,9 +138,25 @@ public class MenuController implements Initializable {
                     UserInterface userImplementation = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
                     controller.setUserImplementation(userImplementation);
                     controller.setStage(new Stage());
-                    controller.setCurrentUser(user);
                     controller.initStage(root);
+                    stage.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
 
+        menuCompanies.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/companies.fxml"));
+                    Parent root = (Parent) loader.load();
+                    CompanyController controller = ((CompanyController) loader.getController());
+                    CompanyFactory companyFactory = new CompanyFactory();
+                    CompanyInterface companyImplementation = companyFactory.getImplementation();
+                    controller.setImplementation(companyImplementation);
+                    controller.setStage(new Stage());
+                    controller.initStage(root);
                 } catch (IOException ex) {
                     Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -194,7 +211,6 @@ public class MenuController implements Initializable {
                     CompanyInterface companyImplementation = companyFactory.getImplementation();
                     controller.setImplementation(companyImplementation);
                     controller.setStage(new Stage());
-                    controller.setCurrentUser(user);
                     controller.initStage(root);
 
                 } catch (IOException ex) {

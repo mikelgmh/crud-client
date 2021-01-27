@@ -1,18 +1,14 @@
 package crudclient.controllers;
 
-// Java
 import crudclient.factories.EmailServiceFactory;
 import crudclient.interfaces.EmailServiceInterface;
 import crudclient.interfaces.SignInInterface;
 import crudclient.model.User;
 import crudclient.util.security.AsymmetricEncryption;
-import crudclient.util.session.UserSession;
-import java.io.IOException;
+import java.util.Date;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-// JavaFX
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -38,7 +34,7 @@ import javafx.stage.Modality;
  * @author Iker, Aketza
  */
 public class SignInController {
-
+    
     private static final Logger logger = Logger.getLogger("crudclient.controllers.SignInController");
     private Stage stage;
     private SignInInterface signInImplementation;
@@ -51,11 +47,11 @@ public class SignInController {
     private PasswordField txt_Password;
     @FXML
     private Hyperlink hlRecoverPassword;
-
+    
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-
+    
     public SignInController() {
     }
 
@@ -68,14 +64,25 @@ public class SignInController {
     public void initStage(Parent root) {
         logger.log(Level.INFO, "Loading the SignIn stage.");
         Scene scene = new Scene(root);
-        //this.setListeners();
         stage.setScene(scene);
         stage.setTitle("Login");
         stage.setResizable(false);
         stage.setOnShowing(this::handleWindowShowing);
         stage.onCloseRequestProperty().set(this::handleCloseRequest);
-        ae = new AsymmetricEncryption(getSignInImplementation().getPublicKey());
         stage.show();
+        // Try to get the public key from the server
+        try {
+            ae = new AsymmetricEncryption(getSignInImplementation().getPublicKey());
+            logger.log(Level.INFO, "Got the public key successfully.");
+        } // If can not get the public key, show an alert
+        catch (Exception ex) {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Cannot connect to the server");
+            alert.setHeaderText("Cannot connect to the server, restart the application \n"
+                    + "or contact the server Administrator.");
+            alert.setContentText(ex.getMessage());
+            alert.showAndWait();
+        }
         logger.log(Level.INFO, "SignIn stage loaded.");
     }
 
@@ -100,13 +107,17 @@ public class SignInController {
      * @throws Exception input/output error.
      */
     @FXML
-    private void handleOnClickLogin(ActionEvent event) throws Exception {
+    private void handleOnClickLogin(ActionEvent event) {
         logger.log(Level.INFO, "Attempting to sign in.");
         try {
             User user = new User();
             MenuController menuController = new MenuController();
             user.setUsername(txt_User.getText());
             user.setPassword(ae.encryptString(txt_Password.getText()));
+            // Get the current Date
+            Date currentDate = new Date();
+            // Set to the logged user the current Date
+            user.setLastAccess(currentDate);
             User loggedUser = getSignInImplementation().loginUser_XML(user, User.class);
 
             // Create the stage for Dashboard
@@ -117,6 +128,7 @@ public class SignInController {
             // Load the stage
             controller.setMenuManagementController(menuController);
             controller.setUser(loggedUser);
+            DashboardController.loggedUser = loggedUser;
             controller.setStage(stageDashboard);
             controller.initStage(root);
             // Close the current stage
@@ -124,11 +136,11 @@ public class SignInController {
         } catch (Exception ex) {
             ex.printStackTrace();
             Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Invalid login.");
-            alert.setHeaderText("Wrong username or passwords.");
+            alert.setTitle("Invalid login");
+            alert.setHeaderText("Wrong username or passwords");
             alert.showAndWait();
         }
-
+        
     }
 
     /**
@@ -161,7 +173,7 @@ public class SignInController {
     private void handleOnClickRecoverPassword(ActionEvent event) throws Exception {
         // Create the stage for RecoverPassword.
         Stage stageRecoverPassword = new Stage();
-
+        
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/EmailService.fxml"));
         Parent root = (Parent) loader.load();
         EmailServiceController controller = ((EmailServiceController) loader.getController());
@@ -187,10 +199,10 @@ public class SignInController {
     /**
      * Method to set the Company implementation getting the Company interface.
      *
-     * @param companyInterface
+     * @param signInInterface
      */
     public void setImplementation(SignInInterface signInInterface) {
         this.signInImplementation = signInInterface;
     }
-
+    
 }
