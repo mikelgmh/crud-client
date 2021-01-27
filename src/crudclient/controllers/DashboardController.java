@@ -23,6 +23,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -41,10 +44,13 @@ public class DashboardController {
     private Label lbl_Connection;
     @FXML
     private Button btn_Logout;
-    @FXML
     private MenuController menuController;
     
     public static User loggedUser;
+    @FXML
+    private Pane paneDashboard;
+    @FXML
+    private ImageView imageAlmazon;
 
     public User getUser() {
         return this.user;

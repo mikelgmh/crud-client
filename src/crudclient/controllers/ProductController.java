@@ -525,10 +525,6 @@ public class ProductController {
              */
             productImplementation = (ProductInterface) new ProductFactory().getImplementation();
             /**
-             * Add the new product to the observable list.
-             */
-            productList.add(newProduct);
-            /**
              * Get the focus of the last row.
              */
             int row = table.getItems().size() - 1;
@@ -542,6 +538,7 @@ public class ProductController {
              * Create in the database.
              */
             productImplementation.create_XML(newProduct);
+            productTableInfo();
             /**
              * The table goes to the focused row.
              */
