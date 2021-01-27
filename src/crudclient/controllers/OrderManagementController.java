@@ -41,8 +41,10 @@ import crudclient.model.OrderProductId;
 import crudclient.model.Product;
 import crudclient.model.UserStatus;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Optional;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -52,7 +54,9 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -67,6 +71,7 @@ import javax.ws.rs.ClientErrorException;
  * Controller class for orders management view . 
  * It contains event handlers and initialization code for the view defined in 
  * orders.fmxl file.
+ * v
  * @author Imanol
  */
 
@@ -131,6 +136,11 @@ public class OrderManagementController {
      * User object to store the current user data
      */
     private User currentUser;
+    
+    /**
+     * Formatter date
+     */
+    DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
      * Orders data table view.
@@ -256,6 +266,12 @@ public class OrderManagementController {
      * Logger definition.
      */
     private static final Logger LOG = Logger.getLogger(OrderManagementController.class.getName());
+    
+    /**
+     * Date picker definition.
+     */
+    @FXML
+    private DatePicker date_OrderPicker;
 
     /**
      * Class empty constructor.
@@ -278,9 +294,15 @@ public class OrderManagementController {
         stage.setTitle("Order Management");
         //Make window NOT resizable
         stage.setResizable(false);
+        //Set the action when try to close the window. 
+        stage.onCloseRequestProperty().set(this::handleCloseRequest);
         //Call the handler method to set the initial parameters of the table:
         //buttons activated, factory and values ​​of the cells and editable tables.
         stage.setOnShowing(this::handleWindowsShowing);
+        //Set different order status to combo box.
+        combo_statusOrder.setItems(FXCollections.observableArrayList(OrderStatus.values()));
+        combo_statusOrder.getSelectionModel().selectFirst();
+        
 
         //Call to the DB to obtain the orders.
         try {
@@ -296,13 +318,6 @@ public class OrderManagementController {
 
         //Show the window.
         stage.show();
-        
-        //Initial alert to warn the user of the characteristics of the tables.
-        showAlert(Alert.AlertType.WARNING, "Caution!!!", "", "Aviso. Los cambios"
-                + " que hagas en la tabla de ordenes (estado de la orden) "
-                + "se actualizarán en la base de datos automaticamente. Los productos"
-                + "(tabla inferior) requieren de pulsar los botones en product manager"
-                + "que se encuentran a su derecha.");
         
         logger.log(Level.INFO, "OrderManagement stage loaded.");
     }
@@ -349,9 +364,7 @@ public class OrderManagementController {
             orderImplementation.editOrder(tableOrder.getSelectionModel().getSelectedItem());
         });
         
-        //Set different order status to combo box.
-        combo_statusOrder.setItems(FXCollections.observableArrayList(OrderStatus.values()));
-        
+           
         //Set factories to columns.
         column_ID.setCellValueFactory(new PropertyValueFactory("id"));
         column_date.setCellValueFactory(new PropertyValueFactory("date"));
@@ -382,6 +395,41 @@ public class OrderManagementController {
         column_status.setCellFactory(ComboBoxTableCell.forTableColumn(statusOrders));
         column_user.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUser().getName().concat(" " + cellData.getValue().getUser().getSurname())));
 
+    }
+    
+    /**
+     * The method that sets the action when try to close the window.
+     * @param event A event that indicates that a window has changed its status.
+     */
+    private void handleCloseRequest(WindowEvent event) {
+        /**
+         * Create a new confirmation alert.
+         */
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        /**
+         * Set the title of the alert.
+         */
+        alert.setTitle("Close confirmation");
+        /**
+         * Set the header text of the alert.
+         */
+        alert.setHeaderText("Application will be closed");
+        /**
+         * Set the content text of the alert.
+         */
+        alert.setContentText("You will close the application");
+        /**
+         * Set the 2 options that are in the alert to click on.
+         */
+        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get().equals(ButtonType.OK)) {
+            stage.close();
+            Platform.exit();
+        } else {
+            event.consume();
+            alert.close();
+        }
     }
     
     /**
@@ -540,6 +588,7 @@ public class OrderManagementController {
                 tableOrder.setItems(orderData);
                 tableOrder.refresh();
                 tableProducts.getItems().clear();
+                showAlert(Alert.AlertType.INFORMATION, "Order created", "", "Order created succesfully.");
             } catch (Exception e) {
                 showAlert(Alert.AlertType.INFORMATION, "Can´t create ", "", "Order deleted from database.");
             }
@@ -630,15 +679,32 @@ public class OrderManagementController {
         filteredData.predicateProperty().bind(Bindings.createObjectBinding(()
                 -> order -> order.getId().toString().contains(txt_IDOrder.getText())
                 && order.getUser().getName().toLowerCase().contains(txt_userOrder.getText().toLowerCase().trim())
-                && order.getTotal_price().toString().contains(txt_totalPriceOrder.getText()),
-                //&& order.getStatus().toString().equalsIgnoreCase(combo_statusOrder.getSelectionModel().getSelectedItem().toString()),
+                && order.getTotal_price().toString().contains(txt_totalPriceOrder.getText())
+                && datePickerChecker(order)
+                && order.getStatus().toString().equalsIgnoreCase(combo_statusOrder.getSelectionModel().getSelectedItem().toString()),
                 txt_IDOrder.textProperty(),
                 txt_userOrder.textProperty(),
-                txt_totalPriceOrder.textProperty()
-        //combo_statusOrder.getSelectionModel().getSelectedItem()
+                txt_totalPriceOrder.textProperty(),
+                date_OrderPicker.getEditor().textProperty(),
+                combo_statusOrder.getSelectionModel().selectedItemProperty()
         ));
     }
+    
 
+    /**
+     * Checks the date picker.
+     *
+     * @param order for access to date
+     * @return date formatter
+     */
+    public boolean datePickerChecker(Order order) {
+        try { // Returns the desired value.
+            return formatter.format(order.getDate()).contains(date_OrderPicker.getValue().toString());
+        } catch (Exception e) {
+            return true;
+        }
+    }
+    
     /**
      * Disable buttons if user privilege is worker
      */
