@@ -103,11 +103,11 @@ public class CompanyCRUDTest extends ApplicationTest {
      */
     @Test
     public void testDCreateCompany() {
-        tableViewCompanies = lookup("#table").queryTableView();
+        tableViewCompanies = lookup("#tableViewCompanies").queryTableView();
         int oldSize = tableViewCompanies.getItems().size();
         clickOn("#btnCreateCompany");
         int newSize = tableViewCompanies.getItems().size();
-        assertTrue(newSize < oldSize);
+        assertTrue(newSize > oldSize);
     }
 
     /**
@@ -115,7 +115,6 @@ public class CompanyCRUDTest extends ApplicationTest {
      */
     @Test
     public void testEModifyCompany() {
-        clickOn("#btnCreateCompany");
         Node row = lookup(".table-row-cell").nth(0).query();
         clickOn(row);
         Node tcNameCompany = lookup("#tcNameCompany").nth(1).query();
@@ -140,13 +139,11 @@ public class CompanyCRUDTest extends ApplicationTest {
      */
     @Test
     public void testFDeleteCompany() {
-        tableViewCompanies = lookup("#table").queryTableView();
+        tableViewCompanies = lookup("#tableViewCompanies").queryTableView();
         int oldSize = tableViewCompanies.getItems().size();
-        Node row = lookup(".table-row-cell").nth(0).query();
-        clickOn(row);
         clickOn("#btnDeleteCompany");
-        clickOn("OK");
+        clickOn("Aceptar");
         int newSize = tableViewCompanies.getItems().size();
-        assertTrue(newSize > oldSize);
+        assertTrue(newSize < oldSize);
     }
 }
