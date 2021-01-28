@@ -86,40 +86,47 @@ public class ProductTest extends ApplicationTest {
 
     @Test
     public void test003_createProduct() {
+        //int totalRows = tv_Tabla.getItems().size();
         clickOn("#btn_CreateProduct");
+        Node rowNameOrder = lookup("#tc_Name").nth(0).query();
+        clickOn(rowNameOrder);
         Node rowName = lookup("#tc_Name").nth(1).query();
         doubleClickOn(rowName);
-        write("Manzana");
-        this.press(KeyCode.ENTER);
+        write("Aceite");
+        type(KeyCode.ENTER);
+        clickOn(rowNameOrder);
         Node rowWeight = lookup("#tc_Weight").nth(1).query();
         doubleClickOn(rowWeight);
         write("13");
-        this.press(KeyCode.ENTER);
+        type(KeyCode.ENTER);
+        clickOn(rowNameOrder);
         Node rowPrice = lookup("#tc_Price").nth(1).query();
         doubleClickOn(rowPrice);
         write("50");
-        this.press(KeyCode.ENTER);
+        type(KeyCode.ENTER);
+       // verifyThat(tv_Tabla, TableViewMatchers.hasNumRows(totalRows+1));
+        
     }
 
     @Test
     public void test004_editProduct() {
-        Node rowName = lookup("#tc_Name").nth(2).query();
+        Node rowName = lookup("#tc_Name").nth(1).query();
         doubleClickOn(rowName);
         write("Prueba");
-        this.press(KeyCode.ENTER);
-        Node rowWeight = lookup("#tc_Weight").nth(2).query();
+        type(KeyCode.ENTER);
+        Node rowWeight = lookup("#tc_Weight").nth(1).query();
         doubleClickOn(rowWeight);
         write("5");
-        this.press(KeyCode.ENTER);
-        Node rowPrice = lookup("#tc_Price").nth(2).query();
+        type(KeyCode.ENTER);
+        Node rowPrice = lookup("#tc_Price").nth(1).query();
         doubleClickOn(rowPrice);
         write("8");
-        this.press(KeyCode.ENTER);
+        type(KeyCode.ENTER);
     }
 
     @Test
     public void test005_deleteProduct() {
-        Node rowName = lookup("#tc_Name").nth(4).query();
+        Node rowName = lookup("#tc_Name").nth(1).query();
         clickOn(rowName);
         clickOn("#btn_DeleteProduct");
     }
@@ -134,4 +141,13 @@ public class ProductTest extends ApplicationTest {
         verifyThat("#btn_OrderCreate", isEnabled());
         verifyThat("#tf_company", isEnabled());
     }
+    @Test
+    public void test007_useFilterFromProduct() {
+        clickOn("#tf_company");
+        write("Abdulai");
+        Node rowName = lookup("#tc_Name").nth(1).query();
+        clickOn(rowName);
+        clickOn("#btn_OrderCreate");
+    }
+    
 }
