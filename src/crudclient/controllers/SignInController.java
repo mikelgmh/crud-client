@@ -114,6 +114,7 @@ public class SignInController {
             MenuController menuController = new MenuController();
             user.setUsername(txt_User.getText());
             user.setPassword(ae.encryptString(txt_Password.getText()));
+            System.out.println("ENCRIPTADO: " + ae.encryptString(txt_Password.getText()));
             // Get the current Date
             Date currentDate = new Date();
             // Set to the logged user the current Date
