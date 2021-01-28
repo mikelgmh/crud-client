@@ -26,6 +26,7 @@ import org.junit.runners.MethodSorters;
 import static org.testfx.api.FxAssert.verifyThat;
 import org.testfx.framework.junit.ApplicationTest;
 import static org.testfx.matcher.base.NodeMatchers.isDisabled;
+import static org.testfx.matcher.base.NodeMatchers.isEnabled;
 import static org.testfx.matcher.base.NodeMatchers.isVisible;
 import static org.testfx.matcher.control.TextInputControlMatchers.hasText;
 
@@ -115,6 +116,10 @@ public class OrderTest extends ApplicationTest {
     public void testC_GoProductWindow() {
         clickOn("#btn_newOrder");
         verifyThat("#paneProducts", isVisible());
+    }  
+    
+    @Test
+    public void testD_sendProductsToOrder(){
         clickOn("#tf_company");
         write("Granja Alonsotegi");
         Node rowName = lookup("#tc_Name").nth(1).query();
@@ -124,18 +129,51 @@ public class OrderTest extends ApplicationTest {
         verifyThat("#paneOrders", isVisible());
     }
     
-    /*@Test
-    public void testD_createOrder() {
+    @Test
+    public void testE_createOrder() {
         Node rowName = lookup("#column_QuantityProduct").nth(1).query();
         doubleClickOn(rowName);
         write("3");
         this.press(KeyCode.ENTER);
         clickOn("#btn_commitOrder");
-        clickOn("")
-    }*/
+        clickOn("Aceptar");
+        clickOn("Aceptar");
+        verifyThat("#paneOrders", isVisible());
+    }
+    
+         
+    @Test
+    public void testF_enabledButtons(){
+        Node rowName = lookup("#column_ID").nth(1).query();
+        clickOn(rowName);
+        verifyThat("#btn_modifyOrder", isEnabled());
+        verifyThat("#btn_deleteOrder", isEnabled());
+    }
     
     @Test
-    public void testE_deleteOrder() {
+    public void testG_deleteOrder() {
+        tableOrder = lookup("#tableOrder").queryTableView();
+        int rowCount = tableOrder.getItems().size();
+        Node row = lookup(".table-row-cell").nth(rowCount - 1).query();
+        clickOn(row);
+        clickOn("#btn_deleteOrder");
+        clickOn("Aceptar");
+    }
+    
+    @Test
+    public void testH_modifyOrder() {
+        tableOrder = lookup("#tableOrder").queryTableView();
+        int rowCount = tableOrder.getItems().size();
+        Node row = lookup(".table-row-cell").nth(rowCount - 1).query();
+        clickOn(row);
+        clickOn("#btn_modifyOrder");
+        Node rowName = lookup("#column_QuantityProduct").nth(1).query();
+        doubleClickOn(rowName);
+        write("50");
+        this.press(KeyCode.ENTER);
+        clickOn("#btn_OrderMngmt");
+        clickOn("Aceptar");
+        verifyThat("#paneOrders", isVisible());
         
     }
     

@@ -8,7 +8,8 @@ import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
 
 /**
- *
+ * Interface that contains the methods for operations in order entity
+ * 
  * @author Imanol
  */
 public interface OrderInterface {
