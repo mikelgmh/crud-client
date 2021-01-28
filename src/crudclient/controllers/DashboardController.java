@@ -75,6 +75,7 @@ public class DashboardController {
      * @param root The loaded view.
      */
     public void initStage(Parent root) {
+        imageAlmazon.setImage(new Image("crudclient/img/ALMAZON.png"));
         logger.log(Level.INFO, "Loading the Dashboard stage.");
         Scene scene = new Scene(root);
         stage.setScene(scene);    
@@ -91,7 +92,7 @@ public class DashboardController {
         menuController.setUser(user);
         loggedUser = user;
         lbl_Welcome.setText("Welcome "+user.getName());
-        lbl_Connection.setText(user.getLastAccessAsString());
+        lbl_Connection.setText("Last access: "+user.getLastAccessAsString());
         //setButtons();
     }
 
