@@ -18,6 +18,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import crudclient.interfaces.UserInterface;
+import java.util.ResourceBundle;
 import javax.ws.rs.core.Response;
 
 /**
@@ -36,7 +37,8 @@ public class UserRESTClient implements UserInterface, EmailServiceInterface, Sig
 
     private WebTarget webTarget;
     private Client client;
-    private static final String BASE_URI = "http://localhost:8080/CRUD-Server/webresources";
+    private static final ResourceBundle rb = ResourceBundle.getBundle("config.config");
+    private static final String BASE_URI = rb.getString("BASE_URL");
 
     /**
      * Empty constructor for userRESTClient.

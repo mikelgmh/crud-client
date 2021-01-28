@@ -5,6 +5,7 @@
  */
 package crudclient.client;
 
+import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -26,7 +27,8 @@ public class OrderProductRESTClient {
 
     private WebTarget webTarget;
     private Client client;
-    private static final String BASE_URI = "http://localhost:8080/CRUD-Server/webresources";
+    private static final ResourceBundle rb = ResourceBundle.getBundle("config.config");
+    private static final String BASE_URI = rb.getString("BASE_URL");
 
     public OrderProductRESTClient() {
         client = javax.ws.rs.client.ClientBuilder.newClient();

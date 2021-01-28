@@ -8,6 +8,7 @@ package crudclient.client;
 import crudclient.interfaces.ProductInterface;
 import crudclient.model.Product;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -30,7 +31,8 @@ public class ProductRESTClient implements ProductInterface{
 
     private WebTarget webTarget;
     private Client client;
-    private static final String BASE_URI = "http://localhost:8080/CRUD-Server/webresources";
+    private static final ResourceBundle rb = ResourceBundle.getBundle("config.config");
+    private static final String BASE_URI = rb.getString("BASE_URL");
 
     public ProductRESTClient() {
         client = javax.ws.rs.client.ClientBuilder.newClient();
