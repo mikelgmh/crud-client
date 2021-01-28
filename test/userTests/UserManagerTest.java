@@ -40,7 +40,7 @@ import static org.testfx.matcher.base.NodeMatchers.isDisabled;
 
 /**
  *
- * @author Mikel, Imanol
+ * @author Mikel
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserManagerTest extends ApplicationTest {
