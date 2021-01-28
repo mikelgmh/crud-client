@@ -172,9 +172,7 @@ public class MenuController implements Initializable {
                     OrderInterface orderImplementation = orderFactory.getImplementation();
                     controller.setOrderImplementation(orderImplementation);
                     controller.setStage(new Stage());
-                    controller.setCurrentUser(user);
                     controller.initStage(root);
-
                 } catch (IOException ex) {
                     Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -191,9 +189,7 @@ public class MenuController implements Initializable {
                     ProductInterface productImplementation = productFactory.getImplementation();
                     controller.setProductImplementation(productImplementation);
                     controller.setStage(new Stage());
-                    controller.setCurrentUser(user);
                     controller.initStage(root);
-
                 } catch (IOException ex) {
                     Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -211,7 +207,6 @@ public class MenuController implements Initializable {
                     controller.setImplementation(companyImplementation);
                     controller.setStage(new Stage());
                     controller.initStage(root);
-
                 } catch (IOException ex) {
                     Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
                 }

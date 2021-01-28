@@ -353,9 +353,6 @@ public class OrderManagementController {
         //Make the button disabled if there is no row selected.
         btn_commitOrder.disableProperty().bind(Bindings.isEmpty(tableProducts.getSelectionModel().getSelectedItems()));
 
-        //Disable buttons if user has worker privilege.
-        setButtonsWorker();
-
         //Set action to update database if the status column is edited.
         column_status.setOnEditCommit((TableColumn.CellEditEvent<Order, OrderStatus> data) -> {
             tableOrder.getSelectionModel().getSelectedItem().setStatus(data.getNewValue());
@@ -702,17 +699,6 @@ public class OrderManagementController {
             return formatter.format(order.getDate()).contains(date_OrderPicker.getValue().toString());
         } catch (Exception e) {
             return true;
-        }
-    }
-    
-    /**
-     * Disable buttons if user privilege is worker
-     */
-    private void setButtonsWorker() {
-        currentUser = DashboardController.loggedUser;
-        if (currentUser.getPrivilege().toString().equalsIgnoreCase("WORKER")) {
-            btn_modifyOrder.setDisable(true);
-            btn_deleteOrder.setDisable(true);
         }
     }
     
