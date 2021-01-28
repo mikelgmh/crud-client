@@ -12,6 +12,7 @@ import javax.ws.rs.client.WebTarget;
 import crudclient.interfaces.OrderInterface;
 import crudclient.model.Order;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Set;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
@@ -32,7 +33,8 @@ public class OrderRESTClient implements OrderInterface {
 
     private WebTarget webTarget;
     private Client client;
-    private static final String BASE_URI = "http://localhost:8080/CRUD-Server/webresources";
+    private static final ResourceBundle rb = ResourceBundle.getBundle("config.config");
+    private static final String BASE_URI = rb.getString("BASE_URL");
 
     public OrderRESTClient() {
         client = javax.ws.rs.client.ClientBuilder.newClient();

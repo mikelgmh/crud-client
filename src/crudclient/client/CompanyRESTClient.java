@@ -6,6 +6,7 @@
 package crudclient.client;
 
 import crudclient.interfaces.CompanyInterface;
+import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -28,8 +29,8 @@ public class CompanyRESTClient implements CompanyInterface {
 
     private WebTarget webTarget;
     private Client client;
-    //To Do leer desde un archivo de propiedades
-    private static final String BASE_URI = "http://localhost:8080/CRUD-Server/webresources";
+    private static final ResourceBundle rb = ResourceBundle.getBundle("config.config");
+    private static final String BASE_URI = rb.getString("BASE_URL");
 
     public CompanyRESTClient() {
         client = javax.ws.rs.client.ClientBuilder.newClient();
