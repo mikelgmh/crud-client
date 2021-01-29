@@ -30,14 +30,12 @@ public interface UserInterface {
      * Edits or updates a user.
      *
      * @param user
-     * @return the edited user.
      */
     public void editUser(Object user) throws ClientErrorException;
 
     /**
      * Deletes a user.
      *
-     * @param user
      */
     public void deleteUser(String userId);
 

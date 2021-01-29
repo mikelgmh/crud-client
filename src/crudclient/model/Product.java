@@ -149,7 +149,7 @@ public class Product implements Serializable {
     /**
      * Compares two Products objects for equality.
      *
-     * @param object The other Product object to compare to.
+     * @param obj The other Product object to compare to.
      * @return true if ids are equals.
      */
     
