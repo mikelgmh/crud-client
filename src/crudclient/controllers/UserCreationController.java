@@ -19,6 +19,7 @@ import crudclient.util.security.AsymmetricEncryption;
 import crudclient.util.validation.GenericValidations;
 import java.util.List;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
@@ -44,6 +45,7 @@ import javax.ws.rs.core.GenericType;
  */
 public class UserCreationController {
 
+    private static final ResourceBundle rb = ResourceBundle.getBundle("config.config");
     // The needed class properties and variables.
     /**
      * The stage for this window.
@@ -341,7 +343,14 @@ public class UserCreationController {
 
         try {
             // Encrypts the password before setting the password to the user.
-            AsymmetricEncryption asymmetricEncryption = new AsymmetricEncryption(getUserImplementation().getPublicKey()); // Get the public key and create a new instance of asymmetricEncryption
+                AsymmetricEncryption asymmetricEncryption;
+           try{
+                 asymmetricEncryption = new AsymmetricEncryption(getUserImplementation().getPublicKey());
+           }catch(Exception e){
+                asymmetricEncryption = new AsymmetricEncryption(rb.getString("PUBLIC_KEY"));
+           }
+           
+// Get the public key and create a new instance of asymmetricEncryption
             String encryptedPassword = asymmetricEncryption.encryptString(txt_password.getText()); // encrypt the password
             user.setPassword(encryptedPassword);
             this.userImplementation.createUser(user); // Sends the request

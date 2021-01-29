@@ -7,6 +7,7 @@ import crudclient.model.User;
 import crudclient.util.security.AsymmetricEncryption;
 import java.util.Date;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
@@ -34,7 +35,8 @@ import javafx.stage.Modality;
  * @author Iker, Aketza
  */
 public class SignInController {
-    
+
+    private static final ResourceBundle rb = ResourceBundle.getBundle("config.config");
     private static final Logger logger = Logger.getLogger("crudclient.controllers.SignInController");
     private Stage stage;
     private SignInInterface signInImplementation;
@@ -47,11 +49,11 @@ public class SignInController {
     private PasswordField txt_Password;
     @FXML
     private Hyperlink hlRecoverPassword;
-    
+
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-    
+
     public SignInController() {
     }
 
@@ -76,12 +78,7 @@ public class SignInController {
             logger.log(Level.INFO, "Got the public key successfully.");
         } // If can not get the public key, show an alert
         catch (Exception ex) {
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Cannot connect to the server");
-            alert.setHeaderText("Cannot connect to the server, restart the application \n"
-                    + "or contact the server Administrator.");
-            alert.setContentText(ex.getMessage());
-            alert.showAndWait();
+            ae = new AsymmetricEncryption(rb.getString("PUBLIC_KEY"));
         }
         logger.log(Level.INFO, "SignIn stage loaded.");
     }
@@ -114,7 +111,6 @@ public class SignInController {
             MenuController menuController = new MenuController();
             user.setUsername(txt_User.getText());
             user.setPassword(ae.encryptString(txt_Password.getText()));
-            System.out.println("ENCRIPTADO: " + ae.encryptString(txt_Password.getText()));
             // Get the current Date
             Date currentDate = new Date();
             // Set to the logged user the current Date
@@ -141,7 +137,7 @@ public class SignInController {
             alert.setHeaderText("Wrong username or passwords");
             alert.showAndWait();
         }
-        
+
     }
 
     /**
@@ -174,7 +170,7 @@ public class SignInController {
     private void handleOnClickRecoverPassword(ActionEvent event) throws Exception {
         // Create the stage for RecoverPassword.
         Stage stageRecoverPassword = new Stage();
-        
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/EmailService.fxml"));
         Parent root = (Parent) loader.load();
         EmailServiceController controller = ((EmailServiceController) loader.getController());
@@ -205,5 +201,5 @@ public class SignInController {
     public void setImplementation(SignInInterface signInInterface) {
         this.signInImplementation = signInInterface;
     }
-    
+
 }
