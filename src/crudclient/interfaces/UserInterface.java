@@ -9,8 +9,6 @@ import crudclient.exceptions.EmailAlreadyExistsException;
 import crudclient.exceptions.EmailAndUsernameAlreadyExistException;
 import crudclient.exceptions.UsernameAlreadyExistsException;
 import java.util.List;
-import java.util.Set;
-import static javafx.scene.input.KeyCode.T;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
 
