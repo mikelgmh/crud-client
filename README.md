@@ -7,6 +7,15 @@
 2. The Glassfish server **MUST** have the JSON exchange enabled and working to login, as the ```getPublicKey``` request only works with JSON.
 
 
+### Configure server for JSON responses:
+
+1. Download this jar from [org.eclipse.persistence.moxy.jar - Google Drive](https://drive.google.com/file/d/1-ubLLgVRjagJGzApejbumyQz-ZgQld1U/view?usp=sharing)
+
+2. Save and replace this file into ```[YOUR__GLASSFISH__SERVER__DIRECTORY]/glassfish/modules```
+
+3. You're now able to get JSON responses.
+
+
 
 ## Login credentials:
 
