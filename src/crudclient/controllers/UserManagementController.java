@@ -10,7 +10,14 @@ import crudclient.exceptions.EmailAlreadyExistsException;
 import crudclient.exceptions.InvalidEmailException;
 import crudclient.exceptions.UsernameAlreadyExistsException;
 import crudclient.factories.CompanyFactory;
+import crudclient.factories.OrderFactory;
+import crudclient.factories.ProductFactory;
+import crudclient.factories.SignInFactory;
+import crudclient.factories.UserFactory;
 import crudclient.interfaces.CompanyInterface;
+import crudclient.interfaces.OrderInterface;
+import crudclient.interfaces.ProductInterface;
+import crudclient.interfaces.SignInInterface;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Parent;
@@ -42,17 +49,25 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
+import javafx.application.Platform;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.beans.binding.Bindings;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.cell.ComboBoxTableCell;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.GenericType;
@@ -156,9 +171,30 @@ public class UserManagementController {
     private TableColumn<User, String> tc_lastAccess;
 
     @FXML
-    private HBox menuBaruser;
+    private VBox vbox;
     @FXML
-    private MenuController menuController;
+    private MenuBar menuBar;
+    @FXML
+    private Menu menuHome;
+    @FXML
+    private MenuItem menuLogout;
+    @FXML
+    private MenuItem menuClose;
+    @FXML
+    private Menu menuManagement;
+    @FXML
+    private MenuItem menuCompanies;
+    @FXML
+    private MenuItem menuUsers;
+    @FXML
+    private MenuItem menuOrders;
+    @FXML
+    private MenuItem menuProducts;
+    @FXML
+    private AnchorPane anchorpane;
+    @FXML
+    private Label hint_email1;
+
 
     /**
      * The empty constructor.
@@ -191,6 +227,9 @@ public class UserManagementController {
 
         // Set stage
         this.setStage(stage);
+        
+        //Set menu
+        setMenu();
 
         // Company implementation
         CompanyFactory companyFactory = new CompanyFactory();
@@ -566,6 +605,7 @@ public class UserManagementController {
      *
      * @throws IOException
      */
+    @FXML
     public void handleOnClickCreateButton() throws IOException {
         // Creates a new window and goes to it.
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/SignUp.fxml")); // Picks thr fxml for the creation window.
@@ -625,6 +665,7 @@ public class UserManagementController {
     /**
      * The event handler for the delete button click
      */
+    @FXML
     public void onDeleteButtonClickAction() {
         User u = table.getSelectionModel().getSelectedItem(); // Gets the selected item in the table
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION); // Creates a new alert and asks the user if really want to delete the user.
@@ -717,24 +758,6 @@ public class UserManagementController {
     }
 
     /**
-     * gets the menu management controller
-     *
-     * @return
-     */
-    public MenuController getMenuManagementController() {
-        return menuController;
-    }
-
-    /**
-     * Sets the menu management controller
-     *
-     * @param menuController
-     */
-    public void setMenuManagementController(MenuController menuController) {
-        this.menuController = menuController;
-    }
-
-    /**
      * gets the master data.
      *
      * @return
@@ -750,6 +773,140 @@ public class UserManagementController {
      */
     public void setMasterData(ObservableList<User> masterData) {
         this.masterData = masterData;
+    }
+
+        private void setMenu() {
+        menuLogout.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Sign Out");
+                String s = "Are you sure you want to logout?";
+                alert.setContentText(s);
+                Optional<ButtonType> result = alert.showAndWait();
+                if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/SignIn.fxml"));
+                        Parent root = (Parent) loader.load();
+                        SignInController controller = ((SignInController) loader.getController());
+                        SignInFactory signInFactory = new SignInFactory();
+                        SignInInterface signInImplementation = signInFactory.getImplementation();
+                        controller.setImplementation(signInImplementation);
+                        controller.setStage(new Stage());
+                        controller.initStage(root);
+                        stage.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+
+        menuClose.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Close confirmation");
+                alert.setHeaderText("Application will be closed");
+                alert.setContentText("You will close the application");
+                alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get().equals(ButtonType.OK)) {
+                    Platform.exit();
+                } else {
+                    t.consume();
+                    alert.close();
+                }
+            }
+        });
+
+        menuUsers.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/UserManagement.fxml"));
+                    Parent root = (Parent) loader.load();
+                    UserManagementController controller = ((UserManagementController) loader.getController());
+                    UserFactory userFactory = new UserFactory();
+                    UserInterface userImplementation = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
+                    controller.setUserImplementation(userImplementation);
+                    controller.setStage(new Stage());
+                    controller.initStage(root);
+                    stage.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+        menuCompanies.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/companies.fxml"));
+                    Parent root = (Parent) loader.load();
+                    CompanyController controller = ((CompanyController) loader.getController());
+                    CompanyFactory companyFactory = new CompanyFactory();
+                    CompanyInterface companyImplementation = companyFactory.getImplementation();
+                    controller.setImplementation(companyImplementation);
+                    controller.setStage(new Stage());
+                    controller.initStage(root);
+                    stage.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+        menuOrders.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/orders.fxml"));
+                    Parent root = (Parent) loader.load();
+                    OrderManagementController controller = ((OrderManagementController) loader.getController());
+                    OrderFactory orderFactory = new OrderFactory();
+                    OrderInterface orderImplementation = orderFactory.getImplementation();
+                    controller.setOrderImplementation(orderImplementation);
+                    controller.setStage(new Stage());
+                    controller.initStage(root);
+                    stage.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+        menuProducts.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/product.fxml"));
+                    Parent root = (Parent) loader.load();
+                    ProductController controller = ((ProductController) loader.getController());
+                    ProductFactory productFactory = new ProductFactory();
+                    ProductInterface productImplementation = productFactory.getImplementation();
+                    controller.setProductImplementation(productImplementation);
+                    controller.setStage(new Stage());
+                    controller.initStage(root);
+                    stage.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+        menuCompanies.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/companies.fxml"));
+                    Parent root = (Parent) loader.load();
+                    CompanyController controller = ((CompanyController) loader.getController());
+                    CompanyFactory companyFactory = new CompanyFactory();
+                    CompanyInterface companyImplementation = companyFactory.getImplementation();
+                    controller.setImplementation(companyImplementation);
+                    controller.setStage(new Stage());
+                    controller.initStage(root);
+                    stage.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
     }
 
 }

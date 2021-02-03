@@ -123,7 +123,6 @@ public class SignInController {
             Parent root = (Parent) loader.load();
             DashboardController controller = ((DashboardController) loader.getController());
             // Load the stage
-            controller.setMenuManagementController(menuController);
             controller.setUser(loggedUser);
             DashboardController.loggedUser = loggedUser;
             controller.setStage(stageDashboard);

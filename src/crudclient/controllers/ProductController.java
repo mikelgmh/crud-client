@@ -7,9 +7,16 @@ package crudclient.controllers;
 
 import crudclient.client.CompanyRESTClient;
 import crudclient.client.ProductRESTClient;
+import crudclient.factories.CompanyFactory;
+import crudclient.factories.OrderFactory;
 import crudclient.factories.ProductFactory;
+import crudclient.factories.SignInFactory;
+import crudclient.factories.UserFactory;
 import crudclient.interfaces.CompanyInterface;
+import crudclient.interfaces.OrderInterface;
 import crudclient.interfaces.ProductInterface;
+import crudclient.interfaces.SignInInterface;
+import crudclient.interfaces.UserInterface;
 import crudclient.model.Company;
 import crudclient.model.Product;
 import crudclient.model.User;
@@ -29,6 +36,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -39,6 +47,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
@@ -47,6 +58,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.converter.DoubleStringConverter;
@@ -138,6 +150,26 @@ public class ProductController {
     private User currentUser;
     @FXML
     private Label lbl_type;
+    @FXML
+    private Pane paneProducts;
+    @FXML
+    private MenuBar menuBar;
+    @FXML
+    private Menu menuHome;
+    @FXML
+    private MenuItem menuLogout;
+    @FXML
+    private MenuItem menuClose;
+    @FXML
+    private Menu menuManagement;
+    @FXML
+    private MenuItem menuCompanies;
+    @FXML
+    private MenuItem menuUsers;
+    @FXML
+    private MenuItem menuOrders;
+    @FXML
+    private MenuItem menuProducts;
 
     /**
      * The getter of the order managment controller.
@@ -172,7 +204,7 @@ public class ProductController {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-    
+
     public User getCurrentUser() {
         return currentUser;
     }
@@ -261,6 +293,8 @@ public class ProductController {
          * Call to the editable table method.
          */
         editableProductTable();
+
+        setMenu();
         /**
          * Call to method to fill the table with information of the database.
          */
@@ -584,11 +618,13 @@ public class ProductController {
             showAlert(Alert.AlertType.WARNING, "Error with database", "", "Can´t delete from the table");
         }
     }
+
     /**
      * Method for the filter of the table.
+     *
      * @param observable
      * @param oldValue
-     * @param newValue 
+     * @param newValue
      */
     private void handleTextChange(ObservableValue observable, String oldValue, String newValue) {
         try {
@@ -623,9 +659,11 @@ public class ProductController {
             showAlert(Alert.AlertType.WARNING, "Error with database", "", "Can´t show the table");
         }
     }
+
     /**
      * Method that sets the behavior when create order button is pressed.
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     private void handleOnClickCreateOrder(ActionEvent event) {
@@ -644,9 +682,11 @@ public class ProductController {
             showAlert(Alert.AlertType.WARNING, "Error with database", "", "Can´t create a new order");
         }
     }
+
     /**
      * The method that sets the action when try to close the window.
-     * @param event 
+     *
+     * @param event
      */
     private void handleCloseRequest(WindowEvent event) {
         /**
@@ -678,20 +718,25 @@ public class ProductController {
             alert.close();
         }
     }
+
     /**
      * Setter of the product implementation.
-     * @param product 
+     *
+     * @param product
      */
     public void setProductImplementation(ProductInterface product) {
         this.productImplementation = product;
     }
+
     /**
      * Getter of the product implementation.
-     * @return 
+     *
+     * @return
      */
     public ProductInterface getProductImplementation() {
         return this.productImplementation;
     }
+
     /**
      * The method of the table when entered from order.
      */
@@ -722,10 +767,11 @@ public class ProductController {
 
     /**
      * The method to show the alerts.
+     *
      * @param type
      * @param title
      * @param header
-     * @param content 
+     * @param content
      */
     public void showAlert(Alert.AlertType type, String title, String header, String content) {
         /**
@@ -747,4 +793,137 @@ public class ProductController {
         alert.showAndWait();
     }
 
+    private void setMenu() {
+        menuLogout.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Sign Out");
+                String s = "Are you sure you want to logout?";
+                alert.setContentText(s);
+                Optional<ButtonType> result = alert.showAndWait();
+                if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/SignIn.fxml"));
+                        Parent root = (Parent) loader.load();
+                        SignInController controller = ((SignInController) loader.getController());
+                        SignInFactory signInFactory = new SignInFactory();
+                        SignInInterface signInImplementation = signInFactory.getImplementation();
+                        controller.setImplementation(signInImplementation);
+                        controller.setStage(new Stage());
+                        controller.initStage(root);
+                        stage.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+
+        menuClose.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Close confirmation");
+                alert.setHeaderText("Application will be closed");
+                alert.setContentText("You will close the application");
+                alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get().equals(ButtonType.OK)) {
+                    Platform.exit();
+                } else {
+                    t.consume();
+                    alert.close();
+                }
+            }
+        });
+
+        menuUsers.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/UserManagement.fxml"));
+                    Parent root = (Parent) loader.load();
+                    UserManagementController controller = ((UserManagementController) loader.getController());
+                    UserFactory userFactory = new UserFactory();
+                    UserInterface userImplementation = userFactory.getUserImplementation(UserFactory.ImplementationType.REST_CLIENT);
+                    controller.setUserImplementation(userImplementation);
+                    controller.setStage(new Stage());
+                    controller.initStage(root);
+                    stage.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+        menuCompanies.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/companies.fxml"));
+                    Parent root = (Parent) loader.load();
+                    CompanyController controller = ((CompanyController) loader.getController());
+                    CompanyFactory companyFactory = new CompanyFactory();
+                    CompanyInterface companyImplementation = companyFactory.getImplementation();
+                    controller.setImplementation(companyImplementation);
+                    controller.setStage(new Stage());
+                    controller.initStage(root);
+                    stage.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+        menuOrders.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/orders.fxml"));
+                    Parent root = (Parent) loader.load();
+                    OrderManagementController controller = ((OrderManagementController) loader.getController());
+                    OrderFactory orderFactory = new OrderFactory();
+                    OrderInterface orderImplementation = orderFactory.getImplementation();
+                    controller.setOrderImplementation(orderImplementation);
+                    controller.setStage(new Stage());
+                    controller.initStage(root);
+                    stage.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+        menuProducts.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/product.fxml"));
+                    Parent root = (Parent) loader.load();
+                    ProductController controller = ((ProductController) loader.getController());
+                    ProductFactory productFactory = new ProductFactory();
+                    ProductInterface productImplementation = productFactory.getImplementation();
+                    controller.setProductImplementation(productImplementation);
+                    controller.setStage(new Stage());
+                    controller.initStage(root);
+                    stage.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+        menuCompanies.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent t) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/crudclient/view/companies.fxml"));
+                    Parent root = (Parent) loader.load();
+                    CompanyController controller = ((CompanyController) loader.getController());
+                    CompanyFactory companyFactory = new CompanyFactory();
+                    CompanyInterface companyImplementation = companyFactory.getImplementation();
+                    controller.setImplementation(companyImplementation);
+                    controller.setStage(new Stage());
+                    controller.initStage(root);
+                    stage.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+    }
 }

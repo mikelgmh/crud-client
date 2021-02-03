@@ -67,7 +67,7 @@ public class ProductTest extends ApplicationTest {
     @Test
     public void test001_LoginTest() {
         clickOn("#txt_User");
-        write("ake");
+        write("aketza");
         clickOn("#txt_Password");
         write("1234$%Mm");
         clickOn("#btn_SignIn");
