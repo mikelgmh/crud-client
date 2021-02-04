@@ -8,9 +8,11 @@ package crudclient.client;
 import crudclient.interfaces.CompanyInterface;
 import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
 
 /**
  * Jersey REST client generated for REST resource:CompanyFacadeREST
@@ -37,12 +39,18 @@ public class CompanyRESTClient implements CompanyInterface {
         webTarget = client.target(BASE_URI).path("company");
     }
 
-    public void edit_XML(Object requestEntity) throws ClientErrorException {
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+    public void edit_XML(Object requestEntity) throws ClientErrorException, InternalServerErrorException {
+        Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        if (response.getStatus() == 500) {
+            throw new InternalServerErrorException();
+        }
     }
 
-    public void edit_JSON(Object requestEntity) throws ClientErrorException {
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+    public void edit_JSON(Object requestEntity) throws ClientErrorException, InternalServerErrorException {
+        Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        if (response.getStatus() == 500) {
+            throw new InternalServerErrorException();
+        }
     }
 
     public <T> T findAllCompanies_XML(GenericType<T> responseType) throws ClientErrorException {
@@ -50,7 +58,6 @@ public class CompanyRESTClient implements CompanyInterface {
         resource = resource.path("findAllCompanies");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
-
 
     public <T> T findAllCompanies_JSON(Class<T> responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
@@ -82,13 +89,19 @@ public class CompanyRESTClient implements CompanyInterface {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public void create_XML(Object requestEntity) throws ClientErrorException {
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML)
+    public void create_XML(Object requestEntity) throws ClientErrorException, InternalServerErrorException {
+        Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML)
                 .post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        if (response.getStatus() == 500) {
+            throw new InternalServerErrorException();
+        }
     }
 
-    public void create_JSON(Object requestEntity) throws ClientErrorException {
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+    public void create_JSON(Object requestEntity) throws ClientErrorException, InternalServerErrorException {
+        Response response = webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        if (response.getStatus() == 500) {
+            throw new InternalServerErrorException();
+        }
     }
 
     public void remove(String id) throws ClientErrorException {

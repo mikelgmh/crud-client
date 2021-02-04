@@ -13,12 +13,16 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import crudclient.model.CompanyType;
+import crudclient.model.Order;
 import java.util.List;
 import java.util.Optional;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -29,6 +33,8 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -92,7 +98,19 @@ public class CompanyController {
                     // If all the field are filled, create the Company in the database
                     Company newCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
                     if (isCompanyDataFilled(newCompany)) {
-                        getCompanyImplementation().edit_XML(newCompany);
+                        try {
+                            getCompanyImplementation().edit_XML(newCompany);
+                        } catch (Exception ex) {
+                            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                            alert.setTitle("Can not edit a Company");
+                            alert.setHeaderText("The Company name already exist in the database");
+                            alert.showAndWait();
+                        }
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Can not edit a Company");
+                        alert.setHeaderText("All the field are not filled");
+                        alert.showAndWait();
                     }
                 });
         tcTypeCompany.setOnEditCommit(
@@ -103,6 +121,11 @@ public class CompanyController {
                     Company newCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
                     if (isCompanyDataFilled(newCompany)) {
                         getCompanyImplementation().edit_XML(newCompany);
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Can not edit a Company");
+                        alert.setHeaderText("All the field are not filled");
+                        alert.showAndWait();
                     }
                 });
         tcLocalizationCompany.setOnEditCommit(
@@ -113,8 +136,15 @@ public class CompanyController {
                     Company newCompany = tableViewCompanies.getSelectionModel().getSelectedItem();
                     if (isCompanyDataFilled(newCompany)) {
                         getCompanyImplementation().edit_XML(newCompany);
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Can not edit a Company");
+                        alert.setHeaderText("All the field are not filled");
+                        alert.showAndWait();
                     }
                 });
+        tfNameFilter.textProperty().addListener(this::filteredListAndTableListeners);
+        tfLocalizationFilter.textProperty().addListener(this::filteredListAndTableListeners);
         stage.show();
         logger.log(Level.INFO, "Companies stage loaded.");
     }
@@ -128,10 +158,9 @@ public class CompanyController {
         btnCreateCompany.setDisable(false);
         btnDeleteCompany.setDisable(true);
         tfNameFilter.clear();
-        // FIXME: Fix the IndexOutOfBoundsException error.
         // Get the Company types and set into the choicebox.
-        cbTypeFilter.getItems().add(null);
         cbTypeFilter.getItems().addAll(FXCollections.observableArrayList(CompanyType.values()));
+        cbTypeFilter.getSelectionModel().selectFirst();
         tfLocalizationFilter.clear();
         // Set the factories to the column values of the table.
         // Name
@@ -158,6 +187,11 @@ public class CompanyController {
             Object oldValue, Object newValue) {
         if (newValue != null) {
             btnDeleteCompany.setDisable(false);
+            if (test()) {
+                btnCreateCompany.setDisable(true);
+            } else {
+                btnCreateCompany.setDisable(false);
+            }
         } else {
             btnDeleteCompany.setDisable(true);
         }
@@ -170,13 +204,22 @@ public class CompanyController {
      */
     @FXML
     private void createCompanyAction(ActionEvent event) {
-        // Create the Company in the table and in the database with data
-        // filled, to comprobate the CRUD is working fine.
-        Company newCompany = new Company("Test", CompanyType.CLIENT, "Test");
-        tableViewCompanies.getItems().add(newCompany);
-        getCompanyImplementation().create_XML(newCompany);
-        // Load again the table to load the Company's ids correctly
-        loadTableView();
+        try {
+            // Create the Company in the table and in the database with data
+            // filled, to comprobate the CRUD is working fine.
+            Company newCompany = new Company();
+            getCompanyImplementation().create_XML(newCompany);
+            tableViewCompanies.getItems().add(newCompany);
+            btnCreateCompany.setDisable(true);
+        } catch (Exception ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Can not create a Company");
+            alert.setHeaderText("The Company name already exist in the database");
+            alert.showAndWait();
+        } finally {
+            // Load again the table to load the Company's ids correctly
+            loadTableView();
+        }
     }
 
     /**
@@ -221,6 +264,17 @@ public class CompanyController {
                 && !newCompany.getLocalization().trim().equals("");
     }
 
+    public boolean test() {
+        boolean companyNot = false;
+        for (int i = 0; i < tableViewCompanies.getItems().size(); i++) {
+            if (!isCompanyDataFilled(tableViewCompanies.getItems().get(i))) {
+                companyNot = true;
+                break;
+            }
+        }
+        return companyNot;
+    }
+
     /**
      * Method to load the TableView from the database.
      */
@@ -254,6 +308,35 @@ public class CompanyController {
             event.consume();
             alert.close();
         }
+    }
+
+    /**
+     * Makes the order table filterable and sorted by ID.
+     */
+    private void filteredListAndTableListeners(ObservableValue observable, String oldValue, String newValue) {
+        FilteredList<Company> filteredData = new FilteredList<>(this.companyData, c -> true);
+        //Calls the filtering method of the table fields.
+        setSearchFilterListeners(filteredData);
+        SortedList<Company> sortedData = new SortedList<>(filteredData);
+
+        sortedData.comparatorProperty().bind(tableViewCompanies.comparatorProperty());
+        this.tableViewCompanies.setItems(sortedData);
+    }
+
+    /**
+     * Makes the table responsive to the filters on the right side.
+     *
+     * @param filteredData has the filtered data from table order.
+     */
+    private void setSearchFilterListeners(FilteredList<Company> filteredData) {
+        filteredData.predicateProperty().bind(Bindings.createObjectBinding(()
+                -> company -> company.getName().toLowerCase().contains(tfNameFilter.getText().toLowerCase().trim())
+                && company.getType().toString().toUpperCase().contains(cbTypeFilter.getSelectionModel().getSelectedItem().toString().toUpperCase())
+                && company.getLocalization().toLowerCase().contains(tfLocalizationFilter.getText().toLowerCase().trim()),
+                tfNameFilter.textProperty(),
+                cbTypeFilter.getSelectionModel().selectedItemProperty(),
+                tfLocalizationFilter.textProperty()
+        ));
     }
 
     /**

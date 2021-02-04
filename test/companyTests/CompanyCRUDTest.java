@@ -72,7 +72,7 @@ public class CompanyCRUDTest extends ApplicationTest {
     @Test
     public void testALoginCorrectUser() {
         clickOn("#txt_User");
-        write("hensly");
+        write("mikel");
         clickOn("#txt_Password");
         write("1234$%Mm");
         clickOn("#btn_SignIn");
